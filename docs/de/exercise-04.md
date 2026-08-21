@@ -56,7 +56,7 @@ das ist Plumbing, keine Engine-Anbindung:
 
 - `adapter/inbound/rest/MembershipController.java`
 - `application/service/RegisterMembershipService.java`
-- `adapter/outbound/cibseven/MembershipProcessAdapter.java`
+- `adapter/outbound/operaton/MembershipProcessAdapter.java`
 - `adapter/outbound/db/*` (Entity, Mapper, JpaRepository, PersistenceAdapter)
 - die Use-Case-Interfaces in `application/port/inbound/*` (`domain/` und die Outbound-Ports sind
   bereits Teil des aktiven Skeletts)
@@ -88,7 +88,7 @@ speichern, den Prozess über den Process-Port starten, `membership.id()` zurück
 
 ### 4. Prozessstart per Korrelation
 
-**Datei:** `adapter/outbound/cibseven/MembershipProcessAdapter.java` – **selbst schreiben.**
+**Datei:** `adapter/outbound/operaton/MembershipProcessAdapter.java` – **selbst schreiben.**
 
 Ein Message Start Event lässt sich nicht über `startProcessInstanceByKey` auslösen. Stelle
 `startProcess(...)` auf die Korrelation der Nachricht `Message_SubscriptionRequested` um. Der

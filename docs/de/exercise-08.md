@@ -126,7 +126,7 @@ brechen.
 
 **Weiterführend:** Kompensation ist das BPMN-Werkzeug für **SAGA-Muster** in verteilten
 Systemen – jeder Schritt bekommt einen Kompensationsschritt, und bei einem Fehler
-kompensiert die Engine die erfolgreichen Schritte in umgekehrter Reihenfolge. In CIB Seven
+kompensiert die Engine die erfolgreichen Schritte in umgekehrter Reihenfolge. In Operaton
 funktioniert das auch über Subprozessgrenzen hinweg.
 
 ## Referenzlösung

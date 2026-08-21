@@ -34,12 +34,12 @@ public class ArchitectureTest {
             .whereLayer("ProcessApi").mayOnlyBeAccessedByLayers("InAdapters", "OutAdapters");
 
     @ArchTest
-    static final ArchRule domain_should_not_depend_on_cibseven = noClasses()
+    static final ArchRule domain_should_not_depend_on_operaton = noClasses()
             .that().resideInAPackage("..domain..")
-            .should().dependOnClassesThat().resideInAPackage("org.cibseven.bpm..");
+            .should().dependOnClassesThat().resideInAPackage("org.operaton.bpm..");
 
     @ArchTest
-    static final ArchRule application_should_not_depend_on_cibseven = noClasses()
+    static final ArchRule application_should_not_depend_on_operaton = noClasses()
             .that().resideInAPackage("..application..")
-            .should().dependOnClassesThat().resideInAPackage("org.cibseven.bpm..");
+            .should().dependOnClassesThat().resideInAPackage("org.operaton.bpm..");
 }

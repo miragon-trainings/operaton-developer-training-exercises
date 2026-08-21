@@ -219,7 +219,7 @@ curl -X POST http://localhost:8080/api/memberships \
 ```
 
 The process reserves a spot, takes the yes path, and waits at the User Task
-`Confirm membership`. Open it in the tasklist (`http://localhost:8080/webapp/#/seven/auth/start`,
+`Confirm membership`. Open it in the tasklist (`http://localhost:8080/operaton/app/cockpit/`,
 admin/admin): name, email, and age are pre-filled. Tick the box for *Confirm
 membership* and complete the task – the instance runs through `Send Welcome Mail` to
 `Membership confirmed`, and `confirmed` is `true` in the history.

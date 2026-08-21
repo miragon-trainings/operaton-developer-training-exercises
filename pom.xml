@@ -8,15 +8,17 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.0</version>
+        <!-- Aligned to the Spring Boot version Operaton 2.1.3 is built and tested against.
+             Boot 4.1.0 drops the auto-configured RestClient.Builder bean the adapters rely on. -->
+        <version>4.0.7</version>
         <relativePath/>
     </parent>
 
     <groupId>io.miragon</groupId>
-    <artifactId>cibseven-developer-training-exercises</artifactId>
+    <artifactId>operaton-developer-training-exercises</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>cibseven-developer-training-exercises</name>
+    <name>operaton-developer-training-exercises</name>
 
     <!--
       Nur der Hauptservice, an dem Teilnehmende von Anfang an arbeiten, plus die Referenzlösungen.
@@ -32,7 +34,7 @@
     <properties>
         <java.version>21</java.version>
         <postgresql.version>42.7.8</postgresql.version>
-        <cib7.version>2.2.0</cib7.version>
+        <operaton.version>2.1.3</operaton.version>
         <archunit.version>1.5.0</archunit.version>
         <bpmn-to-code.version>5.2.0</bpmn-to-code.version>
         <openapi-generator.version>7.24.0</openapi-generator.version>
@@ -44,23 +46,22 @@
     -->
     <dependencyManagement>
         <dependencies>
-            <!-- CIB Seven (direct – no process-engine-api abstraction) -->
-            <!-- '-4' suffixed artifacts are the Spring Boot 4 compatible variants (since CIB seven 2.2.0) -->
+            <!-- Operaton (direct – no process-engine-api abstraction) -->
             <dependency>
-                <groupId>org.cibseven.bpm.springboot</groupId>
-                <artifactId>cibseven-bpm-spring-boot-starter-webapp-4</artifactId>
-                <version>${cib7.version}</version>
+                <groupId>org.operaton.bpm.springboot</groupId>
+                <artifactId>operaton-bpm-spring-boot-starter-webapp</artifactId>
+                <version>${operaton.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.cibseven.bpm.springboot</groupId>
-                <artifactId>cibseven-bpm-spring-boot-starter-rest-4</artifactId>
-                <version>${cib7.version}</version>
+                <groupId>org.operaton.bpm.springboot</groupId>
+                <artifactId>operaton-bpm-spring-boot-starter-rest</artifactId>
+                <version>${operaton.version}</version>
             </dependency>
             <!-- External Task Client (remote worker connecting to the engine REST API, ab Aufgabe 10) -->
             <dependency>
-                <groupId>org.cibseven.bpm.springboot</groupId>
-                <artifactId>cibseven-bpm-spring-boot-starter-external-task-client</artifactId>
-                <version>${cib7.version}</version>
+                <groupId>org.operaton.bpm.springboot</groupId>
+                <artifactId>operaton-bpm-spring-boot-starter-external-task-client</artifactId>
+                <version>${operaton.version}</version>
             </dependency>
             <!-- Architecture tests -->
             <dependency>
@@ -68,19 +69,19 @@
                 <artifactId>archunit-junit5</artifactId>
                 <version>${archunit.version}</version>
             </dependency>
-            <!-- Process tests: CIB Seven port of camunda-bpm-assert (BpmnAwareTests) -->
+            <!-- Process tests: Operaton port of camunda-bpm-assert (BpmnAwareTests) -->
             <dependency>
-                <groupId>org.cibseven.bpm</groupId>
-                <artifactId>cibseven-bpm-assert</artifactId>
-                <version>${cib7.version}</version>
+                <groupId>org.operaton.bpm</groupId>
+                <artifactId>operaton-bpm-assert</artifactId>
+                <version>${operaton.version}</version>
                 <scope>test</scope>
             </dependency>
             <!-- Engine core — a worker without an engine starter (Aufgabe 10) brings it explicitly
                  to spin up a standalone in-memory engine for its own process tests -->
             <dependency>
-                <groupId>org.cibseven.bpm</groupId>
-                <artifactId>cibseven-engine</artifactId>
-                <version>${cib7.version}</version>
+                <groupId>org.operaton.bpm</groupId>
+                <artifactId>operaton-engine</artifactId>
+                <version>${operaton.version}</version>
             </dependency>
             <!-- Runtime types referenced by the bpmn-to-code generated process API -->
             <dependency>
@@ -117,19 +118,6 @@
             </plugins>
         </pluginManagement>
     </build>
-
-    <repositories>
-        <repository>
-            <id>mvn-cibseven-enterprise-snapshots</id>
-            <name>CIB seven EE Snapshots repository</name>
-            <url>https://artifacts.cibseven.org/repository/enterprise-snapshots</url>
-        </repository>
-        <repository>
-            <id>mvn-cibseven-public</id>
-            <name>CIB seven public repository</name>
-            <url>https://artifacts.cibseven.org/repository/public</url>
-        </repository>
-    </repositories>
 
     <profiles>
         <!--

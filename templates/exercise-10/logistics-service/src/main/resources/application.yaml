@@ -4,9 +4,9 @@
 server:
   port: 8090
 
-# CIB Seven External Task Client: connect remotely to the engine's REST API and fulfil our topic.
+# Operaton External Task Client: connect remotely to the engine's REST API and fulfil our topic.
 # The same base-url is reused for the model deployment and the generated typed client (see EngineClientConfig).
-camunda:
+operaton:
   bpm:
     client:
       base-url: http://localhost:8080/engine-rest

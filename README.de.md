@@ -1,8 +1,8 @@
-# CIB Seven Developer Training Exercises
+# Operaton Developer Training Exercises
 
 > 🇩🇪 **Deutsch** · [🇬🇧 English](README.md)
 
-Praxisübungen für das CIB Seven Developer Training. Das Projekt implementiert einen Inner-Circle-Membership-Prozess mit CIB Seven als Process Engine und einer hexagonalen Architektur, die Business-Logik von Infrastruktur entkoppelt.
+Praxisübungen für das Operaton Developer Training. Das Projekt implementiert einen Inner-Circle-Membership-Prozess mit Operaton als Process Engine und einer hexagonalen Architektur, die Business-Logik von Infrastruktur entkoppelt.
 
 ## Übungen
 
@@ -67,8 +67,8 @@ cd stack && docker-compose up -d
 # process-application-Modul starten (das eine Modul, in dem du alle Aufgaben bearbeitest)
 cd services/process-application && ../../mvnw spring-boot:run
 
-# CIB Seven Cockpit
-open http://localhost:8080/webapp/#/seven/auth/start    # admin / admin
+# Operaton Cockpit
+open http://localhost:8080/operaton/app/cockpit/    # admin / admin
 ```
 
 ### Lösung einer Aufgabe laden
@@ -85,23 +85,23 @@ kopieren und mit ihr weiterarbeiten:
 Der Task ersetzt `src/main` komplett (Java, `application.yaml`, BPMN/DMN); `src/test` bleibt
 unberührt. Alle Module – das `process-application`-Modul **und** alle Solutions – laufen auf demselben Port
 (`8080`) und demselben DB-Schema (`exercise`); es läuft also immer nur **ein** Modul zur Zeit.
-Die in **Aufgabe 1** aktivierten CIB-Seven-Abhängigkeiten (`pom.xml`) bleiben bestehen – lade
+Die in **Aufgabe 1** aktivierten Operaton-Abhängigkeiten (`pom.xml`) bleiben bestehen – lade
 eine Lösung ab `exercise-2` daher erst, nachdem Aufgabe 1 abgeschlossen ist.
 
 ## Repository-Struktur
 
 ```
-cibseven-developer-training-exercises/
+operaton-developer-training-exercises/
 ├── docs/                             # Aufgabenbeschreibungen: docs/de/ (Deutsch) + docs/en/ (Englisch) + Assets
 ├── services/                         # Die Services, an denen du arbeitest
 │   ├── process-application/          # Prozess-Anwendung (startet im Zustand von Aufgabe 1)
 │   │   └── src/main/java/io/miragon/training/
 │   │       ├── adapter/
 │   │       │   ├── inbound/
-│   │       │   │   ├── cibseven/     # JavaDelegate-Implementierungen
+│   │       │   │   ├── operaton/     # JavaDelegate-Implementierungen
 │   │       │   │   └── rest/         # REST-Controller
 │   │       │   └── outbound/
-│   │       │       ├── cibseven/     # Process-Engine-Adapter (Start/Korrelation)
+│   │       │       ├── operaton/     # Process-Engine-Adapter (Start/Korrelation)
 │   │       │       └── db/           # JPA-Persistence-Adapter
 │   │       ├── application/
 │   │       │   ├── port/
@@ -128,16 +128,16 @@ cibseven-developer-training-exercises/
 |---|---|
 | Sprache | Java 21 |
 | Framework | Spring Boot 4 |
-| Process Engine | CIB Seven 2.2.0 |
+| Process Engine | Operaton 2.1.3 |
 | Datenbank | PostgreSQL (JPA / Hibernate) |
 | Build | Maven |
 | Architektur-Tests | ArchUnit |
 
-## CIB Seven
+## Operaton
 
-[CIB Seven](https://cibseven.org) ist eine community-gepflegte Distribution von Camunda Platform 7. Sie bietet volle Kompatibilität mit der Camunda-7-API und wird unabhängig als Open Source weiterentwickelt.
+[Operaton](https://operaton.org) ist ein community-getriebener, Apache-2.0-lizenzierter Fork von Camunda 7. Es bietet volle Kompatibilität mit der Camunda-7-API und wird unabhängig als Open Source weiterentwickelt.
 
-In diesem Projekt läuft CIB Seven eingebettet in Spring Boot, stellt die Camunda-Webanwendung unter `http://localhost:8080/webapp/#/seven/auth/start` bereit und übernimmt die BPMN-Prozessausführung für den Inner-Circle-Membership-Prozess.
+In diesem Projekt läuft Operaton eingebettet in Spring Boot, stellt die klassischen Weboberflächen (Cockpit, Tasklist, Admin) unter `http://localhost:8080/operaton/app/cockpit/` bereit und übernimmt die BPMN-Prozessausführung für den Inner-Circle-Membership-Prozess.
 
 Service Tasks werden über das `JavaDelegate`-Pattern mit `DelegateExpression` angebunden:
 
@@ -164,7 +164,7 @@ public class SendWelcomeMailDelegate extends BaseDelegate {
 Das Projekt folgt einer **hexagonalen Architektur** (Ports & Adapters):
 
 ```
-REST / JavaDelegates           Application              CIB7 / Database
+REST / JavaDelegates           Application              Operaton / Database
   (Inbound-Adapter)    →   Ports + Services   →     (Outbound-Adapter)
                                ↑
                             Domain

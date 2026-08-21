@@ -19,6 +19,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <!-- Provides the auto-configured RestClient.Builder bean (RestClientAutoConfiguration). In Spring
+             Boot 4 this sits in the standalone spring-boot-restclient module, which the Operaton webapp
+             starter does not pull in transitively (used by adapter/config/RestClientConfig). -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-restclient</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -37,14 +44,14 @@
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <!-- CIB Seven engine + Cockpit-Webapp + REST-API (Version zentral gemanagt) -->
+        <!-- Operaton engine + Cockpit-Webapp + REST-API (Version zentral gemanagt) -->
         <dependency>
-            <groupId>org.cibseven.bpm.springboot</groupId>
-            <artifactId>cibseven-bpm-spring-boot-starter-webapp-4</artifactId>
+            <groupId>org.operaton.bpm.springboot</groupId>
+            <artifactId>operaton-bpm-spring-boot-starter-webapp</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.cibseven.bpm.springboot</groupId>
-            <artifactId>cibseven-bpm-spring-boot-starter-rest-4</artifactId>
+            <groupId>org.operaton.bpm.springboot</groupId>
+            <artifactId>operaton-bpm-spring-boot-starter-rest</artifactId>
         </dependency>
 
         <!-- Process tests -->
@@ -54,8 +61,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.cibseven.bpm</groupId>
-            <artifactId>cibseven-bpm-assert</artifactId>
+            <groupId>org.operaton.bpm</groupId>
+            <artifactId>operaton-bpm-assert</artifactId>
             <scope>test</scope>
         </dependency>
         <!-- Runtime types referenced by the bpmn-to-code generated process API -->

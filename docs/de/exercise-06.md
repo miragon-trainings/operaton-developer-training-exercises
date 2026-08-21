@@ -49,13 +49,13 @@ Referenzmodell (unverändert gegenüber Aufgabe 5): `../../models/exercise-06/me
 
 ### 1. Test-Dependency ergänzen
 
-Die Assertions kommen aus dem CIB-Seven-Port von `camunda-bpm-assert`. Die Version ist
+Die Assertions kommen aus dem Operaton-Port von `camunda-bpm-assert`. Die Version ist
 zentral in der Root-`pom.xml` gemanagt:
 
 ```xml
 <dependency>
-    <groupId>org.cibseven.bpm</groupId>
-    <artifactId>cibseven-bpm-assert</artifactId>
+    <groupId>org.operaton.bpm</groupId>
+    <artifactId>operaton-bpm-assert</artifactId>
     <scope>test</scope>
 </dependency>
 ```
@@ -71,7 +71,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-    url: jdbc:h2:mem:cibseven-test;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS exercise
+    url: jdbc:h2:mem:operaton-test;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS exercise
     username: sa
     password:
     driver-class-name: org.h2.Driver
@@ -83,7 +83,7 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         default_schema: exercise
 
-camunda:
+operaton:
   bpm:
     admin-user:
       id: admin
@@ -95,12 +95,6 @@ camunda:
       enabled: false   # <-- der Kern: die Async-Continuations führen wir selbst aus
     webapp:
       enabled: false
-
-# Der Webapp-Bean validiert dieses Secret beim Start, auch wenn die Webapp aus ist:
-cibseven:
-  webclient:
-    authentication:
-      jwtSecret: M9nU3ORo3s+gK23D9mO5I2h+EIqnosCFDCJi+2bKoulKqZkeQT8pGYg5RhuORlf/fWhLu5meC/SPZCv9NNuj6SK/vE5Sid04UQGrnyh04EpBdiAosAO91xezjgmbSeALUtneibseGpS0tNE4RvLIl+gXiAKqNXyO
 ```
 
 > **Begriff: Job Executor.** Der Hintergrund-Thread der Engine. Er holt sich die Jobs, die
@@ -127,7 +121,7 @@ jeden Prozess-Test gleich; du rufst nur ihre Methoden auf. Was sie dir gibt:
   prüfen kann.
 
 > Der Helfer braucht zum Kompilieren die Engine-Klassen. Das ist in der `pom.xml` des Moduls schon
-> verdrahtet (die Engine-CORE-Dependency `cibseven-engine`), er kompiliert also von Anfang an – du
+> verdrahtet (die Engine-CORE-Dependency `operaton-engine`), er kompiliert also von Anfang an – du
 > ergänzt dafür nichts. Öffne die Datei einmal, um die zwei, drei Zeilen pro Methode zu sehen, und
 > nutze sie dann einfach.
 

@@ -1,8 +1,8 @@
 # TODO Exercise 1: Uncomment the configuration.
 #
-# It connects the engine to the PostgreSQL from stack/ (docker-compose), creates the
-# Cockpit admin user and configures the web client (among other things the JWT secret for the Cockpit login).
-# Without this configuration the engine finds no database and the application does not start.
+# It connects the engine to the PostgreSQL from stack/ (docker-compose) and creates the
+# Cockpit admin user. Without this configuration the engine finds no database and the
+# application does not start.
 #
 # The engine runs on port 8080 with its own schema `exercise`.
 
@@ -11,7 +11,7 @@ server:
 
 #spring:
 #  datasource:
-#    url: jdbc:postgresql://localhost:5432/cibseven-training?currentSchema=exercise
+#    url: jdbc:postgresql://localhost:5432/operaton-training?currentSchema=exercise
 #    username: admin
 #    password: admin
 #    driver-class-name: org.postgresql.Driver
@@ -23,7 +23,7 @@ server:
 #        dialect: org.hibernate.dialect.PostgreSQLDialect
 #        default_schema: exercise
 #
-#camunda:
+#operaton:
 #  bpm:
 #    admin-user:
 #      id: admin
@@ -31,12 +31,3 @@ server:
 #    database:
 #      type: postgres
 #      schema-update: true
-#
-#cibseven:
-#  webclient:
-#    services:
-#      basePath: services/v1
-#    engineRest:
-#      url: http://localhost:8080
-#    authentication:
-#      jwtSecret: M9nU3ORo3s+gK23D9mO5I2h+EIqnosCFDCJi+2bKoulKqZkeQT8pGYg5RhuORlf/fWhLu5meC/SPZCv9NNuj6SK/vE5Sid04UQGrnyh04EpBdiAosAO91xezjgmbSeALUtneibseGpS0tNE4RvLIl+gXiAKqNXyO

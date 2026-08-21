@@ -52,7 +52,7 @@ process-application  (generic engine host — embedded engine + /engine-rest + C
   • knows nothing about logistics and carries no send-welcome-kit.bpmn
 
 logistics-service  (remote owner — own JVM, :8090)
-  • generated, typed client (openapi-generator from cibseven-engine-rest-openapi)
+  • generated, typed client (openapi-generator from operaton-engine-rest-openapi)
   • deploys send-welcome-kit.bpmn into the engine over REST at start-up (idempotent)
   • fulfils the Service Task shipWelcomeKit as an External Task   (direction 1: engine → worker)
   • drives the engine through the generated client                 (direction 2: worker → engine)
@@ -178,14 +178,14 @@ Activate the two commented-out generator blocks in `pom.xml`:
 - **Process API** (`bpmn-to-code`) – produces the constant
   `SendWelcomeKitProcessApi.ServiceTasks.SHIP_WELCOME_KIT` from your External Task.
 - **Engine client** (`openapi-generator`) – produces a typed `/engine-rest` client from
-  CIB Seven's official OpenAPI spec instead of hand-written REST calls.
+  Operaton's official OpenAPI spec instead of hand-written REST calls.
   Set the two `TODO` values: `generatorName` = `java`, `library` = `restclient`.
 
 ```bash
 ./mvnw -pl services/logistics-service generate-sources
 ```
 
-Afterwards `org.cibseven.rest.client.api` / `.model` sit under `target/…` and
+Afterwards `org.operaton.rest.client.api` / `.model` sit under `target/…` and
 `SendWelcomeKitProcessApi` under `src`.
 
 ### 5. Deploy the model
@@ -212,11 +212,11 @@ This uses the manual Start Event and sits behind the `POST /api/welcome-kits` ac
 
 - The host carries **no** `send-welcome-kit.bpmn`. If it ends up there, the whole point of the
   exercise is broken.
-- CIB Seven still runs embedded in the host. "Remote" is the **client's** view; a
-  true standalone engine (`cibseven/cibseven:run`) would give the same picture with the host swapped out.
+- Operaton still runs embedded in the host. "Remote" is the **client's** view; a
+  true standalone engine (Operaton Run) would give the same picture with the host swapped out.
 - The logistics service runs on port `8090`, the host on `8080`.
-- The setup follows the blueprint
-  [`miragon-blueprints/cibseven-remote-example`](https://github.com/miragon-blueprints/cibseven-remote-example)
+- For a ready-to-fork Operaton reference, see the blueprint
+  [`miragon-blueprints/operaton-embedded-example`](https://github.com/miragon-blueprints/operaton-embedded-example)
   (Kotlin/Gradle there, Java/Maven here).
 
 ## Expected result
@@ -248,7 +248,7 @@ cd solutions/exercise-10/logistics-service && ../../../mvnw spring-boot:run
 # 3. Proof that the remote service deployed the model:
 curl http://localhost:8080/engine-rest/deployment
 
-# 4. Create a member, complete the confirm task in Cockpit (http://localhost:8080/webapp/#/seven/auth/start,
+# 4. Create a member, complete the confirm task in Cockpit (http://localhost:8080/operaton/app/cockpit/,
 #    admin/admin) → the signal fires → a sendWelcomeKit instance runs
 curl -X POST http://localhost:8080/api/memberships \
   -H "Content-Type: application/json" \
@@ -277,7 +277,7 @@ it picks up the task and ships the kit.
 
 ## Hints
 
-**Signal broadcast is synchronous in the thrower.** In CIB Seven and Camunda 7, a signal is
+**Signal broadcast is synchronous in the thrower.** In Operaton and Camunda 7, a signal is
 delivered **in the thrower's transaction**. Without a marker, the Signal End Event would
 create the `sendWelcomeKit` instance and run it synchronously up to the External Task – all in
 the membership's activation transaction. An error there (process not yet deployed, a race

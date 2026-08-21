@@ -4,9 +4,9 @@ import io.miragon.training.adapter.process.SendWelcomeKitProcessApi;
 import io.miragon.training.adapter.process.SendWelcomeKitProcessApi.Elements;
 import io.miragon.training.adapter.process.SendWelcomeKitProcessApi.ServiceTasks;
 import io.miragon.training.adapter.process.SendWelcomeKitProcessApi.Signals;
-import org.cibseven.bpm.engine.ProcessEngine;
-import org.cibseven.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
-import org.cibseven.bpm.engine.runtime.ProcessInstance;
+import org.operaton.bpm.engine.ProcessEngine;
+import org.operaton.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
+import org.operaton.bpm.engine.runtime.ProcessInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,13 +19,13 @@ import static io.miragon.training.process.util.ProcessEngineTestUtils.completeEx
 import static io.miragon.training.process.util.ProcessEngineTestUtils.continueToNextWaitState;
 import static io.miragon.training.process.util.ProcessEngineTestUtils.findInstance;
 import static io.miragon.training.process.util.ProcessEngineTestUtils.startProcessByKey;
-import static org.cibseven.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
-import static org.cibseven.bpm.engine.test.assertions.bpmn.BpmnAwareTests.init;
+import static org.operaton.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.operaton.bpm.engine.test.assertions.bpmn.BpmnAwareTests.init;
 
 /**
  * Process-model behaviour test for the {@code sendWelcomeKit} model — it lives here because this service
  * OWNS the model. It spins up a standalone in-memory engine, deploys the model from this service's own
- * resources, and asserts the topology with CIB seven Assert. Engine communication (broadcasting the
+ * resources, and asserts the topology with Operaton Assert. Engine communication (broadcasting the
  * signal, completing the external task) is outsourced to {@code ProcessEngineTestUtils}.
  *
  * <p>The process is minimal — signal start → one external service task → end — so a single test covers it

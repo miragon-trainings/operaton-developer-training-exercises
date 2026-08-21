@@ -119,7 +119,7 @@ remodeling change that does not alter behavior must not break the test.
 
 **Going further:** compensation is the BPMN tool for **SAGA patterns** in distributed systems –
 each step gets a compensation step, and on failure the engine compensates the successful steps in
-reverse order. In CIB Seven this also works across subprocess boundaries.
+reverse order. In Operaton this also works across subprocess boundaries.
 
 ## Reference solution
 

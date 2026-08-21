@@ -1,16 +1,16 @@
 package io.miragon.training.process.util;
 
-import org.cibseven.bpm.engine.ManagementService;
-import org.cibseven.bpm.engine.ProcessEngine;
-import org.cibseven.bpm.engine.RuntimeService;
-import org.cibseven.bpm.engine.runtime.Job;
-import org.cibseven.bpm.engine.runtime.ProcessInstance;
+import org.operaton.bpm.engine.ManagementService;
+import org.operaton.bpm.engine.ProcessEngine;
+import org.operaton.bpm.engine.RuntimeService;
+import org.operaton.bpm.engine.runtime.Job;
+import org.operaton.bpm.engine.runtime.ProcessInstance;
 
 /**
  * Small helpers to drive a process instance deterministically in a unit test.
  *
  * <p>The job executor is off in the {@code test} profile (see {@code application-test.yaml}).
- * As a result the process waits at every {@code camunda:asyncBefore/After}: no background thread
+ * As a result the process waits at every {@code operaton:asyncBefore/After}: no background thread
  * picks up the job. These helpers instead push the process forward from the test thread –
  * the timing stays fully under control and the test fast and reproducible.
  *

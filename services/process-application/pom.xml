@@ -7,7 +7,7 @@
 
     <parent>
         <groupId>io.miragon</groupId>
-        <artifactId>cibseven-developer-training-exercises</artifactId>
+        <artifactId>operaton-developer-training-exercises</artifactId>
         <version>1.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
@@ -19,6 +19,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- Provides the auto-configured RestClient.Builder bean (RestClientAutoConfiguration). In Spring
+             Boot 4 this sits in the standalone spring-boot-restclient module, which the Operaton webapp
+             starter does not pull in transitively (used by adapter/config/RestClientConfig). -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-restclient</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -39,18 +46,18 @@
             <scope>runtime</scope>
         </dependency>
         <!--
-          TODO Exercise 1: Uncomment the CIB Seven starters so the engine starts with
+          TODO Exercise 1: Uncomment the Operaton starters so the engine starts with
           the web Cockpit and REST API. The versions come centrally from the root pom.xml
           (dependencyManagement) – so you add the deps WITHOUT a <version>.
         -->
-        <!-- CIB Seven engine + Cockpit webapp + REST API (version managed centrally)
+        <!-- Operaton engine + Cockpit webapp + REST API (version managed centrally)
         <dependency>
-            <groupId>org.cibseven.bpm.springboot</groupId>
-            <artifactId>cibseven-bpm-spring-boot-starter-webapp-4</artifactId>
+            <groupId>org.operaton.bpm.springboot</groupId>
+            <artifactId>operaton-bpm-spring-boot-starter-webapp</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.cibseven.bpm.springboot</groupId>
-            <artifactId>cibseven-bpm-spring-boot-starter-rest-4</artifactId>
+            <groupId>org.operaton.bpm.springboot</groupId>
+            <artifactId>operaton-bpm-spring-boot-starter-rest</artifactId>
         </dependency>
         -->
         <dependency>
@@ -65,7 +72,7 @@
         </dependency>
         <!--
           Engine CORE (classes only) so the provided process-test helper
-          src/test/.../process/util/ProcessEngineTestUtils.java compiles while the CIB Seven
+          src/test/.../process/util/ProcessEngineTestUtils.java compiles while the Operaton
           starters are still commented out (before Exercise 1). Version managed centrally.
           Important: NO test scope – from Exercise 1 the starters pull the same engine transitively
           as compile; a direct test scope would downgrade it to test via Maven nearest-wins and
@@ -74,8 +81,8 @@
           on the classpath, no runtime behavior.
         -->
         <dependency>
-            <groupId>org.cibseven.bpm</groupId>
-            <artifactId>cibseven-engine</artifactId>
+            <groupId>org.operaton.bpm</groupId>
+            <artifactId>operaton-engine</artifactId>
         </dependency>
     </dependencies>
 

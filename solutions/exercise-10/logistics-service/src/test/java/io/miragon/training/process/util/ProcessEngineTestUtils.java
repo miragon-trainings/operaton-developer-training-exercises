@@ -1,10 +1,10 @@
 package io.miragon.training.process.util;
 
-import org.cibseven.bpm.engine.ManagementService;
-import org.cibseven.bpm.engine.ProcessEngine;
-import org.cibseven.bpm.engine.externaltask.LockedExternalTask;
-import org.cibseven.bpm.engine.runtime.Job;
-import org.cibseven.bpm.engine.runtime.ProcessInstance;
+import org.operaton.bpm.engine.ManagementService;
+import org.operaton.bpm.engine.ProcessEngine;
+import org.operaton.bpm.engine.externaltask.LockedExternalTask;
+import org.operaton.bpm.engine.runtime.Job;
+import org.operaton.bpm.engine.runtime.ProcessInstance;
 
 import java.util.List;
 import java.util.Map;
@@ -52,7 +52,7 @@ public final class ProcessEngineTestUtils {
 
     /**
      * Executes the pending async-continuation ("message") jobs one after another until the process reaches
-     * its next wait state. Needed because the signal start event is {@code camunda:asyncBefore}: the instance
+     * its next wait state. Needed because the signal start event is {@code operaton:asyncBefore}: the instance
      * is created and committed at once, and the token only moves to the external task when this async job
      * runs. The job executor stays off in the test, so we drive that continuation from the test thread.
      */

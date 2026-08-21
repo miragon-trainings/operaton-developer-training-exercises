@@ -2,7 +2,7 @@
 
 > **Voraussetzung:** Aufgabe 0 ist abgeschlossen (der Sollprozess liegt fachlich vor).
 > **Arbeitsverzeichnis:** `services/process-application`
-> **Neu in dieser Aufgabe:** CIB-Seven-Starter, Engine-Konfiguration, Auto-Deployment, Cockpit, `act_*`-Tabellen, Start-Formular, Manual Task.
+> **Neu in dieser Aufgabe:** Operaton-Starter, Engine-Konfiguration, Auto-Deployment, Cockpit, `act_*`-Tabellen, Start-Formular, Manual Task.
 
 ## Darum geht es
 
@@ -18,14 +18,14 @@ um die Engine überhaupt einmal zu starten und ein Gefühl für Deployment, Ausf
 Datenbestand zu bekommen. Ab Aufgabe 2 baust du die Platzhalter Stück für Stück zu echten
 Schritten aus.
 
-Was jetzt fehlt, ist die **Laufzeitumgebung**: ein Spring-Boot-Modul, in dem die CIB-Seven-Engine
+Was jetzt fehlt, ist die **Laufzeitumgebung**: ein Spring-Boot-Modul, in dem die Operaton-Engine
 läuft. Genau das richtest du jetzt ein.
 
 ## Lernziele
 
 Nach dieser Aufgabe kannst du
 
-- ein Spring-Boot-Modul mit eingebetteter CIB-Seven-Engine lauffähig machen,
+- ein Spring-Boot-Modul mit eingebetteter Operaton-Engine lauffähig machen,
 - benennen, was die Engine zum Starten braucht (Datenbank, Auto-Configuration, Auto-Deployment),
 - dich im Cockpit zwischen Processes, Tasklist und Admin bewegen,
 - die `act_*`-Tabellen den Kategorien Repository, Runtime und History zuordnen,
@@ -59,20 +59,20 @@ cd stack && docker-compose up -d
 Alle Module teilen sich das Schema `exercise`. Lege es einmalig an:
 
 ```bash
-docker exec -i postgres psql -U admin -d cibseven-training < stack/init-schemas.sql
+docker exec -i postgres psql -U admin -d operaton-training < stack/init-schemas.sql
 ```
 
 ### 3. Dependencies aktivieren
 
 Öffne `services/process-application/pom.xml` und kommentiere den Block `TODO Exercise 1` ein: die
-beiden CIB-Seven-Starter (`webapp-4` und `rest-4`). Erst damit sind Engine, Cockpit-Webapp und
+beiden Operaton-Starter (`webapp` und `rest`). Erst damit sind Engine, Cockpit-Webapp und
 REST-API im Modul. Die Versionen kommen zentral aus der Root-`pom.xml` – trage sie **ohne**
 `<version>` ein.
 
 ### 4. Konfiguration aktivieren
 
 Kommentiere in `services/process-application/src/main/resources/application.yaml` den Block
-`TODO Exercise 1` ein: Datenbank-Anbindung, Cockpit-Admin-User und Webclient. Ohne
+`TODO Exercise 1` ein: Datenbank-Anbindung und Cockpit-Admin-User. Ohne
 Datenbankverbindung startet die Engine nicht.
 
 ### 5. Anwendung scharf schalten
@@ -95,7 +95,7 @@ cd services/process-application && ../../mvnw spring-boot:run
 
 Beim ersten Start hat die Engine ihr Datenmodell selbst angelegt: mehrere Dutzend Tabellen mit dem
 Präfix `act_`. Binde die Datenbank mit einem Werkzeug deiner Wahl an (in IntelliJ über *Database*,
-in VS Code über *SQLTools*), Host `localhost`, Port `5432`, Datenbank `cibseven-training`, Benutzer
+in VS Code über *SQLTools*), Host `localhost`, Port `5432`, Datenbank `operaton-training`, Benutzer
 `admin`, Passwort `admin`. Diese fünf Tabellen sind die wichtigsten:
 
 | Tabelle | Präfix | Inhalt |
@@ -115,7 +115,7 @@ SELECT key_, name_, version_ FROM exercise.act_re_procdef;
 ### 8. Cockpit erkunden
 
 Das Cockpit ist die Weboberfläche der Engine. Öffne
-[http://localhost:8080/webapp/#/seven/auth/start](http://localhost:8080/webapp/#/seven/auth/start)
+[http://localhost:8080/operaton/app/cockpit/](http://localhost:8080/operaton/app/cockpit/)
 (admin / admin). Unter **Processes** erscheint `Join Inner Circle` – der Anzeigename des Modells;
 der technische Prozess-Key dahinter ist `subscribeNewsletter`. Klick dich durch **Cockpit**,
 **Tasklist** und **Admin**.

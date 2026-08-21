@@ -7,7 +7,7 @@
 
     <parent>
         <groupId>io.miragon</groupId>
-        <artifactId>cibseven-developer-training-exercises</artifactId>
+        <artifactId>operaton-developer-training-exercises</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
@@ -26,7 +26,16 @@
         <module>exercise-08</module>
         <module>exercise-09</module>
         <module>exercise-10</module>
-        <module>extra-task-1</module>
+        <!--
+          extra-task-1 is temporarily OUT of the default reactor: it depends on the bpm-crafters
+          Operaton engine adapter (dev.bpm-crafters.process-engine-adapters:process-engine-adapter-operaton-*),
+          which is not yet released to Maven Central (only 2026.07.2-SNAPSHOT exists on the bpm-crafters
+          develop branch; the compatibility table lists the Operaton-2.1.3 adapter as "next release").
+          The module itself is fully migrated to Operaton — re-add it here (and pin a released adapter
+          version in its pom) once the adapter ships. To build it now: ./mvnw -pl solutions/extra-task-1 install
+          (its pom declares the Maven Central snapshots repository for the SNAPSHOT adapter).
+        -->
+        <!-- <module>extra-task-1</module> -->
     </modules>
 
 </project>
