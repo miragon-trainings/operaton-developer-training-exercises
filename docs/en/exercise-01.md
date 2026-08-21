@@ -129,7 +129,7 @@ The process is deployed, but has never run. Start it via the start form:
    by the engine.
 4. In `act_hi_procinst` the instance shows as `COMPLETED`; `act_ru_*` is empty again.
 
-> **Term: start form (Generated Form).** The fields `email`/`name`/`age` sit as `operaton:formData`
+> **Term: start form (Generated Form).** The fields `email`/`name`/`age` sit as `camunda:formData`
 > directly on the Start Event. When you start, the Tasklist renders a form from them automatically –
 > no extra file, no HTML. The entered values become process variables of the instance.
 

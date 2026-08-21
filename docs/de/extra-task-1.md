@@ -63,7 +63,7 @@ Was sich ändert – und was nicht:
 | `domain/`, `application/` | unverändert | **unverändert** |
 | Inbound Service Tasks | `JavaDelegate` + `DelegateExecution` | `@ProcessEngineWorker`-Worker |
 | Outbound Prozess-Adapter | `RuntimeService.createMessageCorrelation(...)` | `StartProcessApi` / `CorrelationApi` |
-| BPMN Service Tasks | `operaton:delegateExpression="#{xDelegate}"` | `operaton:type="external"` + `operaton:topic` |
+| BPMN Service Tasks | `camunda:delegateExpression="#{xDelegate}"` | `camunda:type="external"` + `camunda:topic` |
 | Bootstrap | `@EnableProcessApplication` | entfällt – der Adapter übernimmt Deployment und Worker |
 
 Message Start, Boundary Events, Subprozess, Call Activity, DMN und Kompensation bleiben
@@ -96,18 +96,18 @@ bekommt. Aus
 
 ```xml
 <bpmn:serviceTask id="serviceTask_sendConfirmationMail" name="Send confirmation mail"
-                  operaton:delegateExpression="#{sendConfirmationMailDelegate}">
+                  camunda:delegateExpression="#{sendConfirmationMailDelegate}">
 ```
 
 wird so ein External Task mit Topic und Input-Mapping – im XML:
 
 ```xml
 <bpmn:serviceTask id="serviceTask_sendConfirmationMail" name="Send confirmation mail"
-                  operaton:type="external" operaton:topic="sendConfirmationMail">
+                  camunda:type="external" camunda:topic="sendConfirmationMail">
   <bpmn:extensionElements>
-    <operaton:inputOutput>
-      <operaton:inputParameter name="membershipId">${membershipId}</operaton:inputParameter>
-    </operaton:inputOutput>
+    <camunda:inputOutput>
+      <camunda:inputParameter name="membershipId">${membershipId}</camunda:inputParameter>
+    </camunda:inputOutput>
   </bpmn:extensionElements>
 ```
 
@@ -292,7 +292,7 @@ regret*.
 
 ## Selbstcheck
 
-- [ ] Alle sieben Service Tasks sind `operaton:type="external"` mit Topic
+- [ ] Alle sieben Service Tasks sind `camunda:type="external"` mit Topic
 - [ ] Es gibt keine `JavaDelegate`-Klassen mehr, nur noch `@ProcessEngineWorker`-Worker
 - [ ] Der Outbound-Adapter nutzt `StartProcessApi` / `CorrelationApi` statt `RuntimeService`
 - [ ] `@EnableProcessApplication` ist entfernt, der `EngineCommandExecutor`-Bean ist gesetzt

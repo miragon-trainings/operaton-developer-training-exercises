@@ -178,18 +178,18 @@ completion.
 > its own – in the training we deliberately stick with the Generated Form.
 
 In the modeler: select the User Task → Properties Panel → **Forms** section → add form
-fields. In the XML this produces an `extensionElements` block with `operaton:formData` right
+fields. In the XML this produces an `extensionElements` block with `camunda:formData` right
 inside the User Task:
 
 ```xml
-<bpmn:userTask id="userTask_confirmMembership" name="Confirm membership" operaton:asyncAfter="true">
+<bpmn:userTask id="userTask_confirmMembership" name="Confirm membership" camunda:asyncAfter="true">
   <bpmn:extensionElements>
-    <operaton:formData>
-      <operaton:formField id="name" label="Name" type="string" />
-      <operaton:formField id="email" label="E-Mail" type="string" />
-      <operaton:formField id="age" label="Age" type="long" />
-      <operaton:formField id="confirmed" label="Confirm membership" type="boolean" />
-    </operaton:formData>
+    <camunda:formData>
+      <camunda:formField id="name" label="Name" type="string" />
+      <camunda:formField id="email" label="E-Mail" type="string" />
+      <camunda:formField id="age" label="Age" type="long" />
+      <camunda:formField id="confirmed" label="Confirm membership" type="boolean" />
+    </camunda:formData>
   </bpmn:extensionElements>
 </bpmn:userTask>
 ```

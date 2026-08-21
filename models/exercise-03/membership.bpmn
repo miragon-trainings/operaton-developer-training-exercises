@@ -3,27 +3,27 @@
                   xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
                   xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
                   xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                  xmlns:operaton="http://operaton.org/schema/1.0/bpmn"
-                  xmlns:modeler="http://operaton.org/schema/modeler/1.0"
+                  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+                  xmlns:modeler="http://camunda.org/schema/modeler/1.0"
                   id="Definitions_1"
                   targetNamespace="http://bpmn.io/schema/bpmn"
                   exporter="Camunda Modeler"
                   exporterVersion="5.20.0"
-                  modeler:executionPlatform="Operaton"
+                  modeler:executionPlatform="Camunda Platform"
                   modeler:executionPlatformVersion="7.24.0">
 
   <bpmn:process id="subscribeNewsletter"
                 name="Join Inner Circle"
                 isExecutable="true"
-                operaton:historyTimeToLive="180">
+                camunda:historyTimeToLive="180">
 
     <bpmn:startEvent id="startEvent_membershipWanted" name="Membership wanted">
       <bpmn:extensionElements>
-        <operaton:formData>
-          <operaton:formField id="email" label="E-Mail" type="string"/>
-          <operaton:formField id="name" label="Name" type="string"/>
-          <operaton:formField id="age" label="Age" type="long"/>
-        </operaton:formData>
+        <camunda:formData>
+          <camunda:formField id="email" label="E-Mail" type="string"/>
+          <camunda:formField id="name" label="Name" type="string"/>
+          <camunda:formField id="age" label="Age" type="long"/>
+        </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:outgoing>Flow_start_confirm</bpmn:outgoing>
     </bpmn:startEvent>
@@ -34,10 +34,10 @@
 
     <bpmn:userTask id="userTask_confirmMembership" name="Confirm membership">
       <bpmn:extensionElements>
-        <operaton:formData>
-          <operaton:formField id="email" label="E-Mail" type="string"/>
-          <operaton:formField id="confirmed" label="Confirm membership" type="boolean"/>
-        </operaton:formData>
+        <camunda:formData>
+          <camunda:formField id="email" label="E-Mail" type="string"/>
+          <camunda:formField id="confirmed" label="Confirm membership" type="boolean"/>
+        </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_start_confirm</bpmn:incoming>
       <bpmn:outgoing>Flow_confirm_welcome</bpmn:outgoing>
@@ -49,7 +49,7 @@
 
     <bpmn:serviceTask id="serviceTask_sendWelcomeMail"
                       name="Send Welcome Mail"
-                      operaton:delegateExpression="#{sendWelcomeMailDelegate}">
+                      camunda:delegateExpression="#{sendWelcomeMailDelegate}">
       <bpmn:incoming>Flow_confirm_welcome</bpmn:incoming>
       <bpmn:outgoing>Flow_welcome_end</bpmn:outgoing>
     </bpmn:serviceTask>

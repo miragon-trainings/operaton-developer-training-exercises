@@ -132,7 +132,7 @@ Der Prozess ist deployt, aber noch nie gelaufen. Starte ihn über das Start-Form
 4. In `act_hi_procinst` steht die Instanz auf `COMPLETED`; `act_ru_*` ist wieder leer.
 
 > **Begriff: Start-Formular (Generated Form).** Die Felder `email`/`name`/`age` stehen als
-> `operaton:formData` direkt am Start Event. Die Tasklist rendert daraus beim Starten automatisch
+> `camunda:formData` direkt am Start Event. Die Tasklist rendert daraus beim Starten automatisch
 > ein Formular – keine zusätzliche Datei, kein HTML. Die eingegebenen Werte werden zu
 > Prozessvariablen der Instanz.
 

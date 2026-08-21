@@ -13,7 +13,7 @@ import java.util.List;
 public final class SubscribeNewsletterProcessApi {
   public static final ProcessId PROCESS_ID = new ProcessId("subscribeNewsletter");
 
-  public static final BpmnEngine PROCESS_ENGINE = BpmnEngine.OPERATON;
+  public static final BpmnEngine PROCESS_ENGINE = BpmnEngine.CAMUNDA_7;
 
   /**
    * BPMN element ids as declared in the source model.

@@ -179,18 +179,18 @@ Prozessvariable gespeichert.
 > bewusst bei der Generated Form.
 
 Im Modeler: User Task auswählen → Properties Panel → Abschnitt **Forms** → Formularfelder
-anlegen. Im XML entsteht dabei ein `extensionElements`-Block mit `operaton:formData` direkt
+anlegen. Im XML entsteht dabei ein `extensionElements`-Block mit `camunda:formData` direkt
 im User Task:
 
 ```xml
-<bpmn:userTask id="userTask_confirmMembership" name="Confirm membership" operaton:asyncAfter="true">
+<bpmn:userTask id="userTask_confirmMembership" name="Confirm membership" camunda:asyncAfter="true">
   <bpmn:extensionElements>
-    <operaton:formData>
-      <operaton:formField id="name" label="Name" type="string" />
-      <operaton:formField id="email" label="E-Mail" type="string" />
-      <operaton:formField id="age" label="Age" type="long" />
-      <operaton:formField id="confirmed" label="Confirm membership" type="boolean" />
-    </operaton:formData>
+    <camunda:formData>
+      <camunda:formField id="name" label="Name" type="string" />
+      <camunda:formField id="email" label="E-Mail" type="string" />
+      <camunda:formField id="age" label="Age" type="long" />
+      <camunda:formField id="confirmed" label="Confirm membership" type="boolean" />
+    </camunda:formData>
   </bpmn:extensionElements>
 </bpmn:userTask>
 ```

@@ -122,13 +122,13 @@ Mail` und `Notify community` bleiben unverändert, es kommt **kein** neues Eleme
 Alle Änderungen machst du im **Miragon BPMN Modeler**, nicht im XML: End Event auswählen →
 in ein **Signal-End-Event** umwandeln → Signal `Signal_MemberActivated` anlegen/auswählen →
 `asyncBefore` setzen. Die Payload (`name`) gibt das End Event über ein **In Mapping**
-(`operaton:in`) mit. Im XML entsteht dabei:
+(`camunda:in`) mit. Im XML entsteht dabei:
 
 ```xml
-<bpmn:endEvent id="endEvent_membershipActivated" name="Membership activated" operaton:asyncBefore="true">
+<bpmn:endEvent id="endEvent_membershipActivated" name="Membership activated" camunda:asyncBefore="true">
   <bpmn:signalEventDefinition signalRef="Signal_MemberActivated">
     <bpmn:extensionElements>
-      <operaton:in source="name" target="name" />
+      <camunda:in source="name" target="name" />
     </bpmn:extensionElements>
   </bpmn:signalEventDefinition>
 </bpmn:endEvent>

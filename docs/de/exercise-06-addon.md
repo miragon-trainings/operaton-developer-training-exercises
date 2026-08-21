@@ -67,7 +67,7 @@ Die Version kommt zentral aus der Root-`pom.xml`, im Modul also ohne `<version>`
         <outputFolderPath>${project.basedir}/src/main/java</outputFolderPath>
         <packagePath>io.miragon.training.adapter.process</packagePath>
         <outputLanguage>JAVA</outputLanguage>
-        <processEngine>OPERATON</processEngine>
+        <processEngine>CAMUNDA_7</processEngine>
     </configuration>
 </plugin>
 ```

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:operaton="http://operaton.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://operaton.org/schema/modeler/1.0" id="Definitions_1d2hcmz" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.20.0" modeler:executionPlatform="Operaton" modeler:executionPlatformVersion="7.24.0">
-  <bpmn:process id="subscribeNewsletter" isExecutable="true" operaton:historyTimeToLive="180">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1d2hcmz" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.20.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.24.0">
+  <bpmn:process id="subscribeNewsletter" isExecutable="true" camunda:historyTimeToLive="180">
     <bpmn:endEvent id="endEvent_membershipActivated" name="Membership activated">
       <bpmn:incoming>Flow_joinToEnd</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:startEvent id="startEvent_submitRegistration" name="Submit registration form" operaton:asyncBefore="true">
+    <bpmn:startEvent id="startEvent_submitRegistration" name="Submit registration form" camunda:asyncBefore="true">
       <bpmn:outgoing>Flow_0p7ko1g</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_0rxlo7x" messageRef="Message_3p5jpc1" />
     </bpmn:startEvent>
@@ -14,18 +14,18 @@
       <bpmn:startEvent id="startEvent_confirmationRequired" name="Confirmation required">
         <bpmn:outgoing>Flow_1y9mu7r</bpmn:outgoing>
       </bpmn:startEvent>
-      <bpmn:serviceTask id="serviceTask_sendConfirmationMail" name="Send confirmation mail" operaton:asyncBefore="true" operaton:delegateExpression="#{sendConfirmationMailDelegate}">
+      <bpmn:serviceTask id="serviceTask_sendConfirmationMail" name="Send confirmation mail" camunda:asyncBefore="true" camunda:delegateExpression="#{sendConfirmationMailDelegate}">
         <bpmn:incoming>Flow_1y9mu7r</bpmn:incoming>
         <bpmn:outgoing>Flow_1wb7scj</bpmn:outgoing>
       </bpmn:serviceTask>
-      <bpmn:userTask id="userTask_confirmMembership" name="Confirm membership" operaton:asyncAfter="true">
+      <bpmn:userTask id="userTask_confirmMembership" name="Confirm membership" camunda:asyncAfter="true">
         <bpmn:extensionElements>
-          <operaton:formData>
-            <operaton:formField id="name" label="Name" type="string" />
-            <operaton:formField id="email" label="E-Mail" type="string" />
-            <operaton:formField id="age" label="Age" type="long" />
-            <operaton:formField id="confirmed" label="Confirm membership" type="boolean" />
-          </operaton:formData>
+          <camunda:formData>
+            <camunda:formField id="name" label="Name" type="string" />
+            <camunda:formField id="email" label="E-Mail" type="string" />
+            <camunda:formField id="age" label="Age" type="long" />
+            <camunda:formField id="confirmed" label="Confirm membership" type="boolean" />
+          </camunda:formData>
         </bpmn:extensionElements>
         <bpmn:incoming>Flow_1wb7scj</bpmn:incoming>
         <bpmn:outgoing>Flow_0w9368p</bpmn:outgoing>
@@ -42,11 +42,11 @@
       <bpmn:outgoing>Flow_forkToWelcome</bpmn:outgoing>
       <bpmn:outgoing>Flow_forkToNotify</bpmn:outgoing>
     </bpmn:parallelGateway>
-    <bpmn:serviceTask id="serviceTask_sendWelcomeMail" name="Send Welcome Mail" operaton:asyncBefore="true" operaton:delegateExpression="#{sendWelcomeMailDelegate}">
+    <bpmn:serviceTask id="serviceTask_sendWelcomeMail" name="Send Welcome Mail" camunda:asyncBefore="true" camunda:delegateExpression="#{sendWelcomeMailDelegate}">
       <bpmn:incoming>Flow_forkToWelcome</bpmn:incoming>
       <bpmn:outgoing>Flow_welcomeToJoin</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="serviceTask_notifyCommunity" name="Notify community" operaton:asyncBefore="true" operaton:delegateExpression="#{notifyCommunityDelegate}">
+    <bpmn:serviceTask id="serviceTask_notifyCommunity" name="Notify community" camunda:asyncBefore="true" camunda:delegateExpression="#{notifyCommunityDelegate}">
       <bpmn:incoming>Flow_forkToNotify</bpmn:incoming>
       <bpmn:outgoing>Flow_notifyToJoin</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -58,12 +58,12 @@
     <bpmn:endEvent id="endEvent_membershipDeclined" name="Membership declined">
       <bpmn:incoming>Flow_14y1unw</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:serviceTask id="serviceTask_revokeClaim" name="Revoke claim" operaton:delegateExpression="#{revokeClaimDelegate}">
+    <bpmn:serviceTask id="serviceTask_revokeClaim" name="Revoke claim" camunda:delegateExpression="#{revokeClaimDelegate}">
       <bpmn:incoming>Flow_153mcrs</bpmn:incoming>
       <bpmn:incoming>Flow_0ho2dhw</bpmn:incoming>
       <bpmn:outgoing>Flow_14y1unw</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="serviceTask_claimMembership" name="Claim membership" operaton:delegateExpression="#{claimMembershipDelegate}">
+    <bpmn:serviceTask id="serviceTask_claimMembership" name="Claim membership" camunda:delegateExpression="#{claimMembershipDelegate}">
       <bpmn:incoming>Flow_0p7ko1g</bpmn:incoming>
       <bpmn:outgoing>Flow_0hlnr3k</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -75,11 +75,11 @@
     <bpmn:endEvent id="endEvent_membershipRejected" name="Membership rejected">
       <bpmn:incoming>Flow_10ryvaz</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:serviceTask id="serviceTask_sendRejectionMail" name="Send rejection mail" operaton:asyncBefore="true" operaton:delegateExpression="#{sendRejectionMailDelegate}">
+    <bpmn:serviceTask id="serviceTask_sendRejectionMail" name="Send rejection mail" camunda:asyncBefore="true" camunda:delegateExpression="#{sendRejectionMailDelegate}">
       <bpmn:incoming>Flow_0bt3531</bpmn:incoming>
       <bpmn:outgoing>Flow_10ryvaz</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="serviceTask_reSendConfirmationMail" name="Re-Send confirmation mail" operaton:asyncBefore="true" operaton:delegateExpression="#{reSendConfirmationMailDelegate}">
+    <bpmn:serviceTask id="serviceTask_reSendConfirmationMail" name="Re-Send confirmation mail" camunda:asyncBefore="true" camunda:delegateExpression="#{reSendConfirmationMailDelegate}">
       <bpmn:incoming>Flow_1unns5i</bpmn:incoming>
       <bpmn:outgoing>Flow_03vzvil</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -103,20 +103,20 @@
     <bpmn:sequenceFlow id="Flow_10ryvaz" sourceRef="serviceTask_sendRejectionMail" targetRef="endEvent_membershipRejected" />
     <bpmn:sequenceFlow id="Flow_1unns5i" sourceRef="timer_resendEveryDay" targetRef="serviceTask_reSendConfirmationMail" />
     <bpmn:sequenceFlow id="Flow_03vzvil" sourceRef="serviceTask_reSendConfirmationMail" targetRef="endEvent_mailSentAgain" />
-    <bpmn:boundaryEvent id="timer_resendEveryDay" name="Every day" cancelActivity="false" attachedToRef="subProcess_confirmMembership" operaton:asyncAfter="true">
+    <bpmn:boundaryEvent id="timer_resendEveryDay" name="Every day" cancelActivity="false" attachedToRef="subProcess_confirmMembership" camunda:asyncAfter="true">
       <bpmn:outgoing>Flow_1unns5i</bpmn:outgoing>
       <bpmn:timerEventDefinition id="TimerEventDefinition_1f4kmf0">
         <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">R/P1D</bpmn:timeCycle>
       </bpmn:timerEventDefinition>
     </bpmn:boundaryEvent>
     <bpmn:sequenceFlow id="Flow_0ho2dhw" sourceRef="timer_abortAfter3HalfDays" targetRef="serviceTask_revokeClaim" />
-    <bpmn:boundaryEvent id="timer_abortAfter3HalfDays" name="After 3&#10;1/2 days" attachedToRef="subProcess_confirmMembership" operaton:asyncAfter="true">
+    <bpmn:boundaryEvent id="timer_abortAfter3HalfDays" name="After 3&#10;1/2 days" attachedToRef="subProcess_confirmMembership" camunda:asyncAfter="true">
       <bpmn:outgoing>Flow_0ho2dhw</bpmn:outgoing>
       <bpmn:timerEventDefinition id="TimerEventDefinition_1u5smk2">
         <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P3DT12H</bpmn:timeDuration>
       </bpmn:timerEventDefinition>
     </bpmn:boundaryEvent>
-    <bpmn:boundaryEvent id="event_confirmationRejected" name="Confirmation rejected" attachedToRef="subProcess_confirmMembership" operaton:asyncAfter="true">
+    <bpmn:boundaryEvent id="event_confirmationRejected" name="Confirmation rejected" attachedToRef="subProcess_confirmMembership" camunda:asyncAfter="true">
       <bpmn:outgoing>Flow_153mcrs</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_09neu9p" messageRef="Message_ConfirmationRejected" />
     </bpmn:boundaryEvent>

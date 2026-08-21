@@ -63,7 +63,7 @@ What changes – and what doesn't:
 | `domain/`, `application/` | unchanged | **unchanged** |
 | Inbound service tasks | `JavaDelegate` + `DelegateExecution` | `@ProcessEngineWorker` worker |
 | Outbound process adapter | `RuntimeService.createMessageCorrelation(...)` | `StartProcessApi` / `CorrelationApi` |
-| BPMN service tasks | `operaton:delegateExpression="#{xDelegate}"` | `operaton:type="external"` + `operaton:topic` |
+| BPMN service tasks | `camunda:delegateExpression="#{xDelegate}"` | `camunda:type="external"` + `camunda:topic` |
 | Bootstrap | `@EnableProcessApplication` | gone – the adapter takes over deployment and workers |
 
 Message start, boundary events, subprocess, call activity, DMN, and compensation stay
@@ -94,18 +94,18 @@ input mapping under the **Input/Output** section so the worker gets the `members
 
 ```xml
 <bpmn:serviceTask id="serviceTask_sendConfirmationMail" name="Send confirmation mail"
-                  operaton:delegateExpression="#{sendConfirmationMailDelegate}">
+                  camunda:delegateExpression="#{sendConfirmationMailDelegate}">
 ```
 
 this becomes an external task with a topic and input mapping – in the XML:
 
 ```xml
 <bpmn:serviceTask id="serviceTask_sendConfirmationMail" name="Send confirmation mail"
-                  operaton:type="external" operaton:topic="sendConfirmationMail">
+                  camunda:type="external" camunda:topic="sendConfirmationMail">
   <bpmn:extensionElements>
-    <operaton:inputOutput>
-      <operaton:inputParameter name="membershipId">${membershipId}</operaton:inputParameter>
-    </operaton:inputOutput>
+    <camunda:inputOutput>
+      <camunda:inputParameter name="membershipId">${membershipId}</camunda:inputParameter>
+    </camunda:inputOutput>
   </bpmn:extensionElements>
 ```
 
@@ -290,7 +290,7 @@ regret* user task.
 
 ## Self-check
 
-- [ ] All seven service tasks are `operaton:type="external"` with a topic
+- [ ] All seven service tasks are `camunda:type="external"` with a topic
 - [ ] There are no more `JavaDelegate` classes, only `@ProcessEngineWorker` workers
 - [ ] The outbound adapter uses `StartProcessApi` / `CorrelationApi` instead of `RuntimeService`
 - [ ] `@EnableProcessApplication` is removed, the `EngineCommandExecutor` bean is in place

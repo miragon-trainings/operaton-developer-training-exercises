@@ -33,7 +33,7 @@ Das ist der wichtigste Teil. Jede Behauptung im Text muss im Repository nachweis
 |---|---|
 | Element-ID, Message-, Signal- oder Topic-Name | `grep` in `models/exercise-NN/*.bpmn` |
 | Prozess-Key, `isExecutable`, `historyTimeToLive` | `grep '<bpmn:process' models/exercise-NN/*.bpmn` |
-| `asyncBefore` / `asyncAfter` an einem Element | `grep 'operaton:async' models/exercise-NN/*.bpmn` |
+| `asyncBefore` / `asyncAfter` an einem Element | `grep 'camunda:async' models/exercise-NN/*.bpmn` |
 | Timer-Werte (`timeDuration`, `timeCycle`) | `grep -A2 timerEventDefinition models/exercise-NN/*.bpmn` |
 | DMN-Decision-ID, Input, Output, Regeln | `models/exercise-NN/*.dmn` |
 | Klassen-, Methoden- oder Feldnamen | `find solutions/exercise-NN/src -name '*.java'` |
