@@ -37,7 +37,7 @@ public class EngineDeploymentAdapter {
         //   Resolve the resources (classpath*:bpmn/*.bpmn), then POST them as multipart/form-data to
         //   /deployment/create with the idempotency flags enable-duplicate-filtering + deploy-changed-only.
         //   Retry a few times so the worker may start before the engine is ready. See the deploy(...) hint
-        //   below and ProcessModelDeploymentAdapter in miragon-blueprints/cibseven-remote-example.
+        //   below (and the Operaton blueprint miragon-blueprints/operaton-embedded-example).
         log.warn("TODO Exercise 10: EngineDeploymentAdapter does not deploy the owned model yet");
     }
 

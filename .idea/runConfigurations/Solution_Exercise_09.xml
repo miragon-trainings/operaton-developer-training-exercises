@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Solution Exercise 09" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <option name="SPRING_BOOT_MAIN_CLASS" value="io.miragon.training.TrainingApplication" />
-    <module name="solution-exercise-09-process-application" />
+    <module name="solution-exercise-09" />
     <shortenClasspath name="CLASSPATH_FILE" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="io.miragon.training.TrainingApplication" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

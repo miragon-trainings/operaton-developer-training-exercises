@@ -299,11 +299,6 @@ regret*.
 - [ ] Der ArchUnit-Test meldet **null** Abhängigkeiten auf `org.operaton.bpm`
 - [ ] Das fachliche Verhalten ist identisch zu Aufgabe 10
 
-## Hinweise
-
-Als Vorlage dient das Repository [**engine-safari**](https://github.com/emaarco/engine-safari),
-Modul `cib-seven-with-process-engine-api`.
-
 ## Referenzlösung
 
 `../../solutions/extra-task-1/`

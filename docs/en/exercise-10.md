@@ -215,8 +215,8 @@ This uses the manual Start Event and sits behind the `POST /api/welcome-kits` ac
 - Operaton still runs embedded in the host. "Remote" is the **client's** view; a
   true standalone engine (Operaton Run) would give the same picture with the host swapped out.
 - The logistics service runs on port `8090`, the host on `8080`.
-- The setup follows the blueprint
-  [`miragon-blueprints/cibseven-remote-example`](https://github.com/miragon-blueprints/cibseven-remote-example)
+- For a ready-to-fork Operaton reference, see the blueprint
+  [`miragon-blueprints/operaton-embedded-example`](https://github.com/miragon-blueprints/operaton-embedded-example)
   (Kotlin/Gradle there, Java/Maven here).
 
 ## Expected result

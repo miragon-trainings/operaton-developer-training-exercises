@@ -297,11 +297,6 @@ regret* user task.
 - [ ] The ArchUnit test reports **zero** dependencies on `org.operaton.bpm`
 - [ ] The functional behavior is identical to Exercise 10
 
-## Hints
-
-The [**engine-safari**](https://github.com/emaarco/engine-safari) repository serves as a template,
-module `cib-seven-with-process-engine-api`.
-
 ## Reference solution
 
 `../../solutions/extra-task-1/`

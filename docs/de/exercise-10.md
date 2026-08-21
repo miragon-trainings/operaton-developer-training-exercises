@@ -215,8 +215,8 @@ Das nutzt das manuelle Start Event und steckt hinter der Aktion `POST /api/welco
 - Operaton läuft weiterhin eingebettet im Host. „Remote" ist die Sicht des **Clients**; eine
   echte Standalone-Engine (Operaton Run) ergäbe dasselbe Bild mit ausgetauschtem Host.
 - Der Logistik-Service läuft auf Port `8090`, der Host auf `8080`.
-- Der Aufbau orientiert sich am Blueprint
-  [`miragon-blueprints/cibseven-remote-example`](https://github.com/miragon-blueprints/cibseven-remote-example)
+- Als Operaton-Referenz zum Nachbauen siehe den Blueprint
+  [`miragon-blueprints/operaton-embedded-example`](https://github.com/miragon-blueprints/operaton-embedded-example)
   (dort Kotlin/Gradle, hier Java/Maven).
 
 ## Erwartetes Ergebnis
