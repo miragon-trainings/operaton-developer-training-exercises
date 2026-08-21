@@ -2,7 +2,7 @@
 
 > **Prerequisite:** Exercise 0 is complete (the target process exists at the business level).
 > **Working directory:** `services/process-application`
-> **New in this exercise:** CIB Seven starter, engine configuration, auto-deployment, Cockpit, `act_*` tables, start form, Manual Task.
+> **New in this exercise:** Operaton starter, engine configuration, auto-deployment, Cockpit, `act_*` tables, start form, Manual Task.
 
 ## What this is about
 
@@ -17,14 +17,14 @@ This mini-version is **not** the target process and **not** the target model. It
 to get the engine running once and to get a feel for deployment, execution, and the data. From
 Exercise 2 on you build the placeholders out into real steps, one at a time.
 
-What's still missing is the **runtime environment**: a Spring Boot module in which the CIB Seven
+What's still missing is the **runtime environment**: a Spring Boot module in which the Operaton
 engine runs. That's exactly what you'll set up now.
 
 ## Learning goals
 
 After this exercise you can
 
-- get a Spring Boot module with an embedded CIB Seven engine up and running,
+- get a Spring Boot module with an embedded Operaton engine up and running,
 - name what the engine needs in order to start (database, auto-configuration, auto-deployment),
 - find your way around the Cockpit between Processes, Tasklist, and Admin,
 - map the `act_*` tables to the categories Repository, Runtime, and History,
@@ -58,20 +58,20 @@ cd stack && docker-compose up -d
 All modules share the schema `exercise`. Create it once:
 
 ```bash
-docker exec -i postgres psql -U admin -d cibseven-training < stack/init-schemas.sql
+docker exec -i postgres psql -U admin -d operaton-training < stack/init-schemas.sql
 ```
 
 ### 3. Enable the dependencies
 
 Open `services/process-application/pom.xml` and uncomment the `TODO Exercise 1` block: the two
-CIB Seven starters (`webapp-4` and `rest-4`). Only with these are the engine, the Cockpit webapp,
+Operaton starters (`webapp` and `rest`). Only with these are the engine, the Cockpit webapp,
 and the REST API present in the module. The versions come centrally from the root `pom.xml` – so
 add them **without** a `<version>`.
 
 ### 4. Enable the configuration
 
 In `services/process-application/src/main/resources/application.yaml`, uncomment the
-`TODO Exercise 1` block: database connection, Cockpit admin user, and webclient. Without a
+`TODO Exercise 1` block: database connection and Cockpit admin user. Without a
 database connection the engine won't start.
 
 ### 5. Arm the application
@@ -94,7 +94,7 @@ cd services/process-application && ../../mvnw spring-boot:run
 
 On the first start the engine created its data model itself: several dozen tables with the prefix
 `act_`. Connect to the database with a tool of your choice (in IntelliJ via *Database*, in VS Code
-via *SQLTools*), host `localhost`, port `5432`, database `cibseven-training`, user `admin`,
+via *SQLTools*), host `localhost`, port `5432`, database `operaton-training`, user `admin`,
 password `admin`. These five tables are the most important:
 
 | Table | Prefix | Content |
@@ -114,7 +114,7 @@ SELECT key_, name_, version_ FROM exercise.act_re_procdef;
 ### 8. Explore the Cockpit
 
 The Cockpit is the engine's web interface. Open
-[http://localhost:8080/webapp/#/seven/auth/start](http://localhost:8080/webapp/#/seven/auth/start)
+[http://localhost:8080/operaton/app/cockpit/](http://localhost:8080/operaton/app/cockpit/)
 (admin / admin). Under **Processes** you'll see `Join Inner Circle` – the display name of the
 model; the technical process key behind it is `subscribeNewsletter`. Click your way through
 **Cockpit**, **Tasklist**, and **Admin**.
@@ -129,7 +129,7 @@ The process is deployed, but has never run. Start it via the start form:
    by the engine.
 4. In `act_hi_procinst` the instance shows as `COMPLETED`; `act_ru_*` is empty again.
 
-> **Term: start form (Generated Form).** The fields `email`/`name`/`age` sit as `camunda:formData`
+> **Term: start form (Generated Form).** The fields `email`/`name`/`age` sit as `operaton:formData`
 > directly on the Start Event. When you start, the Tasklist renders a form from them automatically –
 > no extra file, no HTML. The entered values become process variables of the instance.
 

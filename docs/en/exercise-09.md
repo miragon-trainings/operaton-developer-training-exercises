@@ -102,12 +102,12 @@ The compensation stays untouched: after returning from the Call Activity, the Co
 You create the variable mapping in the **Miragon BPMN Modeler**, not directly in the XML:
 select the Call Activity → Properties Panel → **In Mapping** section → add one *source/target*
 pair each for `membershipId` and `age` (main process → called process). In the XML this
-produces an `extensionElements` block with `camunda:in` entries on the Call Activity:
+produces an `extensionElements` block with `operaton:in` entries on the Call Activity:
 
 ```xml
 <bpmn:extensionElements>
-  <camunda:in source="membershipId" target="membershipId" />
-  <camunda:in source="age" target="age" />
+  <operaton:in source="membershipId" target="membershipId" />
+  <operaton:in source="age" target="age" />
 </bpmn:extensionElements>
 ```
 

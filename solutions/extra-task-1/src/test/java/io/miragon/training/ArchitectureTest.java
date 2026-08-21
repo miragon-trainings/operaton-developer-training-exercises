@@ -29,22 +29,22 @@ public class ArchitectureTest {
             .whereLayer("ProcessApi").mayOnlyBeAccessedByLayers("InAdapters", "OutAdapters");
 
     @ArchTest
-    static final ArchRule domain_should_not_depend_on_cibseven = noClasses()
+    static final ArchRule domain_should_not_depend_on_operaton = noClasses()
             .that().resideInAPackage("..domain..")
-            .should().dependOnClassesThat().resideInAPackage("org.cibseven.bpm..");
+            .should().dependOnClassesThat().resideInAPackage("org.operaton.bpm..");
 
     @ArchTest
-    static final ArchRule application_should_not_depend_on_cibseven = noClasses()
+    static final ArchRule application_should_not_depend_on_operaton = noClasses()
             .that().resideInAPackage("..application..")
-            .should().dependOnClassesThat().resideInAPackage("org.cibseven.bpm..");
+            .should().dependOnClassesThat().resideInAPackage("org.operaton.bpm..");
 
     /**
      * The headline guardrail of the process-engine-api rebuild:
      * with the worker pattern and the engine-neutral start/correlation API,
-     * NO class in the whole codebase touches the native CIB7 engine anymore.
-     * The only remaining CIB7 references live in {@code pom.xml} and {@code application.yaml}.
+     * NO class in the whole codebase touches the native Operaton engine anymore.
+     * The only remaining Operaton references live in {@code pom.xml} and {@code application.yaml}.
      */
     @ArchTest
     static final ArchRule no_class_should_depend_on_the_native_engine = noClasses()
-            .should().dependOnClassesThat().resideInAPackage("org.cibseven.bpm..");
+            .should().dependOnClassesThat().resideInAPackage("org.operaton.bpm..");
 }

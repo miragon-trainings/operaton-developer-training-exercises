@@ -178,18 +178,18 @@ completion.
 > its own – in the training we deliberately stick with the Generated Form.
 
 In the modeler: select the User Task → Properties Panel → **Forms** section → add form
-fields. In the XML this produces an `extensionElements` block with `camunda:formData` right
+fields. In the XML this produces an `extensionElements` block with `operaton:formData` right
 inside the User Task:
 
 ```xml
-<bpmn:userTask id="userTask_confirmMembership" name="Confirm membership" camunda:asyncAfter="true">
+<bpmn:userTask id="userTask_confirmMembership" name="Confirm membership" operaton:asyncAfter="true">
   <bpmn:extensionElements>
-    <camunda:formData>
-      <camunda:formField id="name" label="Name" type="string" />
-      <camunda:formField id="email" label="E-Mail" type="string" />
-      <camunda:formField id="age" label="Age" type="long" />
-      <camunda:formField id="confirmed" label="Confirm membership" type="boolean" />
-    </camunda:formData>
+    <operaton:formData>
+      <operaton:formField id="name" label="Name" type="string" />
+      <operaton:formField id="email" label="E-Mail" type="string" />
+      <operaton:formField id="age" label="Age" type="long" />
+      <operaton:formField id="confirmed" label="Confirm membership" type="boolean" />
+    </operaton:formData>
   </bpmn:extensionElements>
 </bpmn:userTask>
 ```
@@ -219,7 +219,7 @@ curl -X POST http://localhost:8080/api/memberships \
 ```
 
 The process reserves a spot, takes the yes path, and waits at the User Task
-`Confirm membership`. Open it in the tasklist (`http://localhost:8080/webapp/#/seven/auth/start`,
+`Confirm membership`. Open it in the tasklist (`http://localhost:8080/operaton/app/cockpit/`,
 admin/admin): name, email, and age are pre-filled. Tick the box for *Confirm
 membership* and complete the task – the instance runs through `Send Welcome Mail` to
 `Membership confirmed`, and `confirmed` is `true` in the history.

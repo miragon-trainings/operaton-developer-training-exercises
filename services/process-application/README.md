@@ -1,15 +1,15 @@
-# CIB Seven Developer Training – Exercises
+# Operaton Developer Training – Exercises
 
 > [🇩🇪 Deutsch](README.de.md) · 🇬🇧 **English**
 
-Welcome to the CIB Seven Developer Training!
+Welcome to the Operaton Developer Training!
 
 **Miravelo** is a lifestyle online shop for people in a quarterlife crisis – portafilter machines,
 running gear, gravel bikes, road bikes. The company is growing, the customer base is growing,
 and the processes have to keep up.
 
 In this module you work your way step by step through 10 exercises that build a complete
-Inner Circle membership process on top of CIB Seven (Camunda Platform 7).
+Inner Circle membership process on top of Operaton (Camunda Platform 7).
 
 ## The complete target process
 
@@ -30,12 +30,12 @@ cd ../../stack && docker-compose up -d
 # Start the application (from this process-application directory)
 ../../mvnw spring-boot:run
 
-# CIB Seven Cockpit
-http://localhost:8080/webapp/#/seven/auth/start  (admin / admin)
+# Operaton Cockpit
+http://localhost:8080/operaton/app/cockpit/  (admin / admin)
 ```
 
 > On delivery this module starts in the state of **Exercise 1** – the
-> CIB Seven engine is still commented out. In Exercise 1 you switch it on.
+> Operaton engine is still commented out. In Exercise 1 you switch it on.
 
 ## Exercise overview
 
@@ -60,7 +60,7 @@ http://localhost:8080/webapp/#/seven/auth/start  (admin / admin)
 The project follows the **hexagonal architecture** (Ports & Adapters):
 
 ```
-REST / CIB7 Delegates     Application              CIB7 / Database
+REST / Operaton Delegates     Application              Operaton / Database
   (inbound adapters)  →  ports + services  →     (outbound adapters)
                               ↑
                            Domain
@@ -70,8 +70,8 @@ REST / CIB7 Delegates     Application              CIB7 / Database
 **Packages under `src/main/java/io/miragon/training/`:**
 
 - `adapter/inbound/rest/` – Spring MVC REST controllers
-- `adapter/inbound/cibseven/` – JavaDelegate implementations (`BaseDelegate`)
-- `adapter/outbound/cibseven/` – Process adapter (start process, correlate messages)
+- `adapter/inbound/operaton/` – JavaDelegate implementations (`BaseDelegate`)
+- `adapter/outbound/operaton/` – Process adapter (start process, correlate messages)
 - `adapter/outbound/db/` – JPA persistence adapter
 - `application/port/inbound/` – Use case interfaces
 - `application/port/outbound/` – Repository and process port interfaces
@@ -100,5 +100,5 @@ this module and continue working with it (valid values: 1–10):
 
 The task replaces `src/main` completely (Java, `application.yaml`, BPMN/DMN); `src/test` stays
 untouched. All modules run on the same port (`8080`) and DB schema (`exercise`), so only ever
-one module runs at a time. The prerequisite is that you enabled the CIB Seven dependencies in
+one module runs at a time. The prerequisite is that you enabled the Operaton dependencies in
 **Exercise 1** (the `pom.xml` is not copied along).

@@ -55,7 +55,7 @@ is plumbing, not engine binding:
 
 - `adapter/inbound/rest/MembershipController.java`
 - `application/service/RegisterMembershipService.java`
-- `adapter/outbound/cibseven/MembershipProcessAdapter.java`
+- `adapter/outbound/operaton/MembershipProcessAdapter.java`
 - `adapter/outbound/db/*` (Entity, Mapper, JpaRepository, PersistenceAdapter)
 - the use-case interfaces in `application/port/inbound/*` (`domain/` and the outbound ports are
   already part of the active skeleton)
@@ -87,7 +87,7 @@ start the process via the process port, return `membership.id()`.
 
 ### 4. Start the process via correlation
 
-**File:** `adapter/outbound/cibseven/MembershipProcessAdapter.java` – **write it yourself.**
+**File:** `adapter/outbound/operaton/MembershipProcessAdapter.java` – **write it yourself.**
 
 A Message Start Event can't be triggered via `startProcessInstanceByKey`. Switch `startProcess(...)`
 to correlating the message `Message_SubscriptionRequested`. The `RuntimeService` gives you a

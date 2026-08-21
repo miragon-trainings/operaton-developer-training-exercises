@@ -7,7 +7,7 @@
 
     <parent>
         <groupId>io.miragon</groupId>
-        <artifactId>cibseven-developer-training-exercises</artifactId>
+        <artifactId>operaton-developer-training-exercises</artifactId>
         <version>1.0-SNAPSHOT</version>
         <!-- Correct once the module lives at services/logistics-service (its home after you copy it in
              Exercise 10): ../../pom.xml is the repo root. While it still sits under templates/ (only the CI
@@ -33,7 +33,7 @@
 
     <properties>
         <!-- Package the generated /engine-rest client lands in (used once you enable the generator). -->
-        <cibseven-client.package>org.cibseven.rest.client</cibseven-client.package>
+        <operaton-client.package>org.operaton.rest.client</operaton-client.package>
     </properties>
 
     <dependencies>
@@ -48,10 +48,10 @@
             <artifactId>spring-boot-devtools</artifactId>
             <optional>true</optional>
         </dependency>
-        <!-- CIB Seven External Task Client (Direction 1: Engine -> Worker) -->
+        <!-- Operaton External Task Client (Direction 1: Engine -> Worker) -->
         <dependency>
-            <groupId>org.cibseven.bpm.springboot</groupId>
-            <artifactId>cibseven-bpm-spring-boot-starter-external-task-client</artifactId>
+            <groupId>org.operaton.bpm.springboot</groupId>
+            <artifactId>operaton-bpm-spring-boot-starter-external-task-client</artifactId>
         </dependency>
         <!-- The generated client is self-contained on Jackson 2 (Spring Boot 4 uses Jackson 3),
              hence the Jackson 2 artifacts + jakarta.annotation explicitly (BOM-managed versions). -->
@@ -86,13 +86,13 @@
 
                  Instead of writing REST calls by hand (error-prone: URIs, the typed
                  variable format {"value": …, "type": …}), we generate a ready-made, typed
-                 client from CIB seven's OFFICIAL OpenAPI spec. The spec ships as
-                 openapi.json in the artifact org.cibseven.bpm:cibseven-engine-rest-openapi (pinned
-                 to ${cib7.version} -> client and engine never drift apart).
+                 client from Operaton's OFFICIAL OpenAPI spec. The spec ships as
+                 openapi.json in the artifact org.operaton.bpm:operaton-engine-rest-openapi (pinned
+                 to ${operaton.version} -> client and engine never drift apart).
 
                  Flow: (1) unpack openapi.json from the artifact, (2) run the OpenAPI generator.
                  The generated classes land under target/generated-sources and are compiled along
-                 automatically (org.cibseven.rest.client.api.* / .model.*).
+                 automatically (org.operaton.rest.client.api.* / .model.*).
 
                  How to enable it:
                    1. Uncomment this block.
@@ -114,9 +114,9 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.cibseven.bpm</groupId>
-                                    <artifactId>cibseven-engine-rest-openapi</artifactId>
-                                    <version>${cib7.version}</version>
+                                    <groupId>org.operaton.bpm</groupId>
+                                    <artifactId>operaton-engine-rest-openapi</artifactId>
+                                    <version>${operaton.version}</version>
                                     <type>jar</type>
                                     <includes>openapi.json</includes>
                                     <outputDirectory>${project.build.directory}/openapi</outputDirectory>
@@ -132,7 +132,7 @@
                 <version>${openapi-generator.version}</version>
                 <executions>
                     <execution>
-                        <id>generate-cibseven-client</id>
+                        <id>generate-operaton-client</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>generate</goal>
@@ -143,9 +143,9 @@
                             <generatorName>TODO-GENERATOR-NAME</generatorName>
                             <!- - TODO Exercise 10: choose the client library that builds on Spring's RestClient (value: restclient) - ->
                             <library>TODO-CLIENT-LIBRARY</library>
-                            <apiPackage>${cibseven-client.package}.api</apiPackage>
-                            <modelPackage>${cibseven-client.package}.model</modelPackage>
-                            <invokerPackage>${cibseven-client.package}.invoker</invokerPackage>
+                            <apiPackage>${operaton-client.package}.api</apiPackage>
+                            <modelPackage>${operaton-client.package}.model</modelPackage>
+                            <invokerPackage>${operaton-client.package}.invoker</invokerPackage>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <generateApiDocumentation>false</generateApiDocumentation>
@@ -196,7 +196,7 @@
                     <outputFolderPath>${project.basedir}/src/main/java</outputFolderPath>
                     <packagePath>io.miragon.training.adapter.process</packagePath>
                     <outputLanguage>JAVA</outputLanguage>
-                    <processEngine>CAMUNDA_7</processEngine>
+                    <processEngine>OPERATON</processEngine>
                 </configuration>
             </plugin>
             -->

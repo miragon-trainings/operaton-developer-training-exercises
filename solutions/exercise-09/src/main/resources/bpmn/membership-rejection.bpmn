@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1d2hcmz" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.20.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.24.0">
-  <bpmn:process id="handleRejection" isExecutable="true" camunda:historyTimeToLive="180">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:operaton="http://operaton.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://operaton.org/schema/modeler/1.0" id="Definitions_1d2hcmz" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.20.0" modeler:executionPlatform="Operaton" modeler:executionPlatformVersion="7.24.0">
+  <bpmn:process id="handleRejection" isExecutable="true" operaton:historyTimeToLive="180">
     <bpmn:startEvent id="startEvent_confirmationRejected" name="Confirmation rejected">
       <bpmn:outgoing>Flow_0vqwqsj</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:businessRuleTask id="serviceTask_categorizeApplicant" name="Categorize applicant" camunda:decisionRef="categorizeApplicant" camunda:mapDecisionResult="singleEntry" camunda:resultVariable="isHighValue">
+    <bpmn:businessRuleTask id="serviceTask_categorizeApplicant" name="Categorize applicant" operaton:decisionRef="categorizeApplicant" operaton:mapDecisionResult="singleEntry" operaton:resultVariable="isHighValue">
       <bpmn:incoming>Flow_0vqwqsj</bpmn:incoming>
       <bpmn:outgoing>Flow_0gvf8zj</bpmn:outgoing>
     </bpmn:businessRuleTask>
@@ -18,7 +18,7 @@
     <bpmn:sequenceFlow id="Flow_07y997b" sourceRef="gateway_highValue" targetRef="userTask_writeRegretMail">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isHighValue}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:userTask id="userTask_writeRegretMail" name="Write an&#10;email expressing regret" camunda:asyncAfter="true">
+    <bpmn:userTask id="userTask_writeRegretMail" name="Write an&#10;email expressing regret" operaton:asyncAfter="true">
       <bpmn:incoming>Flow_07y997b</bpmn:incoming>
       <bpmn:outgoing>Flow_1ufk6o2</bpmn:outgoing>
     </bpmn:userTask>

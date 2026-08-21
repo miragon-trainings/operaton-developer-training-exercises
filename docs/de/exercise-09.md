@@ -126,12 +126,12 @@ Compensating End Event, und die Engine ruft `serviceTask_revokeClaim` auf.
 Das Variablen-Mapping legst du im **Miragon BPMN Modeler** an, nicht direkt im XML: Call
 Activity auswählen → Properties Panel → Abschnitt **In Mapping** → für `membershipId` und
 `age` je ein *Source/Target*-Paar anlegen (Hauptprozess → aufgerufener Prozess). Im XML
-entsteht dabei ein `extensionElements`-Block mit `camunda:in`-Einträgen an der Call Activity:
+entsteht dabei ein `extensionElements`-Block mit `operaton:in`-Einträgen an der Call Activity:
 
 ```xml
 <bpmn:extensionElements>
-  <camunda:in source="membershipId" target="membershipId" />
-  <camunda:in source="age" target="age" />
+  <operaton:in source="membershipId" target="membershipId" />
+  <operaton:in source="age" target="age" />
 </bpmn:extensionElements>
 ```
 

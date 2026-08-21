@@ -1,11 +1,11 @@
 package io.miragon.training.adapter.process;
 
-import dev.bpmcrafters.processengineapi.adapter.cibseven.embedded.shared.EngineCommandExecutor;
+import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.shared.EngineCommandExecutor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Wires the process-engine-api onto the embedded CIB7 engine.
+ * Wires the process-engine-api onto the embedded Operaton engine.
  */
 @Configuration
 public class EngineApiConfiguration {

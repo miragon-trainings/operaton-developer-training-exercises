@@ -16,7 +16,7 @@
 
     <properties>
         <!-- Package the generated /engine-rest client lands in. -->
-        <cibseven-client.package>org.cibseven.rest.client</cibseven-client.package>
+        <operaton-client.package>org.operaton.rest.client</operaton-client.package>
     </properties>
 
     <dependencies>
@@ -31,10 +31,10 @@
             <artifactId>spring-boot-devtools</artifactId>
             <optional>true</optional>
         </dependency>
-        <!-- CIB Seven External Task Client (Richtung 1: Engine -> Worker) -->
+        <!-- Operaton External Task Client (Richtung 1: Engine -> Worker) -->
         <dependency>
-            <groupId>org.cibseven.bpm.springboot</groupId>
-            <artifactId>cibseven-bpm-spring-boot-starter-external-task-client</artifactId>
+            <groupId>org.operaton.bpm.springboot</groupId>
+            <artifactId>operaton-bpm-spring-boot-starter-external-task-client</artifactId>
         </dependency>
         <!-- The generated /engine-rest client is self-contained on Jackson 2 (it builds its own
              ObjectMapper + RestClient converters). Spring Boot 4's starter-web ships Jackson 3, so we
@@ -67,8 +67,8 @@
         </dependency>
         <!-- Standalone in-memory engine for the process test — this service OWNS the model. -->
         <dependency>
-            <groupId>org.cibseven.bpm</groupId>
-            <artifactId>cibseven-engine</artifactId>
+            <groupId>org.operaton.bpm</groupId>
+            <artifactId>operaton-engine</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -78,15 +78,15 @@
         </dependency>
         <!-- BpmnAwareTests (isWaitingAt / hasPassed / isEnded) for expressive process-topology asserts -->
         <dependency>
-            <groupId>org.cibseven.bpm</groupId>
-            <artifactId>cibseven-bpm-assert</artifactId>
+            <groupId>org.operaton.bpm</groupId>
+            <artifactId>operaton-bpm-assert</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- 1. Generate the typed /engine-rest client from CIB seven's official OpenAPI spec.
+            <!-- 1. Generate the typed /engine-rest client from Operaton's official OpenAPI spec.
                     Step 1: unpack the bundled openapi.json from the spec artifact (pinned to the engine
                     version, so client and engine never drift). Step 2: run the OpenAPI Generator. The
                     generated sources land under target/generated-sources and are added to the compile
@@ -104,9 +104,9 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.cibseven.bpm</groupId>
-                                    <artifactId>cibseven-engine-rest-openapi</artifactId>
-                                    <version>${cib7.version}</version>
+                                    <groupId>org.operaton.bpm</groupId>
+                                    <artifactId>operaton-engine-rest-openapi</artifactId>
+                                    <version>${operaton.version}</version>
                                     <type>jar</type>
                                     <includes>openapi.json</includes>
                                     <outputDirectory>${project.build.directory}/openapi</outputDirectory>
@@ -122,7 +122,7 @@
                 <version>${openapi-generator.version}</version>
                 <executions>
                     <execution>
-                        <id>generate-cibseven-client</id>
+                        <id>generate-operaton-client</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>generate</goal>
@@ -131,9 +131,9 @@
                             <inputSpec>${project.build.directory}/openapi/openapi.json</inputSpec>
                             <generatorName>java</generatorName>
                             <library>restclient</library>
-                            <apiPackage>${cibseven-client.package}.api</apiPackage>
-                            <modelPackage>${cibseven-client.package}.model</modelPackage>
-                            <invokerPackage>${cibseven-client.package}.invoker</invokerPackage>
+                            <apiPackage>${operaton-client.package}.api</apiPackage>
+                            <modelPackage>${operaton-client.package}.model</modelPackage>
+                            <invokerPackage>${operaton-client.package}.invoker</invokerPackage>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
                             <generateApiDocumentation>false</generateApiDocumentation>
@@ -170,7 +170,7 @@
                     <outputFolderPath>${project.basedir}/src/main/java</outputFolderPath>
                     <packagePath>io.miragon.training.adapter.process</packagePath>
                     <outputLanguage>JAVA</outputLanguage>
-                    <processEngine>CAMUNDA_7</processEngine>
+                    <processEngine>OPERATON</processEngine>
                 </configuration>
             </plugin>
             <plugin>

@@ -49,13 +49,13 @@ Reference model (unchanged from Exercise 5): `../../models/exercise-06/membershi
 
 ### 1. Add the test dependency
 
-The assertions come from the CIB Seven port of `camunda-bpm-assert`. The version is
+The assertions come from the Operaton port of `camunda-bpm-assert`. The version is
 managed centrally in the root `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>org.cibseven.bpm</groupId>
-    <artifactId>cibseven-bpm-assert</artifactId>
+    <groupId>org.operaton.bpm</groupId>
+    <artifactId>operaton-bpm-assert</artifactId>
     <scope>test</scope>
 </dependency>
 ```
@@ -71,7 +71,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-    url: jdbc:h2:mem:cibseven-test;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS exercise
+    url: jdbc:h2:mem:operaton-test;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS exercise
     username: sa
     password:
     driver-class-name: org.h2.Driver
@@ -83,7 +83,7 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         default_schema: exercise
 
-camunda:
+operaton:
   bpm:
     admin-user:
       id: admin
@@ -95,12 +95,6 @@ camunda:
       enabled: false   # <-- the key point: we run the async continuations ourselves
     webapp:
       enabled: false
-
-# The webapp bean validates this secret at start-up, even when the webapp is off:
-cibseven:
-  webclient:
-    authentication:
-      jwtSecret: M9nU3ORo3s+gK23D9mO5I2h+EIqnosCFDCJi+2bKoulKqZkeQT8pGYg5RhuORlf/fWhLu5meC/SPZCv9NNuj6SK/vE5Sid04UQGrnyh04EpBdiAosAO91xezjgmbSeALUtneibseGpS0tNE4RvLIl+gXiAKqNXyO
 ```
 
 > **Term: job executor.** The engine's background thread. It picks up the jobs that
@@ -127,7 +121,7 @@ every process test; you just call its methods. What it gives you:
   against it.
 
 > The helper needs the engine classes to compile. That is already wired into the module's
-> `pom.xml` (the `cibseven-engine` core dependency), so it compiles from the start – you don't
+> `pom.xml` (the `operaton-engine` core dependency), so it compiles from the start – you don't
 > add anything for it. Open the file once to see how the two or three lines per method work; then
 > just use it.
 

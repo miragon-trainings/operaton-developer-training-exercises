@@ -12,16 +12,16 @@
 > What happens if we have to switch in two years?"*
 > — The person who has lived through a migration before.
 
-Camunda 7 is end-of-life, so we moved to **CIB Seven** – a maintained fork,
+Camunda 7 is end-of-life, so we moved to **Operaton** – a maintained fork,
 a solid choice. But our code knows this a little *too* well: every service task hangs off a
-`JavaDelegate` with `org.cibseven.bpm.engine.delegate.DelegateExecution`, and the
-process adapter calls `RuntimeService` directly. Switching to Camunda 8 or
-Operaton would mean touching every delegate and every engine call.
+`JavaDelegate` with `org.operaton.bpm.engine.delegate.DelegateExecution`, and the
+process adapter calls `RuntimeService` directly. Switching to Camunda 8 or yet another engine
+would mean touching every delegate and every engine call.
 
 The [**Process-Engine-API**](https://github.com/bpm-crafters/process-engine-api) from
 bpm-crafters is an engine-neutral abstraction layer – the way JPA abstracts the database.
-It ships adapters for various BPMN engines (CIB Seven, Camunda 7,
-Camunda 8, Operaton). With it, an engine switch becomes – greatly simplified – a **swap of one
+It ships adapters for various BPMN engines (Operaton, Camunda 7,
+Camunda 8, CIB Seven). With it, an engine switch becomes – greatly simplified – a **swap of one
 adapter**. Never quite that simple in reality, but far simpler than otherwise.
 
 The best part: **domain, application services, and ports stay untouched.** They were
@@ -39,7 +39,7 @@ After this exercise you can
 - start processes and correlate messages engine-neutrally (`StartProcessApi`,
   `CorrelationApi`),
 - explain why external tasks make the `asyncBefore` markers unnecessary,
-- guarantee via an architecture test that no `org.cibseven.bpm` import leaks into the code anymore.
+- guarantee via an architecture test that no `org.operaton.bpm` import leaks into the code anymore.
 
 ## Target model
 
@@ -58,12 +58,12 @@ Called process `handleRejection`:
 
 What changes – and what doesn't:
 
-| Layer | Exercise 10 (native CIB Seven) | Extra Task 1 |
+| Layer | Exercise 10 (native Operaton) | Extra Task 1 |
 |---|---|---|
 | `domain/`, `application/` | unchanged | **unchanged** |
 | Inbound service tasks | `JavaDelegate` + `DelegateExecution` | `@ProcessEngineWorker` worker |
 | Outbound process adapter | `RuntimeService.createMessageCorrelation(...)` | `StartProcessApi` / `CorrelationApi` |
-| BPMN service tasks | `camunda:delegateExpression="#{xDelegate}"` | `camunda:type="external"` + `camunda:topic` |
+| BPMN service tasks | `operaton:delegateExpression="#{xDelegate}"` | `operaton:type="external"` + `operaton:topic` |
 | Bootstrap | `@EnableProcessApplication` | gone – the adapter takes over deployment and workers |
 
 Message start, boundary events, subprocess, call activity, DMN, and compensation stay
@@ -81,9 +81,9 @@ To the module's `pom.xml`:
 
 - `dev.bpm-crafters.process-engine-api:process-engine-api`
 - `dev.bpm-crafters.process-engine-worker:process-engine-worker-spring-boot-starter`
-- `dev.bpm-crafters.process-engine-adapters:process-engine-adapter-cib-seven-embedded-spring-boot-starter`
+- `dev.bpm-crafters.process-engine-adapters:process-engine-adapter-operaton-embedded-spring-boot-starter`
 
-The CIB-Seven-embedded adapter is exactly the dependency you would swap for
+The Operaton-embedded adapter is exactly the dependency you would swap for
 a different adapter when switching engines – workers and ports stay as they are.
 
 ### 2. Switch service tasks to external tasks
@@ -94,18 +94,18 @@ input mapping under the **Input/Output** section so the worker gets the `members
 
 ```xml
 <bpmn:serviceTask id="serviceTask_sendConfirmationMail" name="Send confirmation mail"
-                  camunda:delegateExpression="#{sendConfirmationMailDelegate}">
+                  operaton:delegateExpression="#{sendConfirmationMailDelegate}">
 ```
 
 this becomes an external task with a topic and input mapping – in the XML:
 
 ```xml
 <bpmn:serviceTask id="serviceTask_sendConfirmationMail" name="Send confirmation mail"
-                  camunda:type="external" camunda:topic="sendConfirmationMail">
+                  operaton:type="external" operaton:topic="sendConfirmationMail">
   <bpmn:extensionElements>
-    <camunda:inputOutput>
-      <camunda:inputParameter name="membershipId">${membershipId}</camunda:inputParameter>
-    </camunda:inputOutput>
+    <operaton:inputOutput>
+      <operaton:inputParameter name="membershipId">${membershipId}</operaton:inputParameter>
+    </operaton:inputOutput>
   </bpmn:extensionElements>
 ```
 
@@ -128,7 +128,7 @@ public class SendConfirmationMailDelegate extends BaseDelegate {
 }
 ```
 
-becomes an engine-neutral worker – **without** an `org.cibseven.bpm` import:
+becomes an engine-neutral worker – **without** an `org.operaton.bpm` import:
 
 ```java
 @Component
@@ -221,7 +221,7 @@ dev:
           bpmnResourcePattern: "classpath*:/**/*.bpmn"
           dmnResourcePattern: "classpath*:/**/*.dmn"
       adapter:
-        cib-seven-embedded:
+        operaton-embedded:
           enabled: true
           service-tasks:
             delivery-strategy: embedded_scheduled
@@ -232,12 +232,12 @@ dev:
 ### 6. Set the guardrail
 
 An ArchUnit test makes the core statement verifiable: **nowhere** in the Java code may there
-still be an `org.cibseven.bpm` import.
+still be an `org.operaton.bpm` import.
 
 ```java
 @ArchTest
 static final ArchRule no_class_should_depend_on_the_native_engine = noClasses()
-        .should().dependOnClassesThat().resideInAPackage("org.cibseven.bpm..");
+        .should().dependOnClassesThat().resideInAPackage("org.operaton.bpm..");
 ```
 
 Once the test is green, the engine only lives in `pom.xml` and `application.yaml` – exactly
@@ -270,7 +270,7 @@ MEMBERSHIP_ID=$(curl -s -X POST http://localhost:8080/api/memberships \
 curl -X POST http://localhost:8080/api/memberships/$MEMBERSHIP_ID/reject
 ```
 
-In the Cockpit (`http://localhost:8080/webapp/#/seven/auth/start`, admin/admin): the `sendConfirmationMail`
+In the Cockpit (`http://localhost:8080/operaton/app/cockpit/`, admin/admin): the `sendConfirmationMail`
 worker fires, and the *Confirm membership* user task appears. After the
 withdrawal, the `handleRejection` call activity runs, and then the `revokeClaim` worker fires
 through compensation.
@@ -290,11 +290,11 @@ regret* user task.
 
 ## Self-check
 
-- [ ] All seven service tasks are `camunda:type="external"` with a topic
+- [ ] All seven service tasks are `operaton:type="external"` with a topic
 - [ ] There are no more `JavaDelegate` classes, only `@ProcessEngineWorker` workers
 - [ ] The outbound adapter uses `StartProcessApi` / `CorrelationApi` instead of `RuntimeService`
 - [ ] `@EnableProcessApplication` is removed, the `EngineCommandExecutor` bean is in place
-- [ ] The ArchUnit test reports **zero** dependencies on `org.cibseven.bpm`
+- [ ] The ArchUnit test reports **zero** dependencies on `org.operaton.bpm`
 - [ ] The functional behavior is identical to Exercise 10
 
 ## Hints
@@ -308,6 +308,6 @@ module `cib-seven-with-process-engine-api`.
 
 ## Next step
 
-🦁 **Done!** Your process is engine-neutral. CIB Seven still runs under the hood –
+🦁 **Done!** Your process is engine-neutral. Operaton still runs under the hood –
 but your code knows nothing about it anymore. An engine switch is no longer a code rewrite,
 but an adapter swap.

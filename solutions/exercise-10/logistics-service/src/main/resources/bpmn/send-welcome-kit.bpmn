@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_SendWelcomeKit" targetNamespace="http://miravelo.io/logistics">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:operaton="http://operaton.org/schema/1.0/bpmn" id="Definitions_SendWelcomeKit" targetNamespace="http://miravelo.io/logistics">
   <bpmn:signal id="Signal_MemberActivated" name="Signal_MemberActivated" />
-  <bpmn:process id="sendWelcomeKit" name="Send Welcome Kit" isExecutable="true" camunda:historyTimeToLive="180">
-    <bpmn:startEvent id="startEvent_memberActivated" name="New member activated" camunda:asyncBefore="true">
+  <bpmn:process id="sendWelcomeKit" name="Send Welcome Kit" isExecutable="true" operaton:historyTimeToLive="180">
+    <bpmn:startEvent id="startEvent_memberActivated" name="New member activated" operaton:asyncBefore="true">
       <bpmn:outgoing>Flow_signalToStart</bpmn:outgoing>
       <bpmn:signalEventDefinition id="SignalEventDefinition_memberActivated" signalRef="Signal_MemberActivated" />
     </bpmn:startEvent>
@@ -14,7 +14,7 @@
       <bpmn:incoming>Flow_manualToStart</bpmn:incoming>
       <bpmn:outgoing>Flow_startToShip</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:serviceTask id="serviceTask_shipWelcomeKit" name="Ship welcome kit" camunda:type="external" camunda:topic="shipWelcomeKit">
+    <bpmn:serviceTask id="serviceTask_shipWelcomeKit" name="Ship welcome kit" operaton:type="external" operaton:topic="shipWelcomeKit">
       <bpmn:incoming>Flow_startToShip</bpmn:incoming>
       <bpmn:outgoing>Flow_shipToEnd</bpmn:outgoing>
     </bpmn:serviceTask>

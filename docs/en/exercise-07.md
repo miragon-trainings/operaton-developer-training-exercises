@@ -145,7 +145,7 @@ the process variable `membershipId`.
 
 The notification runs entirely inside the engine – an ordinary delegate:
 
-- `adapter/inbound/cibseven/NotifyCommunityDelegate` – reads `membershipId`, calls the use case.
+- `adapter/inbound/operaton/NotifyCommunityDelegate` – reads `membershipId`, calls the use case.
 - `application/port/inbound/NotifyCommunityUseCase` + `application/service/NotifyCommunityService` –
   loads the membership, builds a `Notification` (title and text) and hands it to the out-port.
 - `application/port/outbound/NotificationPublisherOutPort` +

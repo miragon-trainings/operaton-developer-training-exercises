@@ -1,7 +1,7 @@
 package io.miragon.training.adapter.outbound.engine;
 
-import org.cibseven.rest.client.api.ProcessDefinitionApi;
-import org.cibseven.rest.client.invoker.ApiClient;
+import org.operaton.rest.client.api.ProcessDefinitionApi;
+import org.operaton.rest.client.invoker.ApiClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;

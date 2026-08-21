@@ -52,7 +52,7 @@ process-application  (generischer Engine-Host — eingebettete Engine + /engine-
   • kennt die Logistik nicht und trägt kein send-welcome-kit.bpmn
 
 logistics-service  (Remote-Owner — eigene JVM, :8090)
-  • generierter, typisierter Client (openapi-generator aus cibseven-engine-rest-openapi)
+  • generierter, typisierter Client (openapi-generator aus operaton-engine-rest-openapi)
   • deployt send-welcome-kit.bpmn beim Start per REST in die Engine (idempotent)
   • erfüllt den Service Task shipWelcomeKit als External Task   (Richtung 1: Engine → Worker)
   • steuert die Engine über den generierten Client an             (Richtung 2: Worker → Engine)
@@ -122,13 +122,13 @@ Mail` und `Notify community` bleiben unverändert, es kommt **kein** neues Eleme
 Alle Änderungen machst du im **Miragon BPMN Modeler**, nicht im XML: End Event auswählen →
 in ein **Signal-End-Event** umwandeln → Signal `Signal_MemberActivated` anlegen/auswählen →
 `asyncBefore` setzen. Die Payload (`name`) gibt das End Event über ein **In Mapping**
-(`camunda:in`) mit. Im XML entsteht dabei:
+(`operaton:in`) mit. Im XML entsteht dabei:
 
 ```xml
-<bpmn:endEvent id="endEvent_membershipActivated" name="Membership activated" camunda:asyncBefore="true">
+<bpmn:endEvent id="endEvent_membershipActivated" name="Membership activated" operaton:asyncBefore="true">
   <bpmn:signalEventDefinition signalRef="Signal_MemberActivated">
     <bpmn:extensionElements>
-      <camunda:in source="name" target="name" />
+      <operaton:in source="name" target="name" />
     </bpmn:extensionElements>
   </bpmn:signalEventDefinition>
 </bpmn:endEvent>
@@ -178,14 +178,14 @@ Aktiviere in der `pom.xml` die beiden auskommentierten Generator-Blöcke:
 - **Process-API** (`bpmn-to-code`) – erzeugt aus deinem External Task die Konstante
   `SendWelcomeKitProcessApi.ServiceTasks.SHIP_WELCOME_KIT`.
 - **Engine-Client** (`openapi-generator`) – erzeugt aus der offiziellen OpenAPI-Spec von
-  CIB Seven einen typisierten `/engine-rest`-Client statt handgeschriebener REST-Aufrufe.
+  Operaton einen typisierten `/engine-rest`-Client statt handgeschriebener REST-Aufrufe.
   Setze die beiden `TODO`-Werte: `generatorName` = `java`, `library` = `restclient`.
 
 ```bash
 ./mvnw -pl services/logistics-service generate-sources
 ```
 
-Danach liegen `org.cibseven.rest.client.api` / `.model` unter `target/…` und
+Danach liegen `org.operaton.rest.client.api` / `.model` unter `target/…` und
 `SendWelcomeKitProcessApi` unter `src`.
 
 ### 5. Modell deployen
@@ -212,8 +212,8 @@ Das nutzt das manuelle Start Event und steckt hinter der Aktion `POST /api/welco
 
 - Der Host trägt **kein** `send-welcome-kit.bpmn`. Wenn es dort landet, ist die Aussage der
   Aufgabe kaputt.
-- CIB Seven läuft weiterhin eingebettet im Host. „Remote" ist die Sicht des **Clients**; eine
-  echte Standalone-Engine (`cibseven/cibseven:run`) ergäbe dasselbe Bild mit ausgetauschtem Host.
+- Operaton läuft weiterhin eingebettet im Host. „Remote" ist die Sicht des **Clients**; eine
+  echte Standalone-Engine (Operaton Run) ergäbe dasselbe Bild mit ausgetauschtem Host.
 - Der Logistik-Service läuft auf Port `8090`, der Host auf `8080`.
 - Der Aufbau orientiert sich am Blueprint
   [`miragon-blueprints/cibseven-remote-example`](https://github.com/miragon-blueprints/cibseven-remote-example)
@@ -248,7 +248,7 @@ cd solutions/exercise-10/logistics-service && ../../../mvnw spring-boot:run
 # 3. Beweis, dass der Remote-Service das Modell deployt hat:
 curl http://localhost:8080/engine-rest/deployment
 
-# 4. Mitglied anlegen, im Cockpit (http://localhost:8080/webapp/#/seven/auth/start, admin/admin) die
+# 4. Mitglied anlegen, im Cockpit (http://localhost:8080/operaton/app/cockpit/, admin/admin) die
 #    Confirm-Aufgabe abschließen → das Signal feuert → eine sendWelcomeKit-Instanz läuft
 curl -X POST http://localhost:8080/api/memberships \
   -H "Content-Type: application/json" \
@@ -277,7 +277,7 @@ er holt den Task ab und verschickt das Kit.
 
 ## Hinweise
 
-**Signal-Broadcast ist im Werfer synchron.** In CIB Seven und Camunda 7 wird ein Signal **in
+**Signal-Broadcast ist im Werfer synchron.** In Operaton und Camunda 7 wird ein Signal **in
 der Transaktion des Werfers** zugestellt. Ohne Marker würde das Signal-End-Event die
 `sendWelcomeKit`-Instanz anlegen und synchron bis zum External Task ausführen – alles in der
 Aktivierungstransaktion der Membership. Ein Fehler dort (Prozess noch nicht deployt, Race

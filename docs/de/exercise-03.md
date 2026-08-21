@@ -43,8 +43,8 @@ Die Klassen für diese Aufgabe sind mit `TODO Exercise 3` auskommentiert. Kommen
 
 - `application/port/inbound/SendWelcomeMailUseCase.java`
 - `application/service/SendWelcomeMailService.java`
-- `adapter/inbound/cibseven/BaseDelegate.java`
-- `adapter/inbound/cibseven/SendWelcomeMailDelegate.java`
+- `adapter/inbound/operaton/BaseDelegate.java`
+- `adapter/inbound/operaton/SendWelcomeMailDelegate.java`
 
 `SendWelcomeMailService` und `BaseDelegate` sind danach fertig; der Delegate trägt weiterhin ein
 `TODO` – die Engine-Anbindung schreibst du selbst.
@@ -67,7 +67,7 @@ nicht in den Delegate.
 
 ### 4. `SendWelcomeMailDelegate` implementieren
 
-**Datei:** `adapter/inbound/cibseven/SendWelcomeMailDelegate.java` – **selbst schreiben.**
+**Datei:** `adapter/inbound/operaton/SendWelcomeMailDelegate.java` – **selbst schreiben.**
 
 Ersetze das `TODO` in `executeTask(execution)`:
 

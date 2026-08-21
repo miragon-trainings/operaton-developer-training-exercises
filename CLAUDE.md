@@ -27,14 +27,14 @@ cd solutions/exercise-01 && ../../mvnw spring-boot:run
 ./mvnw test -Dtest=<TestClassName>
 ```
 
-CIB Seven Cockpit: `http://localhost:8080/webapp/#/seven/auth/start` (admin/admin)
+Operaton Cockpit: `http://localhost:8080/operaton/app/cockpit/` (admin/admin)
 
 ## Architecture
 
 Hexagonal architecture (ports & adapters) enforced at build time via ArchUnit tests:
 
 ```
-REST / JavaDelegates           Application              CIB7 / Database
+REST / JavaDelegates           Application              Operaton / Database
   (inbound adapters)   →   ports + services   →     (outbound adapters)
                                ↑
                             Domain
@@ -44,8 +44,8 @@ REST / JavaDelegates           Application              CIB7 / Database
 **Package layout** under `src/main/java/io/miragon/training/`:
 
 - `adapter/inbound/rest/` — Spring MVC REST controllers
-- `adapter/inbound/cibseven/` — JavaDelegate implementations (`DelegateExpression`)
-- `adapter/outbound/cibseven/` — Process engine adapter (start process instances, correlate messages)
+- `adapter/inbound/operaton/` — JavaDelegate implementations (`DelegateExpression`)
+- `adapter/outbound/operaton/` — Process engine adapter (start process instances, correlate messages)
 - `adapter/outbound/db/` — JPA persistence adapter
 - `application/port/inbound/` — Use case interfaces
 - `application/port/outbound/` — Repository and process port interfaces
@@ -54,7 +54,7 @@ REST / JavaDelegates           Application              CIB7 / Database
 
 ## Key Technologies
 
-- **CIB Seven** — Community distribution of Camunda Platform 7, runs embedded in Spring Boot
+- **Operaton** — Community-driven fork of Camunda 7, runs embedded in Spring Boot
 - **JavaDelegate** — Service tasks use `DelegateExpression` (e.g. `#{sendWelcomeMailDelegate}`) to bind to Spring beans
 - **ArchUnit** — Architecture tests in `ArchitectureTest.java`
 
@@ -62,7 +62,7 @@ REST / JavaDelegates           Application              CIB7 / Database
 
 Multi-module Maven project:
 - `services/process-application/` — The main module participants work in. Ships in the Aufgabe-1 (Hybrid) state:
-  full hexagonal skeleton present, but CIB deps/config/`@SpringBootApplication` (`TODO Exercise 1`)
+  full hexagonal skeleton present, but Operaton deps/config/`@SpringBootApplication` (`TODO Exercise 1`)
   and the business-layer beans are commented out. The early ramp is gradual: Exercise 1 = switch the
   engine on + run the given start-form / Manual-Task model (no code); Exercise 2 = model a User Task
   with a self-made Generated Form (Cockpit only, still no Java); Exercise 3 = uncomment + implement the
@@ -73,10 +73,10 @@ Multi-module Maven project:
   participant copies it into `services/logistics-service` and adds the `<module>` line. It OWNS a small
   `sendWelcomeKit` process (Signal-Start → external task `shipWelcomeKit` → End), deploys its own BPMN into
   the engine at start-up, fulfils the task via the external-task client, and drives the engine via a typed
-  client it **generates itself** (`openapi-generator-maven-plugin`, spec `cibseven-engine-rest-openapi`,
-  package `org.cibseven.rest.client.*`). Runs on :8090. Ships dormant/compilable with `TODO Exercise 10`
+  client it **generates itself** (`openapi-generator-maven-plugin`, spec `operaton-engine-rest-openapi`,
+  package `org.operaton.rest.client.*`). Runs on :8090. Ships dormant/compilable with `TODO Exercise 10`
   (the generator block + client wiring are commented out). Verified in CI via the `-Pexercise-10` profile.
-  (Replaces the former `notification-service` / the separate `cibseven-engine-client` module.)
+  (Replaces the former `notification-service` / the separate `operaton-engine-client` module.)
 - `docs/` — Per-exercise instructions (`exercise-00.md … exercise-10.md`) + assets.
 - `solutions/exercise-{01-10}/` + `solutions/extra-task-1/` — Cumulative solutions, each building on the previous.
   Exercise 10 is nested into two sub-services: `solutions/exercise-10/process-application/` (the generic

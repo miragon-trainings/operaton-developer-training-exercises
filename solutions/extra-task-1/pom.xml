@@ -18,16 +18,21 @@
         <!-- bpm-crafters process-engine-api: engine-neutral abstraction layer -->
         <process-engine-api.version>1.7</process-engine-api.version>
         <process-engine-worker.version>0.8.5</process-engine-worker.version>
-        <process-engine-adapter-cib7.version>2026.07.1</process-engine-adapter-cib7.version>
+        <!--
+          The bpm-crafters Operaton adapter is not yet released to Maven Central (see the note in
+          solutions/pom.xml). Until it ships, use the develop SNAPSHOT (resolved from the Central
+          snapshots repository declared below). Bump to the release version once available.
+        -->
+        <process-engine-adapter-operaton.version>2026.07.2-SNAPSHOT</process-engine-adapter-operaton.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!-- Aligns the versions of the CIB Seven process-engine-adapter modules -->
+            <!-- Aligns the versions of the Operaton process-engine-adapter modules -->
             <dependency>
                 <groupId>dev.bpm-crafters.process-engine-adapters</groupId>
-                <artifactId>process-engine-adapter-cib-seven-bom</artifactId>
-                <version>${process-engine-adapter-cib7.version}</version>
+                <artifactId>process-engine-adapter-operaton-bom</artifactId>
+                <version>${process-engine-adapter-operaton.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -57,14 +62,14 @@
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <!-- CIB Seven engine + Cockpit-Webapp + REST-API (Version zentral gemanagt) -->
+        <!-- Operaton engine + Cockpit-Webapp + REST-API (Version zentral gemanagt) -->
         <dependency>
-            <groupId>org.cibseven.bpm.springboot</groupId>
-            <artifactId>cibseven-bpm-spring-boot-starter-webapp-4</artifactId>
+            <groupId>org.operaton.bpm.springboot</groupId>
+            <artifactId>operaton-bpm-spring-boot-starter-webapp</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.cibseven.bpm.springboot</groupId>
-            <artifactId>cibseven-bpm-spring-boot-starter-rest-4</artifactId>
+            <groupId>org.operaton.bpm.springboot</groupId>
+            <artifactId>operaton-bpm-spring-boot-starter-rest</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -89,11 +94,11 @@
             <artifactId>process-engine-worker-spring-boot-starter</artifactId>
             <version>${process-engine-worker.version}</version>
         </dependency>
-        <!-- CIB Seven adapter: plugs the process-engine-api onto the embedded CIB7 engine -->
+        <!-- Operaton adapter: plugs the process-engine-api onto the embedded Operaton engine -->
         <dependency>
             <groupId>dev.bpm-crafters.process-engine-adapters</groupId>
-            <artifactId>process-engine-adapter-cib-seven-embedded-spring-boot-starter</artifactId>
-            <version>${process-engine-adapter-cib7.version}</version>
+            <artifactId>process-engine-adapter-operaton-embedded-spring-boot-starter</artifactId>
+            <version>${process-engine-adapter-operaton.version}</version>
         </dependency>
         <!-- Runtime types referenced by the bpmn-to-code generated process API -->
         <dependency>
@@ -123,7 +128,7 @@
                     <outputFolderPath>${project.basedir}/src/main/java</outputFolderPath>
                     <packagePath>io.miragon.training.adapter.process</packagePath>
                     <outputLanguage>JAVA</outputLanguage>
-                    <processEngine>CAMUNDA_7</processEngine>
+                    <processEngine>OPERATON</processEngine>
                 </configuration>
             </plugin>
             <plugin>
@@ -135,5 +140,23 @@
             </plugin>
         </plugins>
     </build>
+
+    <!--
+      Only needed while the bpm-crafters Operaton adapter is a SNAPSHOT (see the version note above).
+      Remove once a released adapter version is used.
+    -->
+    <repositories>
+        <repository>
+            <id>central-snapshots</id>
+            <name>Maven Central Snapshots</name>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
 </project>

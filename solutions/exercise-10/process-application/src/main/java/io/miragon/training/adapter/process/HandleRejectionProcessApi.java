@@ -11,7 +11,7 @@ import java.util.List;
 public final class HandleRejectionProcessApi {
   public static final ProcessId PROCESS_ID = new ProcessId("handleRejection");
 
-  public static final BpmnEngine PROCESS_ENGINE = BpmnEngine.CAMUNDA_7;
+  public static final BpmnEngine PROCESS_ENGINE = BpmnEngine.OPERATON;
 
   /**
    * BPMN element ids as declared in the source model.
