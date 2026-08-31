@@ -30,7 +30,7 @@ cd solutions/exercise-01 && ../../mvnw spring-boot:run
 Operaton Cockpit: `http://localhost:8080/operaton/app/cockpit/` (admin/admin)
 
 EnterpriseGlue The Bridge (optional additional UI): `http://localhost:8081`
-(`admin@operaton-training.local` / `TrainingAdmin123!`). Register the engine under
+(`admin@enterpriseglue.com` / `adminadmin`). Register the engine under
 Platform Settings → Engines with base URL `http://host.docker.internal:8080/engine-rest`
 (the Bridge backend runs in Docker, so it reaches the host engine via `host.docker.internal`).
 

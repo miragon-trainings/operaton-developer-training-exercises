@@ -78,9 +78,11 @@ services:
       POSTGRES_SCHEMA: main
       POSTGRES_SSL: "false"
       POSTGRES_SSL_REJECT_UNAUTHORIZED: "false"
-      # --- Seeded admin (dev only) — used to log in to the Bridge ---
-      ADMIN_EMAIL: admin@operaton-training.local
-      ADMIN_PASSWORD: TrainingAdmin123!
+      # --- Seeded admin (dev only) — log in to the Bridge with these credentials ---
+      # NOTE: the Bridge validates both: ADMIN_EMAIL must be a valid email address and
+      # ADMIN_PASSWORD must be at least 8 characters — so a plain "admin"/"admin" is rejected.
+      ADMIN_EMAIL: admin@enterpriseglue.com
+      ADMIN_PASSWORD: adminadmin
       ADMIN_EMAIL_VERIFICATION_EXEMPT: "true"   # let the seeded admin log in without email verification
       # --- Secrets (throwaway dev values — DO NOT reuse in production) ---
       JWT_SECRET: 1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f809

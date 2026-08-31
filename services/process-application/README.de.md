@@ -34,7 +34,7 @@ cd ../../stack && docker-compose up -d
 http://localhost:8080/operaton/app/cockpit/  (admin / admin)
 
 # EnterpriseGlue The Bridge (optionale zusätzliche UI)
-http://localhost:8081  (admin@operaton-training.local / TrainingAdmin123!)
+http://localhost:8081  (admin@enterpriseglue.com / adminadmin)
 ```
 
 > Im Auslieferungszustand startet dieses Modul im Zustand von **Aufgabe 1** – die

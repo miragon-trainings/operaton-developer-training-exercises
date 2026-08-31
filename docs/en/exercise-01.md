@@ -126,7 +126,7 @@ there – complementary to the Cockpit. It already started with the stack in ste
 in, and connect it to your engine.
 
 1. Open [http://localhost:8081](http://localhost:8081) and log in with the dev admin
-   (`admin@operaton-training.local` / `TrainingAdmin123!`).
+   (`admin@enterpriseglue.com` / `adminadmin`).
 2. Register the engine under **Platform Settings → Engines** with the base URL
    `http://host.docker.internal:8080/engine-rest`. That is the same REST API the Cockpit uses; the
    training engine runs without authentication. From inside the container the host is reachable via

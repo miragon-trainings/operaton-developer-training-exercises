@@ -127,7 +127,7 @@ modellieren, deployen und verwalten – ergänzend zum Cockpit. Sie ist in Schri
 schon gestartet. Öffne sie, melde dich an und verbinde sie mit deiner Engine.
 
 1. Öffne [http://localhost:8081](http://localhost:8081) und melde dich mit dem Dev-Admin an
-   (`admin@operaton-training.local` / `TrainingAdmin123!`).
+   (`admin@enterpriseglue.com` / `adminadmin`).
 2. Registriere die Engine unter **Platform Settings → Engines** mit der Basis-URL
    `http://host.docker.internal:8080/engine-rest`. Das ist dieselbe REST-Schnittstelle, die auch
    das Cockpit nutzt; die Trainings-Engine läuft ohne Authentifizierung. Aus dem Container heraus
