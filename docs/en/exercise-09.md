@@ -144,7 +144,7 @@ MEMBERSHIP_ID=$(curl -s -X POST http://localhost:8080/api/memberships \
 curl -X POST http://localhost:8080/api/memberships/$MEMBERSHIP_ID/reject
 ```
 
-In the Cockpit: the main instance sits at the Call Activity `callActivity_handleRejection`, while an **own process instance** of `handleRejection` runs through. The Business Rule Task evaluates the DMN, `isHighValue` is `false`, the Exclusive Gateway takes the default flow, and the called instance ends at *Accept rejection*. Back in the main instance, the Compensating End Event fires, and the log shows the spot being released.
+In the Cockpit: the main instance sits at the Call Activity `callActivity_handleRejection`, while an **own process instance** of `handleRejection` runs through. The Business Rule Task evaluates the DMN, `isHighValue` is `false`, the Exclusive Gateway takes the default flow, and the called instance ends at *Accept rejection*. Back in the main instance, the Compensating End Event fires, and the log shows the spot being released. In the Bridge, `handleRejection` appears as its own process definition (see Exercise 1).
 
 **Rejection within the target group:**
 

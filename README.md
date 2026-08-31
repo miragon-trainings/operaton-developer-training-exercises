@@ -36,7 +36,7 @@ Detailed exercise descriptions can be found in [`docs/`](docs/).
 | Exercise | Topic | Description |
 |---|---|---|
 | [0](docs/en/exercise-00.md) | Business-level BPMN modeling | Model the complete Inner Circle membership process at the business level — the shared target for the whole training |
-| [1](docs/en/exercise-01.md) | Getting the engine running | Run the given start-form / Manual-Task model end-to-end, get to know the Cockpit and the engine's `act_*` tables |
+| [1](docs/en/exercise-01.md) | Getting the engine running | Run the given start-form / Manual-Task model end-to-end, get to know the Cockpit, the engine's `act_*` tables, and EnterpriseGlue The Bridge |
 | [2](docs/en/exercise-02.md) | The first wait state | Turn the "Confirm" Manual Task into a User Task and give it a self-made Generated Form |
 | [3](docs/en/exercise-03.md) | Automate a step | Turn the "Send welcome mail" Manual Task into a Service Task backed by a JavaDelegate (Cockpit-started) |
 | [4](docs/en/exercise-04.md) | The application takes over | Message start event, REST register + confirm endpoints, message correlation, persistence |
@@ -57,7 +57,7 @@ Detailed exercise descriptions can be found in [`docs/`](docs/).
 ## Quick Start
 
 ```bash
-# Start PostgreSQL
+# Start PostgreSQL, MailHog and EnterpriseGlue The Bridge
 cd stack && docker-compose up -d
 
 # Build everything
@@ -68,6 +68,9 @@ cd services/process-application && ../../mvnw spring-boot:run
 
 # Operaton Cockpit
 open http://localhost:8080/operaton/app/cockpit/    # admin / admin
+
+# EnterpriseGlue The Bridge (additional UI)
+open http://localhost:8081                          # admin@enterpriseglue.com / adminadmin
 ```
 
 ### Loading an exercise solution
@@ -116,7 +119,7 @@ operaton-developer-training-exercises/
 │   └── extra-task-1/
 ├── models/                           # Reference BPMN/DMN models
 ├── stack/
-│   ├── docker-compose.yml            # PostgreSQL + MailHog
+│   ├── docker-compose.yml            # PostgreSQL + MailHog + EnterpriseGlue The Bridge
 │   └── init-schemas.sql
 └── pom.xml
 ```
@@ -131,12 +134,15 @@ operaton-developer-training-exercises/
 | Database | PostgreSQL (JPA / Hibernate) |
 | Build | Maven |
 | Architecture tests | ArchUnit |
+| Process UIs | Operaton Cockpit + EnterpriseGlue The Bridge |
 
 ## Operaton
 
 [Operaton](https://operaton.org) is a community-driven, Apache-2.0 fork of Camunda 7. It offers full compatibility with the Camunda 7 API and is developed further independently as open source.
 
 In this project, Operaton runs embedded in Spring Boot, provides the classic web applications (Cockpit, Tasklist, Admin) at `http://localhost:8080/operaton/app/cockpit/`, and handles the BPMN process execution for the Inner Circle membership process.
+
+As an **additional UI**, [EnterpriseGlue The Bridge](https://github.com/EnterpriseGlue/enterpriseglue-the-bridge-oss) — an open-source portal to design, deploy and manage BPMN/DMN processes — runs alongside the stack at `http://localhost:8081`. It connects to the same engine REST API (`/engine-rest`) that the Cockpit uses; you set it up in Exercise 1.
 
 Service tasks are wired up via the `JavaDelegate` pattern with `DelegateExpression`:
 

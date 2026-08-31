@@ -24,7 +24,7 @@ Der ausgelagerte Sub-Prozess für die Ablehnung (Call Activity + DMN):
 ## Voraussetzungen
 
 ```bash
-# PostgreSQL und MailHog starten (im Stack-Verzeichnis)
+# PostgreSQL, MailHog und EnterpriseGlue The Bridge starten (im Stack-Verzeichnis)
 cd ../../stack && docker-compose up -d
 
 # Anwendung starten (aus diesem process-application-Verzeichnis)
@@ -32,6 +32,9 @@ cd ../../stack && docker-compose up -d
 
 # Operaton Cockpit
 http://localhost:8080/operaton/app/cockpit/  (admin / admin)
+
+# EnterpriseGlue The Bridge (zusätzliche UI)
+http://localhost:8081  (admin@enterpriseglue.com / adminadmin)
 ```
 
 > Im Auslieferungszustand startet dieses Modul im Zustand von **Aufgabe 1** – die

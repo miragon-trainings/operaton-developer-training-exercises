@@ -107,6 +107,7 @@ Englische Fachbegriffe bleiben englisch, wenn sie im Werkzeug so heißen. Sie we
 | Transaktionsgrenze, Kompensation, Korrelation | Transaction Boundary, Compensation |
 | Aufgabe 4 | Exercise 4, Übung 4 |
 | Engine, Cockpit, Tasklist | Maschine, Steuerpult |
+| EnterpriseGlue The Bridge, Bridge | (nicht eindeutschen, nicht deklinieren) |
 
 ### Präzision vor Umschreibung
 
@@ -212,7 +213,7 @@ fachliche Vorgriff in Aufgabe 0 gilt nicht als doppelte Einführung.
 | Aufgabe | Wird hier eingeführt |
 |---|---|
 | 0 | fachliche Modellierung; Anwendung aller BPMN-Grundformen aus Kapitel 1 – Start/End Event, User Task, Service Task, Sequenzfluss, eingebetteter Subprozess, Boundary Event, Exclusive/Parallel Gateway, Kompensation (rein fachlich) |
-| 1 | Engine, Deployment, Cockpit, Tasklist, Prozessdefinition, **Prozessinstanz**, Prozessvariable, **Start-Formular** (Generated Form am Start Event, vorhanden), **Manual Task** (Durchlauf ohne Code), `act_*`-Tabellen (`re` / `ru` / `hi`) |
+| 1 | Engine, Deployment, Cockpit, Tasklist, Prozessdefinition, **Prozessinstanz**, Prozessvariable, **Start-Formular** (Generated Form am Start Event, vorhanden), **Manual Task** (Durchlauf ohne Code), `act_*`-Tabellen (`re` / `ru` / `hi`), **EnterpriseGlue The Bridge** (zusätzliche UI, spricht `engine-rest`) |
 | 2 | Prozess-Key, Element-ID, `isExecutable`, `historyTimeToLive`, **User Task**, **Wait State**, **Generated Form selbst erstellen** (am User Task) |
 | 3 | Manual Task → **Service Task**, **JavaDelegate**, **Delegate Expression**, hexagonale Architektur (Delegate → Use Case → Service), Prozessvariable im Delegate lesen |
 | 4 | Message Start Event, Nachricht, **Korrelation** (`createMessageCorrelation` / `correlateStartMessage`), **`RuntimeService`** (Prozessstart aus Java), **REST-Endpunkt**, **Persistenz** (Repository), Task-Completion per REST (Confirm-Endpunkt), `membershipId` als Prozessreferenz |

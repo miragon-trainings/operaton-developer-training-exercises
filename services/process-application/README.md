@@ -24,7 +24,7 @@ The extracted sub-process for the rejection (Call Activity + DMN):
 ## Prerequisites
 
 ```bash
-# Start PostgreSQL and MailHog (in the stack directory)
+# Start PostgreSQL, MailHog and EnterpriseGlue The Bridge (in the stack directory)
 cd ../../stack && docker-compose up -d
 
 # Start the application (from this process-application directory)
@@ -32,6 +32,9 @@ cd ../../stack && docker-compose up -d
 
 # Operaton Cockpit
 http://localhost:8080/operaton/app/cockpit/  (admin / admin)
+
+# EnterpriseGlue The Bridge (additional UI)
+http://localhost:8081  (admin@enterpriseglue.com / adminadmin)
 ```
 
 > On delivery this module starts in the state of **Exercise 1** – the

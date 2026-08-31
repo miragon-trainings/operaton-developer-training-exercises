@@ -85,7 +85,7 @@ löst der Abbruch die Kompensation aus.
 2. Warte, bis das Timer Boundary Event feuert.
 3. Im Log erscheint die Freigabe (`Revoking membership claim for …`) – obwohl kein
    expliziter Task mehr im Pfad liegt.
-4. Im Cockpit endet die Instanz an „Membership declined".
+4. Im Cockpit endet die Instanz an „Membership declined" (auch in der Bridge sichtbar, siehe Aufgabe 1).
 
 **Abbruch durch Rückzug:**
 

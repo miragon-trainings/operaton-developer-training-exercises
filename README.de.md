@@ -37,7 +37,7 @@ Detaillierte Aufgabenbeschreibungen befinden sich in [`docs/`](docs/).
 | Aufgabe | Thema | Beschreibung |
 |---|---|---|
 | [0](docs/de/exercise-00.md) | Fachliche BPMN-Modellierung | Den kompletten Inner-Circle-Membership-Prozess rein fachlich modellieren — die gemeinsame Vorlage für das ganze Training |
-| [1](docs/de/exercise-01.md) | Engine zum Laufen bringen | Das vorgegebene Start-Formular-/Manual-Task-Modell durchlaufen lassen, Cockpit und `act_*`-Tabellen der Engine kennenlernen |
+| [1](docs/de/exercise-01.md) | Engine zum Laufen bringen | Das vorgegebene Start-Formular-/Manual-Task-Modell durchlaufen lassen, Cockpit, `act_*`-Tabellen der Engine und EnterpriseGlue The Bridge kennenlernen |
 | [2](docs/de/exercise-02.md) | Der erste Wartepunkt | Aus dem Manual Task „Confirm" einen User Task machen und ihm eine selbst erstellte Generated Form geben |
 | [3](docs/de/exercise-03.md) | Einen Schritt automatisieren | Aus dem Manual Task „Send welcome mail" einen Service Task mit JavaDelegate machen (Start über Cockpit) |
 | [4](docs/de/exercise-04.md) | Die Anwendung übernimmt | Message Start Event, REST-Endpunkte für Register + Confirm, Nachrichten-Korrelation, Persistenz |
@@ -58,7 +58,7 @@ Detaillierte Aufgabenbeschreibungen befinden sich in [`docs/`](docs/).
 ## Quick Start
 
 ```bash
-# PostgreSQL starten
+# PostgreSQL, MailHog und EnterpriseGlue The Bridge starten
 cd stack && docker-compose up -d
 
 # Alles bauen
@@ -69,6 +69,9 @@ cd services/process-application && ../../mvnw spring-boot:run
 
 # Operaton Cockpit
 open http://localhost:8080/operaton/app/cockpit/    # admin / admin
+
+# EnterpriseGlue The Bridge (zusätzliche UI)
+open http://localhost:8081                          # admin@enterpriseglue.com / adminadmin
 ```
 
 ### Lösung einer Aufgabe laden
@@ -117,7 +120,7 @@ operaton-developer-training-exercises/
 │   └── extra-task-1/
 ├── models/                           # Referenz-BPMN-/DMN-Modelle
 ├── stack/
-│   ├── docker-compose.yml            # PostgreSQL + MailHog
+│   ├── docker-compose.yml            # PostgreSQL + MailHog + EnterpriseGlue The Bridge
 │   └── init-schemas.sql
 └── pom.xml
 ```
@@ -132,12 +135,15 @@ operaton-developer-training-exercises/
 | Datenbank | PostgreSQL (JPA / Hibernate) |
 | Build | Maven |
 | Architektur-Tests | ArchUnit |
+| Prozess-UIs | Operaton Cockpit + EnterpriseGlue The Bridge |
 
 ## Operaton
 
 [Operaton](https://operaton.org) ist ein community-getriebener, Apache-2.0-lizenzierter Fork von Camunda 7. Es bietet volle Kompatibilität mit der Camunda-7-API und wird unabhängig als Open Source weiterentwickelt.
 
 In diesem Projekt läuft Operaton eingebettet in Spring Boot, stellt die klassischen Weboberflächen (Cockpit, Tasklist, Admin) unter `http://localhost:8080/operaton/app/cockpit/` bereit und übernimmt die BPMN-Prozessausführung für den Inner-Circle-Membership-Prozess.
+
+Als **zusätzliche UI** läuft [EnterpriseGlue The Bridge](https://github.com/EnterpriseGlue/enterpriseglue-the-bridge-oss) — ein Open-Source-Portal zum Modellieren, Deployen und Verwalten von BPMN/DMN-Prozessen — parallel im Stack unter `http://localhost:8081`. Es spricht dieselbe Engine-REST-API (`/engine-rest`) wie das Cockpit; eingerichtet wird es in Aufgabe 1.
 
 Service Tasks werden über das `JavaDelegate`-Pattern mit `DelegateExpression` angebunden:
 

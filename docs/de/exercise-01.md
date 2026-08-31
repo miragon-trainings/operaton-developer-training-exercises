@@ -2,7 +2,7 @@
 
 > **Voraussetzung:** Aufgabe 0 ist abgeschlossen (der Sollprozess liegt fachlich vor).
 > **Arbeitsverzeichnis:** `services/process-application`
-> **Neu in dieser Aufgabe:** Operaton-Starter, Engine-Konfiguration, Auto-Deployment, Cockpit, `act_*`-Tabellen, Start-Formular, Manual Task.
+> **Neu in dieser Aufgabe:** Operaton-Starter, Engine-Konfiguration, Auto-Deployment, Cockpit, `act_*`-Tabellen, Start-Formular, Manual Task, EnterpriseGlue The Bridge (zusätzliche UI).
 
 ## Darum geht es
 
@@ -48,7 +48,7 @@ Aufgabe nichts – du bringst ihn zum Laufen.
 ### 1. Datenbank starten
 
 Die Engine speichert ihren gesamten Zustand in einer relationalen Datenbank. Fahre zuerst den
-Docker-Stack hoch; er bringt PostgreSQL und MailHog mit:
+Docker-Stack hoch; er bringt PostgreSQL, MailHog und EnterpriseGlue The Bridge mit:
 
 ```bash
 cd stack && docker-compose up -d
@@ -120,7 +120,27 @@ Das Cockpit ist die Weboberfläche der Engine. Öffne
 der technische Prozess-Key dahinter ist `subscribeNewsletter`. Klick dich durch **Cockpit**,
 **Tasklist** und **Admin**.
 
-### 9. Prozess durchspielen
+### 9. EnterpriseGlue The Bridge verbinden
+
+Die Bridge ist eine zusätzliche Weboberfläche für die Engine: Hier lassen sich Prozesse
+modellieren, deployen und verwalten – ergänzend zum Cockpit. Sie ist in Schritt 1 mit dem Stack
+schon gestartet. Öffne sie, melde dich an und verbinde sie mit deiner Engine.
+
+1. Öffne [http://localhost:8081](http://localhost:8081) und melde dich mit dem Dev-Admin an
+   (`admin@enterpriseglue.com` / `adminadmin`).
+2. Registriere die Engine unter **Platform Settings → Engines** mit der Basis-URL
+   `http://host.docker.internal:8080/engine-rest`. Das ist dieselbe REST-Schnittstelle, die auch
+   das Cockpit nutzt; die Trainings-Engine läuft ohne Authentifizierung. Aus dem Container heraus
+   ist der Host über `host.docker.internal` erreichbar – nicht über `localhost`.
+3. Danach erscheint dieselbe Prozessdefinition (`Join Inner Circle` / `subscribeNewsletter`) auch
+   in der Bridge.
+
+> **Begriff: EnterpriseGlue The Bridge.** Eine zusätzliche UI für die Engine (BPMN/DMN
+> modellieren, deployen und verwalten). Sie spricht dieselbe `engine-rest`-API wie das Cockpit und
+> ist damit eine Alternative zu den klassischen Operaton-Weboberflächen. Die genaue Bezeichnung der
+> Felder kann je nach Bridge-Version abweichen; entscheidend ist die Engine-Basis-URL.
+
+### 10. Prozess durchspielen
 
 Der Prozess ist deployt, aber noch nie gelaufen. Starte ihn über das Start-Formular:
 
@@ -163,6 +183,7 @@ End Event durch.
 - [ ] `Join Inner Circle` erscheint im Cockpit unter **Processes**
 - [ ] Eine über das Start-Formular gestartete Instanz läuft vollständig durch (History `COMPLETED`)
 - [ ] Du kannst erklären, warum die Instanz mit lauter Manual Tasks nirgends wartet
+- [ ] Die Bridge ist unter `http://localhost:8081` erreichbar und zeigt nach dem Verbinden dieselbe Prozessdefinition
 
 ## Hinweise
 
