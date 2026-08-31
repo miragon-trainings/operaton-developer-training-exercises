@@ -49,7 +49,7 @@ services:
       retries: 20
 
   enterpriseglue-backend:
-    image: ghcr.io/enterpriseglue/enterpriseglue-the-bridge-oss-backend:v0.10.2
+    image: ghcr.io/enterpriseglue/enterpriseglue-the-bridge-oss-backend:v0.19.2
     container_name: enterpriseglue-backend
     restart: always
     init: true
@@ -97,7 +97,7 @@ services:
       retries: 10
 
   enterpriseglue-frontend:
-    image: ghcr.io/enterpriseglue/enterpriseglue-the-bridge-oss-frontend:v0.10.2
+    image: ghcr.io/enterpriseglue/enterpriseglue-the-bridge-oss-frontend:v0.19.2
     container_name: enterpriseglue-frontend
     restart: always
     depends_on:
