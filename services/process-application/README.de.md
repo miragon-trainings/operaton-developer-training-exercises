@@ -33,7 +33,7 @@ cd ../../stack && docker-compose up -d
 # Operaton Cockpit
 http://localhost:8080/operaton/app/cockpit/  (admin / admin)
 
-# EnterpriseGlue The Bridge (optionale zusätzliche UI)
+# EnterpriseGlue The Bridge (zusätzliche UI)
 http://localhost:8081  (admin@enterpriseglue.com / adminadmin)
 ```
 

@@ -2,7 +2,7 @@
 
 > **Voraussetzung:** Aufgabe 0 ist abgeschlossen (der Sollprozess liegt fachlich vor).
 > **Arbeitsverzeichnis:** `services/process-application`
-> **Neu in dieser Aufgabe:** Operaton-Starter, Engine-Konfiguration, Auto-Deployment, Cockpit, `act_*`-Tabellen, Start-Formular, Manual Task, EnterpriseGlue The Bridge (optionale zusätzliche UI).
+> **Neu in dieser Aufgabe:** Operaton-Starter, Engine-Konfiguration, Auto-Deployment, Cockpit, `act_*`-Tabellen, Start-Formular, Manual Task, EnterpriseGlue The Bridge (zusätzliche UI).
 
 ## Darum geht es
 
@@ -120,7 +120,7 @@ Das Cockpit ist die Weboberfläche der Engine. Öffne
 der technische Prozess-Key dahinter ist `subscribeNewsletter`. Klick dich durch **Cockpit**,
 **Tasklist** und **Admin**.
 
-### 9. EnterpriseGlue The Bridge verbinden (optional)
+### 9. EnterpriseGlue The Bridge verbinden
 
 Die Bridge ist eine zusätzliche Weboberfläche für die Engine: Hier lassen sich Prozesse
 modellieren, deployen und verwalten – ergänzend zum Cockpit. Sie ist in Schritt 1 mit dem Stack
@@ -135,7 +135,7 @@ schon gestartet. Öffne sie, melde dich an und verbinde sie mit deiner Engine.
 3. Danach erscheint dieselbe Prozessdefinition (`Join Inner Circle` / `subscribeNewsletter`) auch
    in der Bridge.
 
-> **Begriff: EnterpriseGlue The Bridge.** Eine optionale, zusätzliche UI für die Engine (BPMN/DMN
+> **Begriff: EnterpriseGlue The Bridge.** Eine zusätzliche UI für die Engine (BPMN/DMN
 > modellieren, deployen und verwalten). Sie spricht dieselbe `engine-rest`-API wie das Cockpit und
 > ist damit eine Alternative zu den klassischen Operaton-Weboberflächen. Die genaue Bezeichnung der
 > Felder kann je nach Bridge-Version abweichen; entscheidend ist die Engine-Basis-URL.
@@ -183,7 +183,7 @@ End Event durch.
 - [ ] `Join Inner Circle` erscheint im Cockpit unter **Processes**
 - [ ] Eine über das Start-Formular gestartete Instanz läuft vollständig durch (History `COMPLETED`)
 - [ ] Du kannst erklären, warum die Instanz mit lauter Manual Tasks nirgends wartet
-- [ ] (optional) Die Bridge ist unter `http://localhost:8081` erreichbar und zeigt nach dem Verbinden dieselbe Prozessdefinition
+- [ ] Die Bridge ist unter `http://localhost:8081` erreichbar und zeigt nach dem Verbinden dieselbe Prozessdefinition
 
 ## Hinweise
 

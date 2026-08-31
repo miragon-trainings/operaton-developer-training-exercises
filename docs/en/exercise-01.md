@@ -2,7 +2,7 @@
 
 > **Prerequisite:** Exercise 0 is complete (the target process exists at the business level).
 > **Working directory:** `services/process-application`
-> **New in this exercise:** Operaton starter, engine configuration, auto-deployment, Cockpit, `act_*` tables, start form, Manual Task, EnterpriseGlue The Bridge (optional additional UI).
+> **New in this exercise:** Operaton starter, engine configuration, auto-deployment, Cockpit, `act_*` tables, start form, Manual Task, EnterpriseGlue The Bridge (additional UI).
 
 ## What this is about
 
@@ -119,7 +119,7 @@ The Cockpit is the engine's web interface. Open
 model; the technical process key behind it is `subscribeNewsletter`. Click your way through
 **Cockpit**, **Tasklist**, and **Admin**.
 
-### 9. Connect EnterpriseGlue The Bridge (optional)
+### 9. Connect EnterpriseGlue The Bridge
 
 The Bridge is an additional web UI for the engine: you can model, deploy and manage processes
 there – complementary to the Cockpit. It already started with the stack in step 1. Open it, log
@@ -134,7 +134,7 @@ in, and connect it to your engine.
 3. Afterwards the same process definition (`Join Inner Circle` / `subscribeNewsletter`) shows up in
    the Bridge as well.
 
-> **Term: EnterpriseGlue The Bridge.** An optional, additional UI for the engine (model, deploy and
+> **Term: EnterpriseGlue The Bridge.** An additional UI for the engine (model, deploy and
 > manage BPMN/DMN). It speaks the same `engine-rest` API as the Cockpit, so it's an alternative to
 > the classic Operaton web apps. The exact field labels may differ between Bridge versions; what
 > matters is the engine base URL.
@@ -180,7 +180,7 @@ stopping.
 - [ ] `Join Inner Circle` appears in the Cockpit under **Processes**
 - [ ] An instance started via the start form runs all the way through (History `COMPLETED`)
 - [ ] You can explain why the instance made up of nothing but Manual Tasks never waits
-- [ ] (optional) The Bridge is reachable at `http://localhost:8081` and, once connected, shows the same process definition
+- [ ] The Bridge is reachable at `http://localhost:8081` and, once connected, shows the same process definition
 
 ## Hints
 

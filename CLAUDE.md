@@ -29,7 +29,7 @@ cd solutions/exercise-01 && ../../mvnw spring-boot:run
 
 Operaton Cockpit: `http://localhost:8080/operaton/app/cockpit/` (admin/admin)
 
-EnterpriseGlue The Bridge (optional additional UI): `http://localhost:8081`
+EnterpriseGlue The Bridge (additional UI): `http://localhost:8081`
 (`admin@enterpriseglue.com` / `adminadmin`). Register the engine under
 Platform Settings → Engines with base URL `http://host.docker.internal:8080/engine-rest`
 (the Bridge backend runs in Docker, so it reaches the host engine via `host.docker.internal`).
@@ -91,8 +91,8 @@ Multi-module Maven project:
 - All modules (process-application + every solution) run on the same port (`8080`) and DB schema (`exercise`) —
   one module at a time. `stack/init-schemas.sql` creates just that one schema.
 - `stack/docker-compose.yml` also runs **EnterpriseGlue The Bridge** (frontend on host `:8081`; backend + its
-  own Postgres are internal, not published), an optional additional UI that connects to the engine's `/engine-rest`.
-  Introduced in Exercise 1. It needs no code changes in any module — every module already exposes `engine-rest`.
+  own Postgres are internal, not published), an additional UI that connects to the engine's `/engine-rest`.
+  Set up in Exercise 1. It needs no code changes in any module — every module already exposes `engine-rest`.
 - The `load-solution` antrun task replaces `services/process-application/src/main` wholesale (Java, `application.yaml`,
   BPMN/DMN) from a solution; `src/test` and `pom.xml` are left untouched.
 

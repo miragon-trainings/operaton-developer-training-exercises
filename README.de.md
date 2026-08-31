@@ -70,7 +70,7 @@ cd services/process-application && ../../mvnw spring-boot:run
 # Operaton Cockpit
 open http://localhost:8080/operaton/app/cockpit/    # admin / admin
 
-# EnterpriseGlue The Bridge (optionale zusätzliche UI)
+# EnterpriseGlue The Bridge (zusätzliche UI)
 open http://localhost:8081                          # admin@enterpriseglue.com / adminadmin
 ```
 
