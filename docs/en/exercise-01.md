@@ -2,7 +2,7 @@
 
 > **Prerequisite:** Exercise 0 is complete (the target process exists at the business level).
 > **Working directory:** `services/process-application`
-> **New in this exercise:** Operaton starter, engine configuration, auto-deployment, Cockpit, `act_*` tables, start form, Manual Task.
+> **New in this exercise:** Operaton starter, engine configuration, auto-deployment, Cockpit, `act_*` tables, start form, Manual Task, EnterpriseGlue The Bridge (optional additional UI).
 
 ## What this is about
 
@@ -47,7 +47,7 @@ in this exercise – you'll bring it to life.
 ### 1. Start the database
 
 The engine stores its entire state in a relational database. So bring up the Docker stack first;
-it comes with PostgreSQL and MailHog:
+it comes with PostgreSQL, MailHog and EnterpriseGlue The Bridge:
 
 ```bash
 cd stack && docker-compose up -d
@@ -119,7 +119,27 @@ The Cockpit is the engine's web interface. Open
 model; the technical process key behind it is `subscribeNewsletter`. Click your way through
 **Cockpit**, **Tasklist**, and **Admin**.
 
-### 9. Play through the process
+### 9. Connect EnterpriseGlue The Bridge (optional)
+
+The Bridge is an additional web UI for the engine: you can model, deploy and manage processes
+there – complementary to the Cockpit. It already started with the stack in step 1. Open it, log
+in, and connect it to your engine.
+
+1. Open [http://localhost:8081](http://localhost:8081) and log in with the dev admin
+   (`admin@operaton-training.local` / `TrainingAdmin123!`).
+2. Register the engine under **Platform Settings → Engines** with the base URL
+   `http://host.docker.internal:8080/engine-rest`. That is the same REST API the Cockpit uses; the
+   training engine runs without authentication. From inside the container the host is reachable via
+   `host.docker.internal` – not via `localhost`.
+3. Afterwards the same process definition (`Join Inner Circle` / `subscribeNewsletter`) shows up in
+   the Bridge as well.
+
+> **Term: EnterpriseGlue The Bridge.** An optional, additional UI for the engine (model, deploy and
+> manage BPMN/DMN). It speaks the same `engine-rest` API as the Cockpit, so it's an alternative to
+> the classic Operaton web apps. The exact field labels may differ between Bridge versions; what
+> matters is the engine base URL.
+
+### 10. Play through the process
 
 The process is deployed, but has never run. Start it via the start form:
 
@@ -160,6 +180,7 @@ stopping.
 - [ ] `Join Inner Circle` appears in the Cockpit under **Processes**
 - [ ] An instance started via the start form runs all the way through (History `COMPLETED`)
 - [ ] You can explain why the instance made up of nothing but Manual Tasks never waits
+- [ ] (optional) The Bridge is reachable at `http://localhost:8081` and, once connected, shows the same process definition
 
 ## Hints
 

@@ -33,7 +33,8 @@ Referenzmodell: `../../models/exercise-03/membership.bpmn`
 
 Gegenüber Aufgabe 2 ändert sich genau ein Element: aus dem Manual Task „Send welcome mail" wird der
 Service Task `serviceTask_sendWelcomeMail`, gebunden an `#{sendWelcomeMailDelegate}`. Der Prozess
-startet weiterhin über das Start-Formular im Cockpit.
+startet weiterhin über das Start-Formular im Cockpit (alternativ in der Bridge unter
+`http://localhost:8081`, siehe Aufgabe 1).
 
 ## Aufgabe
 

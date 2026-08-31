@@ -151,7 +151,8 @@ runtimeService.createMessageCorrelation(/* message name */)
 ```
 
 The business key links the process instance to the business object: in the Cockpit, each
-instance can be uniquely mapped to a registration and searched for specifically.
+instance can be uniquely mapped to a registration and searched for specifically. The Bridge offers
+the same view (`http://localhost:8081`, see Exercise 1).
 
 ### 6. Task form for the approval
 

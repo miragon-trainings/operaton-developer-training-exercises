@@ -151,7 +151,8 @@ runtimeService.createMessageCorrelation(/* Message-Name */)
 ```
 
 Der Business Key verknüpft die Prozessinstanz mit dem fachlichen Objekt: Im Cockpit lässt
-sich jede Instanz eindeutig einer Anmeldung zuordnen und gezielt suchen.
+sich jede Instanz eindeutig einer Anmeldung zuordnen und gezielt suchen. Dieselbe Sicht bietet
+die Bridge (`http://localhost:8081`, siehe Aufgabe 1).
 
 ### 6. Task-Formular für die Freigabe
 

@@ -268,7 +268,7 @@ it picks up the task and ships the kit.
 
 - [ ] `send-welcome-kit.bpmn` lives **only** in the logistics service
 - [ ] It appears in the engine's deployments **only** after the logistics service has been
-      started (`GET /engine-rest/deployment` or Cockpit)
+      started (`GET /engine-rest/deployment`, Cockpit or the Bridge)
 - [ ] Restarting the logistics service creates **no** second deployment
 - [ ] An activated member triggers `Signal_MemberActivated`, a `sendWelcomeKit` instance
       runs, the worker ships the kit

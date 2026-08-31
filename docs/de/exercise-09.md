@@ -184,6 +184,7 @@ während eine **eigene Prozessinstanz** von `handleRejection` durchläuft. Der B
 Task wertet die DMN aus, `isHighValue` ist `false`, das Exclusive Gateway nimmt den
 Default-Flow und die aufgerufene Instanz endet an *Accept rejection*. Zurück in der
 Hauptinstanz feuert das Compensating End Event, im Log erscheint die Freigabe des Platzes.
+In der Bridge erscheint `handleRejection` als eigene Prozessdefinition (siehe Aufgabe 1).
 
 **Ablehnung innerhalb der Zielgruppe:**
 

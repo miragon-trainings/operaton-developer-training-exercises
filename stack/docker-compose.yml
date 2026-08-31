@@ -1,4 +1,13 @@
 # Use this only in dev environments. It's not intended for production usage.
+#
+# Services:
+#   - postgres  : the training engine database (Operaton stores its state here)
+#   - mailhog   : local SMTP catcher (Web UI on :8025)
+#   - enterpriseglue-*: EnterpriseGlue "The Bridge" — an additional web UI for Operaton
+#                 to design, deploy and manage BPMN/DMN processes. Open http://localhost:8081.
+#                 The Bridge backend talks to the engine's REST API at
+#                 http://host.docker.internal:8080/engine-rest (register it under
+#                 Platform Settings -> Engines). All secrets below are throwaway dev values.
 services:
 
   postgres:
@@ -19,3 +28,84 @@ services:
       - "1025:1025"   # SMTP
       - "8025:8025"   # Web UI
     restart: always
+
+  # --- EnterpriseGlue "The Bridge" — additional Operaton UI (http://localhost:8081) ---
+
+  enterpriseglue-db:
+    image: postgres:18-alpine
+    container_name: enterpriseglue-db
+    restart: always
+    # No host port published: the Bridge's own database stays internal (no clash with 5432).
+    environment:
+      POSTGRES_USER: enterpriseglue
+      POSTGRES_PASSWORD: enterpriseglue
+      POSTGRES_DB: enterpriseglue
+    volumes:
+      - enterpriseglue_postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U enterpriseglue -d enterpriseglue -h 127.0.0.1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  enterpriseglue-backend:
+    image: ghcr.io/enterpriseglue/enterpriseglue-the-bridge-oss-backend:v0.10.2
+    container_name: enterpriseglue-backend
+    restart: always
+    init: true
+    # Lets the backend reach the Operaton engine running on the host (Linux + Docker Desktop).
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      enterpriseglue-db:
+        condition: service_healthy
+    volumes:
+      - enterpriseglue_git_repos:/app/data/repos
+    expose:
+      - "8787"
+    environment:
+      NODE_ENV: production
+      API_PORT: "8787"
+      API_BASE_URL: ""            # empty -> same-origin API calls through the frontend's Nginx proxy
+      # --- Bridge database (the enterpriseglue-db service above) ---
+      DATABASE_TYPE: postgres
+      POSTGRES_HOST: enterpriseglue-db
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: enterpriseglue
+      POSTGRES_PASSWORD: enterpriseglue
+      POSTGRES_DB: enterpriseglue
+      POSTGRES_DATABASE: enterpriseglue
+      POSTGRES_SCHEMA: main
+      POSTGRES_SSL: "false"
+      POSTGRES_SSL_REJECT_UNAUTHORIZED: "false"
+      # --- Seeded admin (dev only) — used to log in to the Bridge ---
+      ADMIN_EMAIL: admin@operaton-training.local
+      ADMIN_PASSWORD: TrainingAdmin123!
+      ADMIN_EMAIL_VERIFICATION_EXEMPT: "true"   # let the seeded admin log in without email verification
+      # --- Secrets (throwaway dev values — DO NOT reuse in production) ---
+      JWT_SECRET: 1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f809
+      ENCRYPTION_KEY: 649d6faf9c780ede201f7aea9280bd5e832c586bbb6144cf2d449269ee410009
+      # --- Git-backed storage ---
+      GIT_REPOS_PATH: ./data/repos
+      GIT_DEFAULT_BRANCH: main
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"const p=process.env.API_PORT||'8787';require('http').get('http://127.0.0.1:'+p+'/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1));\""]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  enterpriseglue-frontend:
+    image: ghcr.io/enterpriseglue/enterpriseglue-the-bridge-oss-frontend:v0.10.2
+    container_name: enterpriseglue-frontend
+    restart: always
+    depends_on:
+      enterpriseglue-backend:
+        condition: service_healthy
+    environment:
+      API_UPSTREAM: enterpriseglue-backend:8787
+    ports:
+      - "8081:8080"   # host 8081 -> avoids the Operaton Cockpit port 8080
+
+volumes:
+  enterpriseglue_postgres_data:
+  enterpriseglue_git_repos:

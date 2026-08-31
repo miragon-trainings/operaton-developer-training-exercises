@@ -80,7 +80,7 @@ trigger compensation.
 2. Wait until the Timer Boundary Event fires.
 3. The log shows the release (`Revoking membership claim for …`) – even though there is no
    explicit task left in the path.
-4. In the Cockpit the instance ends at "Membership declined".
+4. In the Cockpit the instance ends at "Membership declined" (also visible in the Bridge, see Exercise 1).
 
 **Abort via withdrawal:**
 
