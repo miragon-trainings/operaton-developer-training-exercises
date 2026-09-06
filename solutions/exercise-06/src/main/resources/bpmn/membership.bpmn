@@ -37,7 +37,7 @@
       <bpmn:incoming>Flow_0p7ko1g</bpmn:incoming>
       <bpmn:outgoing>Flow_1spthma</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:exclusiveGateway id="gateway_hasEmptySpots" name="Has empty spots" default="Flow_1pl6nn4">
+    <bpmn:exclusiveGateway id="gateway_hasEmptySpots" name="Free seat available?" default="Flow_1pl6nn4">
       <bpmn:incoming>Flow_1spthma</bpmn:incoming>
       <bpmn:outgoing>Flow_1pl6nn4</bpmn:outgoing>
       <bpmn:outgoing>Flow_0cad0i8</bpmn:outgoing>
