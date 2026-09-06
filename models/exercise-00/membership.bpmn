@@ -3,7 +3,6 @@
   <bpmn:process id="innerCircleMembership" name="Miravelo Inner Circle Membership" isExecutable="false">
     <bpmn:startEvent id="startEvent_submitRegistration" name="Submit registration form">
       <bpmn:outgoing>Flow_0p7ko1g</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0rxlo7x" messageRef="Message_3p5jpc1" />
     </bpmn:startEvent>
     <bpmn:subProcess id="subProcess_confirmMembership" name="Confirm membership">
       <bpmn:incoming>Flow_0camehw</bpmn:incoming>
@@ -51,7 +50,7 @@
       <bpmn:incoming>Flow_0p7ko1g</bpmn:incoming>
       <bpmn:outgoing>Flow_0hlnr3k</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:exclusiveGateway id="gateway_hasEmptySpots" name="Has empty spots" default="Flow_0camehw">
+    <bpmn:exclusiveGateway id="gateway_hasEmptySpots" name="Free seat available?" default="Flow_0camehw">
       <bpmn:incoming>Flow_0hlnr3k</bpmn:incoming>
       <bpmn:outgoing>Flow_0camehw</bpmn:outgoing>
       <bpmn:outgoing>Flow_0bt3531</bpmn:outgoing>
@@ -113,7 +112,6 @@
     <bpmn:sequenceFlow id="Flow_03vzvil" sourceRef="serviceTask_reSendConfirmationMail" targetRef="endEvent_mailSentAgain" />
     <bpmn:association id="association_compensateClaim" associationDirection="One" sourceRef="boundary_compensateClaim" targetRef="serviceTask_revokeClaim" />
   </bpmn:process>
-  <bpmn:message id="Message_3p5jpc1" name="Registration submitted" />
   <bpmn:message id="Message_ConfirmationRejected" name="Confirmation rejected" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="innerCircleMembership">

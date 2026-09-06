@@ -1,6 +1,6 @@
 # Aufgabe 0 – Den Sollprozess fachlich modellieren
 
-> **Voraussetzung:** Kapitel 1 – du kennst BPMN als Notation (Events, Tasks, Gateways, Subprozesse, Boundary Events, Kompensation).
+> **Voraussetzung:** Kapitel 1 – du kennst BPMN als Notation: Events, Tasks, Sequenzfluss, Gateways. Subprozess, Boundary Events und Kompensation wendest du hier zum ersten Mal fachlich an (technisch vertieft in späteren Aufgaben).
 > **Arbeitsverzeichnis:** ein beliebiger Ordner deiner Wahl (noch kein Code, noch kein Modul).
 > **Neu in dieser Aufgabe:** BPMN-Modeler, der vollständige Sollprozess als gemeinsame Landkarte.
 
@@ -31,8 +31,8 @@ Nach dieser Aufgabe kannst du
 
 - einen BPMN-Modeler installieren und darin ein durchgängiges Modell anlegen,
 - die Notation aus Kapitel 1 auf einen realen Geschäftsprozess anwenden – Start- und End Events,
-  User Task und Service Task, Exclusive und Parallel Gateway, eingebetteter Subprozess,
-  Boundary Events und Kompensation,
+  User Task und Service Task, Exclusive und Parallel Gateway – und die fortgeschrittenen Formen
+  eingebetteter Subprozess, Boundary Events und Kompensation hier zum ersten Mal fachlich einsetzen,
 - Warte- und Verzweigungspunkte im Ablauf begründen (wo wartet der Prozess auf einen Menschen,
   wo auf eine Frist, wo entscheidet eine Bedingung),
 - Elemente so benennen, dass ein Fachbereich den Ablauf ohne Rückfragen vorlesen kann.
@@ -47,11 +47,15 @@ Trainings Schritt für Schritt technisch nach.
 
 ## Aufgabe
 
-### 1. Modeler installieren
+### 1. Modeler in der IDE installieren
 
-Wir arbeiten mit dem **[Miragon BPMN Modeler](https://miragon.github.io/bpmn-modeler/)**.
-Es gibt ihn als VS-Code-Extension, als IntelliJ-Plugin und als eigenständige Desktop-App –
-nimm die Variante, die zu deiner Umgebung passt. Lege danach ein neues BPMN-Diagramm an.
+Wir modellieren direkt in der IDE – keine separate Anwendung nötig. Installiere den **Miragon BPMN
+Modeler** als [VS-Code-Extension](https://marketplace.visualstudio.com/items?itemName=miragon-gmbh.vs-code-bpmn-modeler)
+oder als [IntelliJ-Plugin](https://plugins.jetbrains.com/plugin/32634-miragon-bpmn-modeler). Egal
+welche IDE, es ist derselbe Modeler – so öffnet jede folgende Aufgabe das Modell in einem echten
+Modeler. Ohne VS Code oder IntelliJ nutzt du die
+[eigenständige Desktop-App](https://miragon.github.io/bpmn-modeler/) als Rückfalloption. Lege
+danach ein neues BPMN-Diagramm an.
 
 ### 2. Registrierung und Kapazitätsprüfung modellieren
 
@@ -63,11 +67,11 @@ Bewerbung mit einer Absage.
 |---|---|
 | Start Event | Submit registration form |
 | Service Task | Claim membership |
-| Exclusive Gateway | Has empty spots |
+| Exclusive Gateway | Free seat available? |
 | Service Task | Send rejection mail |
 | End Event | Membership rejected |
 
-Verbinde Start → *Claim membership* → *Has empty spots*. Vom Gateway führt ein Pfad **No** zu
+Verbinde Start → *Claim membership* → *Free seat available?*. Vom Gateway führt ein Pfad **No** zu
 *Send rejection mail* → *Membership rejected*. Der Pfad **Yes** bleibt zunächst offen – ihn füllst
 du im nächsten Schritt. Der Platz wird also **vor** der Prüfung reserviert; darum kümmert sich
 Schritt 6.
@@ -109,7 +113,9 @@ führen zu *Membership declined*.
 
 Ist die Mitgliedschaft bestätigt, wird das Mitglied aktiviert – und zwei Dinge passieren
 gleichzeitig: die Willkommens-Mail geht raus, und die Community wird informiert. Modelliere das
-mit einem **Parallel Gateway** (Fork und Join).
+mit einem **Parallel Gateway** (Fork und Join). Schließe den Fork mit einem Parallel-Join
+desselben Typs (AND mit AND), damit beide Zweige wieder synchronisiert werden, bevor es zu
+*Membership activated* geht.
 
 | Typ | Name |
 |---|---|
@@ -144,6 +150,13 @@ für alle Folgeaufgaben.
 - **Nur fachlich.** Es geht um Ablauf und Benennung. Element-IDs nach Konvention, Formularfelder,
   die Anbindung von Service Tasks an Java-Code sowie `isExecutable` und `historyTimeToLive` lässt
   du hier bewusst weg – das kommt ab Aufgabe 2.
+- **Sauber modellieren, nicht nur vollständig.** Wende die Modellierungsregeln aus Kapitel 1 an:
+  Benenne jede Aktivität als Verb plus Objekt (*Claim membership*), jedes Gateway als Frage und
+  jeden ausgehenden Sequenzfluss als Antwort (*Yes* / *No*). Rahme den Ablauf mit Start- und End
+  Events und gib jedem End Event einen eigenen Namen. Halte den Happy Path – Registrierung,
+  Bestätigung, Aktivierung – auf einer geraden Linie von links nach rechts und führe die Ausnahmen
+  (Absage, Frist, Ablehnung, Erinnerung) kreuzungsfrei nach oben oder unten weg. Verzweige nur an
+  Gateways: Fork und Join sind getrennte Rauten.
 - **Das ist der Zielzustand, nicht der erste Schritt.** Niemand automatisiert diesen Prozess auf
   einmal. Ab Aufgabe 1 nimmst du dir kleine Ausschnitte vor.
 - **Noch nicht ins Modul kopieren.** Unter `services/process-application/src/main/resources/bpmn/`
@@ -161,31 +174,53 @@ könnte den Ablauf vorlesen, ohne nachzufragen, was ein einzelnes Element bedeut
 
 ## Selbstcheck
 
-- [ ] Das Modell hat genau einen Startpunkt und endet in *Membership activated*, *Membership
-      rejected* oder *Membership declined*
+- [ ] Der Prozess ist mit Start- und End Events gerahmt: der Hauptablauf startet mit *Submit
+      registration form*, der Bestätigungs-Subprozess hat seinen eigenen Start, und jedes End Event
+      trägt einen eigenen Namen (*Membership activated*, *Membership rejected*, *Membership
+      declined*, *Mail sent again* sowie im Subprozess *Membership confirmed*)
+- [ ] Jede Aktivität ist als Verb plus Objekt benannt, das Exclusive Gateway als Frage
+      (*Free seat available?*) und seine ausgehenden Sequenzflüsse als Antwort (*Yes* / *No*)
 - [ ] Die Kapazität wird über ein Exclusive Gateway mit einem **No**-Pfad zur Absage geprüft
 - [ ] Die Bestätigung liegt in einem eingebetteten Subprozess mit einem User Task
 - [ ] Am Subprozess hängen drei Boundary Events: täglicher (nicht unterbrechender) Timer,
       3½-Tage-Timer (unterbrechend) und ein Message Event (unterbrechend)
-- [ ] Die Aktivierung läuft über ein Parallel Gateway (Willkommens-Mail und Community-Info
-      gleichzeitig)
+- [ ] Die Aktivierung läuft über ein Parallel Gateway; der Fork wird mit einem Parallel-Join
+      desselben Typs geschlossen, der auf beide Zweige wartet (Willkommens-Mail und Community-Info
+      laufen gleichzeitig)
 - [ ] *Revoke claim* ist ein Kompensations-Handler, per Association an das Boundary Event von
       *Claim membership* gehängt, und *Membership declined* ist ein Compensating End Event
+- [ ] Der Happy Path verläuft gerade von links nach rechts; die Ausnahmepfade zweigen kreuzungsfrei
+      ab, und kein Gateway mergt und splittet zugleich (Fork und Join sind getrennte Rauten)
+- [ ] Du bist jeden Pfad einmal von Hand durchgegangen: Happy Path, Absage, Frist-Abbruch, aktive
+      Ablehnung und tägliche Erinnerung enden jeweils in genau einem benannten End Event; kein Zweig
+      läuft ins Leere
+- [ ] Du kannst in je einem Satz sagen, wo der Ablauf auf einen Menschen wartet (am User Task) und
+      warum das Exclusive Gateway verzweigt
 - [ ] Alle Elemente sind über Sequenzflüsse verbunden – kein loses Element
 - [ ] Die Datei liegt als `membership.bpmn` gespeichert vor
 
 ## Hinweise
 
 Lass dich von der Größe nicht abschrecken: Jeder fortgeschrittene Baustein bekommt später seine
-**eigene Aufgabe**, in der du ihn technisch umsetzt – der Bestätigungsschritt in Aufgabe 3, das
-Kapazitäts-Gateway in Aufgabe 4, Subprozess und Boundary Events in Aufgabe 6, die Kompensation in
-Aufgabe 7. Hier zeichnest du zuerst die ganze Landkarte, damit du bei jedem Teilschritt weißt,
+**eigene Aufgabe**, in der du ihn technisch umsetzt – der Bestätigungsschritt in Aufgabe 4, das
+Kapazitäts-Gateway in Aufgabe 5, Subprozess und Boundary Events in Aufgabe 7, die Kompensation in
+Aufgabe 8. Hier zeichnest du zuerst die ganze Landkarte, damit du bei jedem Teilschritt weißt,
 wohin er gehört.
 
 Warum ein User Task und ein Service Task? Der **User Task** wartet auf einen Menschen – jemand
 bestätigt die Mitgliedschaft. Der **Service Task** wird von einem System erledigt – der
 Mailversand, die Platzreservierung. Diese Unterscheidung legt fest, wo der Prozess wartet und wo
-er von allein weiterläuft.
+er von allein weiterläuft. Die drei Mails sind übrigens **Service Tasks**, keine Send Tasks – ein
+System erledigt sie (ab Aufgabe 3 setzt du sie als JavaDelegate um). Manual Task, Business Rule
+Task, Script Task und die übrigen Task-Typen aus Kapitel 1 tauchen erst später auf oder bleiben
+ganz außen vor.
+
+**Warum keine Pools, Lanes oder Datenobjekte?** Der ganze Ablauf spielt bei Miravelo intern, mit
+einem einzigen menschlichen Berührungspunkt – dem User Task *Confirm membership*; alle übrigen
+Schritte sind Service Tasks. Nach der Regel „Lanes mit Disziplin" bekommt ein System keine eigene
+Lane, und ein einzelner Beteiligter braucht weder Pool noch Lane – beides würde diese Landkarte
+nur mit Rauschen füllen. Datenobjekte sind rein beschreibend, die Engine wertet sie nicht aus;
+deshalb lassen wir sie hier bewusst weg und konzentrieren uns auf Ablauf und Benennung.
 
 ## Referenzlösung
 

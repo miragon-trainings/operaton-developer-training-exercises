@@ -1,6 +1,6 @@
 # Exercise 0 – Model the target process at the business level
 
-> **Prerequisite:** Chapter 1 – you know BPMN as a notation (events, tasks, gateways, subprocesses, boundary events, compensation).
+> **Prerequisite:** Chapter 1 – you know BPMN as a notation: events, tasks, sequence flow, gateways. Subprocess, boundary events and compensation you apply here for the first time at the business level (deepened technically in later exercises).
 > **Working directory:** any folder you like (no code yet, no module yet).
 > **New in this exercise:** BPMN modeler, the complete target process as a shared map.
 
@@ -31,8 +31,9 @@ After this exercise you can
 
 - install a BPMN modeler and create an end-to-end model in it,
 - apply the notation from Chapter 1 to a real business process – Start and End Events,
-  User Task and Service Task, Exclusive and Parallel Gateway, an embedded subprocess,
-  boundary events and compensation,
+  User Task and Service Task, Exclusive and Parallel Gateway – and put the advanced forms
+  embedded subprocess, boundary events and compensation to use here for the first time at the
+  business level,
 - justify the waiting and branching points in the flow (where does the process wait for a
   human, where for a deadline, where does a condition decide),
 - name elements so the business side can read the flow out loud without follow-up questions.
@@ -47,11 +48,15 @@ technically, step by step, over the course of the training.
 
 ## The task
 
-### 1. Install the modeler
+### 1. Install the modeler in your IDE
 
-We work with the **[Miragon BPMN Modeler](https://miragon.github.io/bpmn-modeler/)**.
-It comes as a VS Code extension, as an IntelliJ plugin and as a standalone desktop app –
-pick the variant that fits your environment. Then create a new BPMN diagram.
+We model straight inside the IDE – no separate app needed. Install the **Miragon BPMN Modeler**
+as a [VS Code extension](https://marketplace.visualstudio.com/items?itemName=miragon-gmbh.vs-code-bpmn-modeler)
+or as an [IntelliJ plugin](https://plugins.jetbrains.com/plugin/32634-miragon-bpmn-modeler).
+Whichever IDE you pick, it is the same modeler – so every following exercise opens the model in a
+real modeler. Without VS Code or IntelliJ, use the
+[standalone desktop app](https://miragon.github.io/bpmn-modeler/) as a fallback. Then create a new
+BPMN diagram.
 
 ### 2. Model registration and capacity check
 
@@ -63,11 +68,11 @@ rejection.
 |---|---|
 | Start Event | Submit registration form |
 | Service Task | Claim membership |
-| Exclusive Gateway | Has empty spots |
+| Exclusive Gateway | Free seat available? |
 | Service Task | Send rejection mail |
 | End Event | Membership rejected |
 
-Connect Start → *Claim membership* → *Has empty spots*. From the gateway a **No** path leads
+Connect Start → *Claim membership* → *Free seat available?*. From the gateway a **No** path leads
 to *Send rejection mail* → *Membership rejected*. The **Yes** path stays open for now – you
 fill it in the next step. The seat is reserved **before** the check; step 6 deals with that.
 
@@ -108,7 +113,8 @@ reminder on the side. The two **interrupting** events abort the confirmation and
 
 Once the membership is confirmed, the member is activated – and two things happen at once:
 the welcome mail goes out, and the community is notified. Model this with a **Parallel Gateway**
-(fork and join).
+(fork and join). Close the fork with a parallel join of the same type (AND with AND), so both
+branches are synchronised again before you reach *Membership activated*.
 
 | Type | Name |
 |---|---|
@@ -143,6 +149,13 @@ all the exercises that follow.
 - **Business level only.** This is about flow and naming. Element IDs by convention, form
   fields, wiring service tasks to Java code as well as `isExecutable` and `historyTimeToLive`
   are deliberately left out here – that comes from Exercise 2 on.
+- **Model it clean, not just complete.** Apply the modelling rules from Chapter 1: name every
+  activity as a verb plus object (*Claim membership*), every gateway as a question and every
+  outgoing sequence flow as the answer (*Yes* / *No*). Frame the flow with Start and End Events and
+  give each End Event its own name. Keep the happy path – registration, confirmation, activation –
+  on a straight line from left to right, and route the exceptions (rejection, deadline, decline,
+  reminder) away above or below without crossing flows. Branch only at gateways: fork and join are
+  separate diamonds.
 - **This is the target state, not the first step.** Nobody automates this process in one go.
   From Exercise 1 on you take on small excerpts.
 - **Don't copy it into the module yet.** Under `services/process-application/src/main/resources/bpmn/`
@@ -159,29 +172,50 @@ business side could read the flow out loud without asking what a single element 
 
 ## Self-check
 
-- [ ] The model has exactly one start and ends in *Membership activated*, *Membership rejected*
-      or *Membership declined*
+- [ ] The process is framed with Start and End Events: the main flow starts at *Submit
+      registration form*, the confirmation subprocess has its own start, and every End Event carries
+      its own name (*Membership activated*, *Membership rejected*, *Membership declined*, *Mail sent
+      again*, plus *Membership confirmed* inside the subprocess)
+- [ ] Every activity is named as a verb plus object, the Exclusive Gateway as a question
+      (*Free seat available?*) and its outgoing sequence flows as the answer (*Yes* / *No*)
 - [ ] Capacity is checked via an Exclusive Gateway with a **No** path to the rejection
 - [ ] The confirmation lives in an embedded subprocess with a User Task
 - [ ] Three boundary events hang on the subprocess: a daily (non-interrupting) timer, a 3½-day
       timer (interrupting) and a message event (interrupting)
-- [ ] The activation runs through a Parallel Gateway (welcome mail and community notification
-      at the same time)
+- [ ] The activation runs through a Parallel Gateway; the fork is closed with a parallel join of
+      the same type that waits for both branches (welcome mail and community notification run at the
+      same time)
 - [ ] *Revoke claim* is a compensation handler, attached via an association to the boundary
       event of *Claim membership*, and *Membership declined* is a Compensating End Event
+- [ ] The happy path runs straight from left to right; exception paths branch away without crossing
+      flows, and no gateway merges and splits at once (fork and join are separate diamonds)
+- [ ] You walked every path once by hand: happy path, rejection, deadline abort, active rejection
+      and the daily reminder each end in exactly one named End Event; no branch runs into nothing
+- [ ] You can say in one sentence each where the flow waits for a human (at the User Task) and why
+      the Exclusive Gateway branches
 - [ ] All elements are connected via sequence flows – no dangling element
 - [ ] The file is saved as `membership.bpmn`
 
 ## Hints
 
 Don't let the size scare you: every advanced building block gets its **own exercise** later, in
-which you implement it technically – the confirmation step in Exercise 3, the capacity gateway
-in Exercise 4, subprocess and boundary events in Exercise 6, compensation in Exercise 7. Here you
+which you implement it technically – the confirmation step in Exercise 4, the capacity gateway
+in Exercise 5, subprocess and boundary events in Exercise 7, compensation in Exercise 8. Here you
 first draw the whole map, so that at every partial step you know where it belongs.
 
 Why a User Task and a Service Task? The **User Task** waits for a human – someone confirms the
 membership. The **Service Task** is handled by a system – the mail dispatch, the seat
 reservation. This distinction defines where the process waits and where it continues on its own.
+By the way, the three mails are **Service Tasks**, not Send Tasks – a system handles them (from
+Exercise 3 on you implement them as a JavaDelegate). Manual Task, Business Rule Task, Script Task
+and the remaining task types from Chapter 1 only appear later or stay out entirely.
+
+**Why no pools, lanes or data objects?** The whole flow runs inside Miravelo, with a single human
+touchpoint – the User Task *Confirm membership*; every other step is a Service Task. Following the
+'lanes with discipline' rule a System gets no lane of its own, and a single participant needs
+neither a Pool nor a Lane – both would only fill this map with noise. Data objects are purely
+descriptive; the engine does not evaluate them, so we deliberately leave them out here and focus on
+flow and naming.
 
 ## Reference solution
 
