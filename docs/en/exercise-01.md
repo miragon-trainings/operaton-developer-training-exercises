@@ -131,28 +131,29 @@ in, and connect it to your engine.
 
    | Field | Value |
    |---|---|
-   | Name | `Training` (free choice) |
-   | Base URL | `http://host.docker.internal:8080/engine-rest` |
-   | Type | `Operaton` |
-   | Connection mode | `Connect directly to the engine` |
-   | Endpoint authentication | `Username and password` → `admin` / `admin` |
-   | Environment | `Dev` |
+   | Engine name | `Training` (free choice) |
+   | Engine product | `Operaton` |
+   | How EnterpriseGlue connects | `Connect directly to the engine` |
+   | Endpoint URL | `http://host.docker.internal:8080/engine-rest` |
+   | Endpoint authentication | `Username and password` → Username `admin`, Password `admin` |
+   | Environment label | `Dev` (preselected) |
 
-   Leave everything else at its defaults. The base URL is the same REST API the Cockpit uses. From
-   inside the container the host is reachable via `host.docker.internal` – not via `localhost`.
-3. After saving, the engine shows as **connected**, and the same process definition
+   Leave everything else at its defaults. The endpoint URL is the same REST API the Cockpit uses.
+   From inside the container the host is reachable via `host.docker.internal` – not via `localhost`.
+3. After **Create**, the engine shows the status **Connected**, and the same process definition
    (`Join Inner Circle` / `subscribeNewsletter`) shows up in the Bridge under **Mission Control**.
 
 > **Term: EnterpriseGlue The Bridge.** An additional UI for the engine (model, deploy and
 > manage BPMN/DMN). It speaks the same `engine-rest` API as the Cockpit, so it's an alternative to
 > the classic Operaton web apps. The exact field labels may differ between Bridge versions; what
-> matters is the engine base URL, a *direct* connection, and username/password.
+> matters is the engine's endpoint URL, a *direct* connection, and username/password.
 
-> **Why username/password?** The training engine runs without authentication and simply ignores
-> the credentials. The Bridge, however, refuses to store an engine *without* credentials unless the
-> engine sits behind a customer-managed sidecar (a different connection mode). `admin`/`admin` are
-> the Cockpit admin credentials from `application.yaml` – so they'd also be right if you switched
-> REST authentication on later.
+> **Note: Why username/password?** The training engine runs without authentication and ignores the
+> credentials. The Bridge, however, refuses to store an engine *without* credentials unless the engine
+> sits behind a customer-managed gateway or sidecar (the other option under *How EnterpriseGlue
+> connects*) and a platform admin has explicitly allowed that. `admin`/`admin` are the Cockpit admin
+> credentials from `application.yaml` – so they'd also be right if you switched REST authentication on
+> later.
 
 ### 10. Play through the process
 

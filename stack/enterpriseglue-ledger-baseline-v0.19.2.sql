@@ -4,8 +4,9 @@
 -- (v0.19.x) or copied the sources outside the compiled tree (v0.20.0). On first start they therefore built
 -- the schema with synchronize() but left the ledger table `main.migrations` EMPTY. Any later image
 -- (v0.20.1+) then tries to re-run every migration from scratch and crashes at start-up (e.g.
--- `column "user_id" does not exist`). v0.20.1–v0.24.x contain a built-in recovery, but it is pinned to the
--- v0.20.0 inventory and does not fire for v0.19.x databases or in v0.25.0+.
+-- `column "user_id" does not exist`). Images from v0.20.1 on contain a built-in recovery, but it is pinned
+-- to the exact v0.20.0 inventory (132 migrations) and therefore fires neither for v0.19.x databases nor in
+-- current images.
 --
 -- This script records the 131 migrations that a v0.19.2-built schema already embodies (everything up to
 -- 1700000000129) as executed, so the current image only runs the newer ones. It refuses to run on a ledger

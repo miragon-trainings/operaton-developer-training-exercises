@@ -132,28 +132,29 @@ schon gestartet. Öffne sie, melde dich an und verbinde sie mit deiner Engine.
 
    | Feld | Wert |
    |---|---|
-   | Name | `Training` (frei wählbar) |
-   | Base URL | `http://host.docker.internal:8080/engine-rest` |
-   | Type | `Operaton` |
-   | Connection mode | `Connect directly to the engine` |
-   | Endpoint authentication | `Username and password` → `admin` / `admin` |
-   | Environment | `Dev` |
+   | Engine name | `Training` (frei wählbar) |
+   | Engine product | `Operaton` |
+   | How EnterpriseGlue connects | `Connect directly to the engine` |
+   | Endpoint URL | `http://host.docker.internal:8080/engine-rest` |
+   | Endpoint authentication | `Username and password` → Username `admin`, Password `admin` |
+   | Environment label | `Dev` (vorausgewählt) |
 
-   Alles andere bleibt auf den Vorgaben. Die Basis-URL ist dieselbe REST-Schnittstelle, die auch
+   Alles andere bleibt auf den Vorgaben. Die Endpoint-URL ist dieselbe REST-Schnittstelle, die auch
    das Cockpit nutzt. Aus dem Container heraus ist der Host über `host.docker.internal` erreichbar –
    nicht über `localhost`.
-3. Nach dem Speichern steht die Engine auf **connected**, und dieselbe Prozessdefinition
+3. Nach **Create** steht die Engine auf **Connected**, und dieselbe Prozessdefinition
    (`Join Inner Circle` / `subscribeNewsletter`) erscheint in der Bridge unter **Mission Control**.
 
 > **Begriff: EnterpriseGlue The Bridge.** Eine zusätzliche UI für die Engine (BPMN/DMN
 > modellieren, deployen und verwalten). Sie spricht dieselbe `engine-rest`-API wie das Cockpit und
 > ist damit eine Alternative zu den klassischen Operaton-Weboberflächen. Die genaue Bezeichnung der
-> Felder kann je nach Bridge-Version abweichen; entscheidend sind die Engine-Basis-URL, eine
+> Felder kann je nach Bridge-Version abweichen; entscheidend sind die Endpoint-URL der Engine, eine
 > *direkte* Verbindung und Benutzername/Passwort.
 
-> **Warum Benutzername/Passwort?** Die Trainings-Engine läuft ohne Authentifizierung und ignoriert
-> die Zugangsdaten schlicht. Die Bridge speichert eine Engine *ohne* Zugangsdaten aber nur, wenn sie
-> hinter einem kundenseitig betriebenen Sidecar liegt (ein anderer Connection mode). `admin`/`admin`
+> **Hinweis: Warum Benutzername/Passwort?** Die Trainings-Engine läuft ohne Authentifizierung und
+> ignoriert die Zugangsdaten. Die Bridge speichert eine Engine *ohne* Zugangsdaten aber nur, wenn sie
+> hinter einem kundenseitig betriebenen Gateway oder Sidecar liegt (die andere Option unter *How
+> EnterpriseGlue connects*) und ein Platform-Admin das ausdrücklich freigeschaltet hat. `admin`/`admin`
 > sind die Cockpit-Admin-Zugangsdaten aus der `application.yaml` – sie wären also auch dann richtig,
 > wenn du die REST-Authentifizierung später einschaltest.
 
@@ -206,11 +207,12 @@ End Event durch.
 
 - Startet die Anwendung mit einem Datenbankfehler, prüfe zuerst Schritt 2: Ohne das Schema
   `exercise` findet die Engine ihre Tabellen nicht.
-- Schlägt das Speichern der Engine in der Bridge mit einem generischen Fehler fehl und zeigt
-  `docker logs enterpriseglue-backend` die Meldung `Engine base URL must use HTTPS when endpoint
-  policy is enforced`, läuft das Bridge-Backend ohne die `EG_ENGINE_*`-Variablen aus
-  `stack/docker-compose.yml` (z. B. ein Container aus einer älteren Compose-Datei). Führe
-  `cd stack && docker-compose up -d` erneut aus, damit das Backend neu erzeugt wird. Die verwandte
+- Schlägt das Anlegen der Engine in der Bridge mit einem generischen Fehler fehl und zeigt
+  `docker logs enterpriseglue-backend` die Meldung
+  `Engine base URL must use HTTPS when endpoint policy is enforced`, läuft das Bridge-Backend ohne
+  die `EG_ENGINE_*`-Variablen aus `stack/docker-compose.yml` (z. B. ein Container aus einer älteren
+  Compose-Datei). Führe `cd stack && docker-compose up -d` erneut aus, damit das Backend neu erzeugt
+  wird. Die verwandte
   Meldung `Engine base URL private host must have an exact endpoint-policy allowlist entry` bedeutet,
   dass `localhost`/`127.0.0.1` statt `host.docker.internal` eingetragen wurde.
 - Die Präfixe sind ein Merkanker: `re` liegt fest, `ru` bewegt sich, `hi` ist Vergangenheit.
