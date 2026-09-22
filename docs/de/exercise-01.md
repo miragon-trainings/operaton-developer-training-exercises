@@ -215,6 +215,11 @@ End Event durch.
   wird. Die verwandte
   Meldung `Engine base URL private host must have an exact endpoint-policy allowlist entry` bedeutet,
   dass `localhost`/`127.0.0.1` statt `host.docker.internal` eingetragen wurde.
+- Bricht `docker-compose up -d` mit `container enterpriseglue-backend is unhealthy` ab und zeigt
+  `docker logs enterpriseglue-backend` eine fehlgeschlagene Migration (z. B. `column "user_id" does not
+  exist`), stammen die Bridge-Volumes von einem älteren Bridge-Image. Entweder setzt du die Bridge-Volumes
+  zurück (frischer Stand) oder spielst einmalig `stack/enterpriseglue-ledger-baseline-v0.19.2.sql` ein –
+  beide Rezepte stehen im Kopf dieser Datei.
 - Die Präfixe sind ein Merkanker: `re` liegt fest, `ru` bewegt sich, `hi` ist Vergangenheit.
 
 ## Referenzlösung

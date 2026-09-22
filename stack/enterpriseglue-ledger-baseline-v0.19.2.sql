@@ -20,7 +20,9 @@
 -- and volumes and start again:
 --   cd stack && docker-compose rm -sf enterpriseglue-frontend enterpriseglue-backend enterpriseglue-db \
 --     && docker volume rm stack_enterpriseglue_postgres_data stack_enterpriseglue_git_repos && docker-compose up -d
--- (Do NOT use `docker-compose down -v` – that would also wipe the training engine's PostgreSQL data.)
+-- (The `stack_` prefix is the compose project name, i.e. the directory name; check `docker volume ls` if you
+-- run compose differently. Do NOT use `docker-compose down -v` – that would also wipe the training engine's
+-- PostgreSQL data.)
 
 BEGIN;
 

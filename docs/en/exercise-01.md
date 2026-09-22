@@ -208,6 +208,10 @@ stopping.
   older compose file). Run `cd stack && docker-compose up -d` again so the backend is recreated. The
   sibling message `Engine base URL private host must have an exact endpoint-policy allowlist entry`
   means `localhost`/`127.0.0.1` was entered instead of `host.docker.internal`.
+- If `docker-compose up -d` stops with `container enterpriseglue-backend is unhealthy` and
+  `docker logs enterpriseglue-backend` shows a failed migration (e.g. `column "user_id" does not exist`),
+  the Bridge volumes stem from an older Bridge image. Either reset the Bridge volumes (fresh setup) or
+  apply `stack/enterpriseglue-ledger-baseline-v0.19.2.sql` once – both recipes are in that file's header.
 - The prefixes are a handy mnemonic: `re` is fixed, `ru` is moving, `hi` is the past.
 
 ## Reference solution
