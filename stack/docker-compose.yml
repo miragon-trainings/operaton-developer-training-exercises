@@ -7,7 +7,14 @@
 #                 to design, deploy and manage BPMN/DMN processes. Open http://localhost:8081.
 #                 The Bridge backend talks to the engine's REST API at
 #                 http://host.docker.internal:8080/engine-rest (register it under
-#                 Platform Settings -> Engines). All secrets below are throwaway dev values.
+#                 Platform settings -> Engines -> Add engine). Since Bridge v0.11.0 the backend enforces a
+#                 fail-closed "engine endpoint policy" in production mode (HTTPS only, no
+#                 private/Docker-local hosts) — the EG_ENGINE_* / EG_ALLOW_INSECURE_ENGINE_HTTP
+#                 variables below opt the plain-HTTP training engine back in.
+#                 Upgrading a Bridge database that was created by the v0.19.x/v0.20.0 images? Those images
+#                 left the migration ledger empty, so newer images fail at start-up. Either reset the Bridge
+#                 volumes (fresh setup) or apply `enterpriseglue-ledger-baseline-v0.19.2.sql` once – see the
+#                 header of that file. All secrets below are throwaway dev values.
 services:
 
   postgres:
@@ -49,7 +56,7 @@ services:
       retries: 20
 
   enterpriseglue-backend:
-    image: ghcr.io/enterpriseglue/enterpriseglue-the-bridge-oss-backend:v0.19.2
+    image: ghcr.io/enterpriseglue/enterpriseglue-the-bridge-oss-backend:v0.28.7
     container_name: enterpriseglue-backend
     restart: always
     init: true
@@ -90,6 +97,17 @@ services:
       # --- Git-backed storage ---
       GIT_REPOS_PATH: ./data/repos
       GIT_DEFAULT_BRANCH: main
+      # --- Engine endpoint policy (dev only) ---
+      # With NODE_ENV=production the Bridge fails closed on every engine URL that is not HTTPS
+      # or that points to a private/Docker-local host — registering
+      # http://host.docker.internal:8080/engine-rest then fails with
+      # "Engine base URL must use HTTPS when endpoint policy is enforced" (shown as a generic
+      # error in the UI). These three variables are the documented opt-in for exactly that case:
+      # an exact host allowlist entry, the private-host opt-in and the plain-HTTP override.
+      # See https://github.com/EnterpriseGlue/enterpriseglue-the-bridge-oss/blob/v0.28.7/docs/reference/configuration.md#engine-endpoint-policy
+      EG_ENGINE_ALLOWED_HOSTS: host.docker.internal
+      EG_ENGINE_ALLOW_PRIVATE_HOSTS: "true"
+      EG_ALLOW_INSECURE_ENGINE_HTTP: "true"
     healthcheck:
       test: ["CMD-SHELL", "node -e \"const p=process.env.API_PORT||'8787';require('http').get('http://127.0.0.1:'+p+'/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1));\""]
       interval: 10s
@@ -97,7 +115,7 @@ services:
       retries: 10
 
   enterpriseglue-frontend:
-    image: ghcr.io/enterpriseglue/enterpriseglue-the-bridge-oss-frontend:v0.19.2
+    image: ghcr.io/enterpriseglue/enterpriseglue-the-bridge-oss-frontend:v0.28.7
     container_name: enterpriseglue-frontend
     restart: always
     depends_on:

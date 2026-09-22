@@ -127,17 +127,33 @@ in, and connect it to your engine.
 
 1. Open [http://localhost:8081](http://localhost:8081) and log in with the dev admin
    (`admin@enterpriseglue.com` / `adminadmin`).
-2. Register the engine under **Platform Settings → Engines** with the base URL
-   `http://host.docker.internal:8080/engine-rest`. That is the same REST API the Cockpit uses; the
-   training engine runs without authentication. From inside the container the host is reachable via
-   `host.docker.internal` – not via `localhost`.
-3. Afterwards the same process definition (`Join Inner Circle` / `subscribeNewsletter`) shows up in
-   the Bridge as well.
+2. Register the engine under **Platform settings → Engines → Add engine**:
+
+   | Field | Value |
+   |---|---|
+   | Engine name | `Training` (free choice) |
+   | Engine product | `Operaton` |
+   | How EnterpriseGlue connects | `Connect directly to the engine` |
+   | Endpoint URL | `http://host.docker.internal:8080/engine-rest` |
+   | Endpoint authentication | `Username and password` → Username `admin`, Password `admin` |
+   | Environment label | `Dev` (preselected) |
+
+   Leave everything else at its defaults. The endpoint URL is the same REST API the Cockpit uses.
+   From inside the container the host is reachable via `host.docker.internal` – not via `localhost`.
+3. After **Create**, the engine shows the status **Connected**, and the same process definition
+   (`Join Inner Circle` / `subscribeNewsletter`) shows up in the Bridge under **Mission Control**.
 
 > **Term: EnterpriseGlue The Bridge.** An additional UI for the engine (model, deploy and
 > manage BPMN/DMN). It speaks the same `engine-rest` API as the Cockpit, so it's an alternative to
 > the classic Operaton web apps. The exact field labels may differ between Bridge versions; what
-> matters is the engine base URL.
+> matters is the engine's endpoint URL, a *direct* connection, and username/password.
+
+> **Note: Why username/password?** The training engine runs without authentication and ignores the
+> credentials. The Bridge, however, refuses to store an engine *without* credentials unless the engine
+> sits behind a customer-managed gateway or sidecar (the other option under *How EnterpriseGlue
+> connects*) and a platform admin has explicitly allowed that. `admin`/`admin` are the Cockpit admin
+> credentials from `application.yaml` – so they'd also be right if you switched REST authentication on
+> later.
 
 ### 10. Play through the process
 
@@ -186,6 +202,16 @@ stopping.
 
 - If the application starts with a database error, check step 2 first: without the schema
   `exercise` the engine can't find its tables.
+- If saving the engine in the Bridge fails with a generic error and `docker logs enterpriseglue-backend`
+  shows `Engine base URL must use HTTPS when endpoint policy is enforced`, the Bridge backend is
+  running without the `EG_ENGINE_*` variables from `stack/docker-compose.yml` (e.g. a container from an
+  older compose file). Run `cd stack && docker-compose up -d` again so the backend is recreated. The
+  sibling message `Engine base URL private host must have an exact endpoint-policy allowlist entry`
+  means `localhost`/`127.0.0.1` was entered instead of `host.docker.internal`.
+- If `docker-compose up -d` stops with `container enterpriseglue-backend is unhealthy` and
+  `docker logs enterpriseglue-backend` shows a failed migration (e.g. `column "user_id" does not exist`),
+  the Bridge volumes stem from an older Bridge image. Either reset the Bridge volumes (fresh setup) or
+  apply `stack/enterpriseglue-ledger-baseline-v0.19.2.sql` once – both recipes are in that file's header.
 - The prefixes are a handy mnemonic: `re` is fixed, `ru` is moving, `hi` is the past.
 
 ## Reference solution
