@@ -31,8 +31,13 @@ Operaton Cockpit: `http://localhost:8080/operaton/app/cockpit/` (admin/admin)
 
 EnterpriseGlue The Bridge (additional UI): `http://localhost:8081`
 (`admin@enterpriseglue.com` / `adminadmin`). Register the engine under
-Platform Settings → Engines with base URL `http://host.docker.internal:8080/engine-rest`
-(the Bridge backend runs in Docker, so it reaches the host engine via `host.docker.internal`).
+Platform settings → Engines → Add engine with base URL `http://host.docker.internal:8080/engine-rest`,
+connection mode "Connect directly to the engine" and username/password `admin`/`admin`
+(the Bridge backend runs in Docker, so it reaches the host engine via `host.docker.internal`; the
+engine ignores the credentials, but the Bridge won't store a credential-less direct engine).
+The Bridge enforces an HTTPS-only "engine endpoint policy" in production mode; the
+`EG_ENGINE_ALLOWED_HOSTS` / `EG_ENGINE_ALLOW_PRIVATE_HOSTS` / `EG_ALLOW_INSECURE_ENGINE_HTTP`
+variables in `stack/docker-compose.yml` opt the plain-HTTP training engine back in.
 
 ## Architecture
 

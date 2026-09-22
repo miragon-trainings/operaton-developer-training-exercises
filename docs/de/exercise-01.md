@@ -128,17 +128,34 @@ schon gestartet. Öffne sie, melde dich an und verbinde sie mit deiner Engine.
 
 1. Öffne [http://localhost:8081](http://localhost:8081) und melde dich mit dem Dev-Admin an
    (`admin@enterpriseglue.com` / `adminadmin`).
-2. Registriere die Engine unter **Platform Settings → Engines** mit der Basis-URL
-   `http://host.docker.internal:8080/engine-rest`. Das ist dieselbe REST-Schnittstelle, die auch
-   das Cockpit nutzt; die Trainings-Engine läuft ohne Authentifizierung. Aus dem Container heraus
-   ist der Host über `host.docker.internal` erreichbar – nicht über `localhost`.
-3. Danach erscheint dieselbe Prozessdefinition (`Join Inner Circle` / `subscribeNewsletter`) auch
-   in der Bridge.
+2. Registriere die Engine unter **Platform settings → Engines → Add engine**:
+
+   | Feld | Wert |
+   |---|---|
+   | Name | `Training` (frei wählbar) |
+   | Base URL | `http://host.docker.internal:8080/engine-rest` |
+   | Type | `Operaton` |
+   | Connection mode | `Connect directly to the engine` |
+   | Endpoint authentication | `Username and password` → `admin` / `admin` |
+   | Environment | `Dev` |
+
+   Alles andere bleibt auf den Vorgaben. Die Basis-URL ist dieselbe REST-Schnittstelle, die auch
+   das Cockpit nutzt. Aus dem Container heraus ist der Host über `host.docker.internal` erreichbar –
+   nicht über `localhost`.
+3. Nach dem Speichern steht die Engine auf **connected**, und dieselbe Prozessdefinition
+   (`Join Inner Circle` / `subscribeNewsletter`) erscheint in der Bridge unter **Mission Control**.
 
 > **Begriff: EnterpriseGlue The Bridge.** Eine zusätzliche UI für die Engine (BPMN/DMN
 > modellieren, deployen und verwalten). Sie spricht dieselbe `engine-rest`-API wie das Cockpit und
 > ist damit eine Alternative zu den klassischen Operaton-Weboberflächen. Die genaue Bezeichnung der
-> Felder kann je nach Bridge-Version abweichen; entscheidend ist die Engine-Basis-URL.
+> Felder kann je nach Bridge-Version abweichen; entscheidend sind die Engine-Basis-URL, eine
+> *direkte* Verbindung und Benutzername/Passwort.
+
+> **Warum Benutzername/Passwort?** Die Trainings-Engine läuft ohne Authentifizierung und ignoriert
+> die Zugangsdaten schlicht. Die Bridge speichert eine Engine *ohne* Zugangsdaten aber nur, wenn sie
+> hinter einem kundenseitig betriebenen Sidecar liegt (ein anderer Connection mode). `admin`/`admin`
+> sind die Cockpit-Admin-Zugangsdaten aus der `application.yaml` – sie wären also auch dann richtig,
+> wenn du die REST-Authentifizierung später einschaltest.
 
 ### 10. Prozess durchspielen
 
@@ -189,6 +206,13 @@ End Event durch.
 
 - Startet die Anwendung mit einem Datenbankfehler, prüfe zuerst Schritt 2: Ohne das Schema
   `exercise` findet die Engine ihre Tabellen nicht.
+- Schlägt das Speichern der Engine in der Bridge mit einem generischen Fehler fehl und zeigt
+  `docker logs enterpriseglue-backend` die Meldung `Engine base URL must use HTTPS when endpoint
+  policy is enforced`, läuft das Bridge-Backend ohne die `EG_ENGINE_*`-Variablen aus
+  `stack/docker-compose.yml` (z. B. ein Container aus einer älteren Compose-Datei). Führe
+  `cd stack && docker-compose up -d` erneut aus, damit das Backend neu erzeugt wird. Die verwandte
+  Meldung `Engine base URL private host must have an exact endpoint-policy allowlist entry` bedeutet,
+  dass `localhost`/`127.0.0.1` statt `host.docker.internal` eingetragen wurde.
 - Die Präfixe sind ein Merkanker: `re` liegt fest, `ru` bewegt sich, `hi` ist Vergangenheit.
 
 ## Referenzlösung
