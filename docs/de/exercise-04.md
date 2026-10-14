@@ -145,7 +145,8 @@ curl -X POST http://localhost:8080/api/memberships \
 
 1. Der Aufruf liefert die `membershipId` zurück. `Send confirmation mail` läuft durch – im Log
    steht `Sending confirmation mail to bob@miravelo.com`.
-2. Die Prozessinstanz wartet am User Task `Confirm membership` (in `act_ru_task` sichtbar).
+2. Die Prozessinstanz wartet am User Task `Confirm membership`. In der H2-Konsole (siehe
+   [Aufgabe 1](exercise-01.md)) siehst du ihn mit `SELECT id_, name_, proc_inst_id_ FROM act_ru_task;`.
 3. Bestätige über den Endpunkt – mit der ID aus Schritt 1:
 
    ```bash

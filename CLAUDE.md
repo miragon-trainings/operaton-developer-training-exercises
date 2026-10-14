@@ -5,9 +5,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Build & Run
 
 ```bash
-# Start PostgreSQL, MailHog + EnterpriseGlue The Bridge (required before running the app)
-cd stack && docker-compose up -d
-
 # Build
 ./mvnw clean install
 
@@ -25,11 +22,30 @@ cd solutions/exercise-01 && ../../mvnw spring-boot:run
 
 # Run a single test class
 ./mvnw test -Dtest=<TestClassName>
+
+# Optional: EnterpriseGlue The Bridge (additional UI, needs Docker; NOT required to run the app)
+cd stack && docker-compose up -d
 ```
 
 Operaton Cockpit: `http://localhost:8080/operaton/app/cockpit/` (admin/admin)
 
-EnterpriseGlue The Bridge (additional UI): `http://localhost:8081`
+H2 console: `http://localhost:8080/h2-console` — JDBC URL `jdbc:h2:file:~/.operaton-training/exercise`, user `sa`,
+empty password (the login form pre-fills `jdbc:h2:~/test`; replace it).
+
+**Database:** no Docker, nothing to install or start. The app runs the engine on an embedded, file-based H2
+(`~/.operaton-training/exercise.mv.db`), created on first start; the engine creates its `act_*` tables itself
+(`operaton.bpm.database.schema-update: true`) in H2's default schema (`PUBLIC`), so SQL needs no schema prefix.
+Engine state survives restarts (JPA tables such as `membership` are recreated on each start, `ddl-auto: create`);
+reset = stop the app and delete `~/.operaton-training` (Windows: `%USERPROFILE%\.operaton-training`). The running
+app locks the file — external DB tools cannot open it meanwhile, and a DB tool holding the file blocks the app's
+start (use the H2 console). If the `TODO Exercise 1` block in `application.yaml` stays commented out while the
+pom deps are enabled, the app still starts, but Spring Boot falls back to a throwaway in-memory H2 (log shows
+`jdbc:h2:mem:…`): no admin user (webapps redirect to the Admin "Operaton Setup" page instead of a login), no H2
+console (404 — only with `mvnw spring-boot:run`, which excludes devtools; an IDE run with devtools enables the
+console anyway), nothing survives a restart. Process tests (Exercise 6+) use the `test` profile with a separate
+in-memory H2 (`jdbc:h2:mem:operaton-test`).
+
+EnterpriseGlue The Bridge (optional additional UI, Docker): `http://localhost:8081`
 (`admin@enterpriseglue.com` / `adminadmin`). Register the engine under
 Platform settings → Engines → Add engine with endpoint URL `http://host.docker.internal:8080/engine-rest`,
 "How EnterpriseGlue connects" = "Connect directly to the engine" and username/password `admin`/`admin`
@@ -93,11 +109,14 @@ Multi-module Maven project:
   engine host, which additively broadcasts `Signal_MemberActivated`) + `solutions/exercise-10/logistics-service/`
   (the remote owner of the `sendWelcomeKit` process; generates its own typed engine client in-module).
 - `models/` — Reference BPMN/DMN models
-- All modules (process-application + every solution) run on the same port (`8080`) and DB schema (`exercise`) —
-  one module at a time. `stack/init-schemas.sql` creates just that one schema.
-- `stack/docker-compose.yml` also runs **EnterpriseGlue The Bridge** (frontend on host `:8081`; backend + its
-  own Postgres are internal, not published), an additional UI that connects to the engine's `/engine-rest`.
-  Set up in Exercise 1. It needs no code changes in any module — every module already exposes `engine-rest`.
+- All modules (process-application + every solution) run on the same port (`8080`) and the same H2 file
+  (`~/.operaton-training/exercise.mv.db`) — one module at a time; a second instance fails at startup with
+  "Database may be already in use".
+- `stack/docker-compose.yml` runs only the optional **EnterpriseGlue The Bridge** (frontend on host `:8081`;
+  backend + its own database are internal, not published), an additional UI that connects to the engine's
+  `/engine-rest`. Docker is needed for nothing else; every exercise is completable without it. Set up in the
+  optional last step of Exercise 1. It needs no code changes in any module — every module already exposes
+  `engine-rest`.
 - The `load-solution` antrun task replaces `services/process-application/src/main` wholesale (Java, `application.yaml`,
   BPMN/DMN) from a solution; `src/test` and `pom.xml` are left untouched.
 

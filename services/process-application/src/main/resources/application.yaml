@@ -1,27 +1,30 @@
 # TODO Exercise 1: Uncomment the configuration.
 #
-# It connects the engine to the PostgreSQL from stack/ (docker-compose) and creates the
-# Cockpit admin user. Without this configuration the engine finds no database and the
-# application does not start.
+# It connects the engine to an embedded H2 database (a file in your home directory – nothing to
+# install or start), enables the H2 console and creates the Cockpit admin user. Without this
+# configuration the application falls back to a throwaway in-memory database: no admin user for
+# the Cockpit login, no H2 console, and every process instance is gone after a restart.
 #
-# The engine runs on port 8080 with its own schema `exercise`.
+# The engine runs on port 8080; the H2 console for the engine tables is at /h2-console.
 
 server:
   port: 8080
 
 #spring:
 #  datasource:
-#    url: jdbc:postgresql://localhost:5432/operaton-training?currentSchema=exercise
-#    username: admin
-#    password: admin
-#    driver-class-name: org.postgresql.Driver
+#    # Embedded H2 database, stored as a file in your home directory – nothing to install or start.
+#    # The engine state survives a restart. To reset: stop the application, delete ~/.operaton-training.
+#    url: jdbc:h2:file:~/.operaton-training/exercise
+#    username: sa
+#    password:
+#    driver-class-name: org.h2.Driver
 #  jpa:
 #    hibernate:
 #      ddl-auto: create
-#    properties:
-#      hibernate:
-#        dialect: org.hibernate.dialect.PostgreSQLDialect
-#        default_schema: exercise
+#  h2:
+#    console:
+#      # SQL console in the browser: http://localhost:8080/h2-console (same JDBC URL, user sa, no password)
+#      enabled: true
 #
 #operaton:
 #  bpm:
@@ -29,5 +32,5 @@ server:
 #      id: admin
 #      password: admin
 #    database:
-#      type: postgres
+#      type: h2
 #      schema-update: true

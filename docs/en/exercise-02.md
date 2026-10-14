@@ -92,10 +92,17 @@ form. This time it does **not** run through: it stops at the User Task `Confirm 
 
 ## Expected result
 
-After starting via the start form, the instance waits at the User Task – in `act_ru_task` there
-is one row, and in the Cockpit under **Tasklist** `Confirm membership` appears. Open the task:
-`email` is pre-filled. Tick `confirmed` and complete – the instance runs through the (still manual)
-"Send welcome mail" to `Member joined`.
+After starting via the start form, the instance waits at the User Task – in the Cockpit under
+**Tasklist** `Confirm membership` appears. You can see the wait state in the data as well: open the
+H2 console as in [Exercise 1](exercise-01.md) (it remembers the JDBC URL) and run this query:
+
+```sql
+SELECT id_, name_, proc_inst_id_ FROM act_ru_task;
+```
+
+For every waiting instance there is one row with `Confirm membership`. Open the task in the
+Tasklist: `email` is pre-filled. Tick `confirmed` and complete – the instance runs through the
+(still manual) "Send welcome mail" to `Member joined`, and its row disappears from `act_ru_task`.
 
 > **Term: wait state.** A point at which the process instance **stops and waits for an event from
 > outside** – here the User Task, which waits for its own completion. The engine writes the state

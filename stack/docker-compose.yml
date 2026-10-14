@@ -1,8 +1,9 @@
 # Use this only in dev environments. It's not intended for production usage.
 #
+# OPTIONAL: the exercises need no Docker — the engine runs on an embedded H2 database inside the
+# application. This stack only runs the optional, additional UI:
+#
 # Services:
-#   - postgres  : the training engine database (Operaton stores its state here)
-#   - mailhog   : local SMTP catcher (Web UI on :8025)
 #   - enterpriseglue-*: EnterpriseGlue "The Bridge" — an additional web UI for Operaton
 #                 to design, deploy and manage BPMN/DMN processes. Open http://localhost:8081.
 #                 The Bridge backend talks to the engine's REST API at
@@ -17,32 +18,13 @@
 #                 header of that file. All secrets below are throwaway dev values.
 services:
 
-  postgres:
-    image: postgres:18
-    container_name: postgres
-    ports:
-      - "5432:5432"
-    restart: always
-    environment:
-      POSTGRES_DB: operaton-training
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-
-  mailhog:
-    image: mailhog/mailhog:v1.0.1
-    container_name: mailhog
-    ports:
-      - "1025:1025"   # SMTP
-      - "8025:8025"   # Web UI
-    restart: always
-
   # --- EnterpriseGlue "The Bridge" — additional Operaton UI (http://localhost:8081) ---
 
   enterpriseglue-db:
     image: postgres:18-alpine
     container_name: enterpriseglue-db
     restart: always
-    # No host port published: the Bridge's own database stays internal (no clash with 5432).
+    # No host port published: the Bridge's own database stays internal.
     environment:
       POSTGRES_USER: enterpriseglue
       POSTGRES_PASSWORD: enterpriseglue

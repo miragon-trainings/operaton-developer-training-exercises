@@ -23,22 +23,34 @@ The extracted sub-process for the rejection (Call Activity + DMN):
 
 ## Prerequisites
 
-```bash
-# Start PostgreSQL, MailHog and EnterpriseGlue The Bridge (in the stack directory)
-cd ../../stack && docker-compose up -d
+You don't need Docker for the exercises: the engine uses an embedded H2 database that is stored as
+a file under `~/.operaton-training` – there is no database to install or start. You only need
+Docker for the optional EnterpriseGlue The Bridge (last section of the code block below).
 
+The engine's data (deployments, waiting instances, history) survives a restart; the application's
+own JPA tables (e.g. `membership` from Exercise 4 on) are recreated empty on every start
+(`ddl-auto: create`) – a membership registered before a restart can't be confirmed afterwards, so
+register a new one. For a clean slate, stop the application and delete the folder
+`~/.operaton-training` (on Windows `%USERPROFILE%\.operaton-training`).
+
+```bash
 # Start the application (from this process-application directory)
 ../../mvnw spring-boot:run
 
 # Operaton Cockpit
 http://localhost:8080/operaton/app/cockpit/  (admin / admin)
 
-# EnterpriseGlue The Bridge (additional UI)
+# H2 console (engine tables) – replace the pre-filled JDBC URL jdbc:h2:~/test in the login form
+http://localhost:8080/h2-console  (JDBC URL jdbc:h2:file:~/.operaton-training/exercise, user sa, no password)
+
+# Optional: EnterpriseGlue The Bridge (additional UI, needs Docker; started in the stack directory)
+cd ../../stack && docker-compose up -d
 http://localhost:8081  (admin@enterpriseglue.com / adminadmin)
 ```
 
 > On delivery this module starts in the state of **Exercise 1** – the
-> Operaton engine is still commented out. In Exercise 1 you switch it on.
+> Operaton engine is still commented out, so the Cockpit and the H2 console aren't reachable yet.
+> In Exercise 1 you switch it on.
 
 ## Exercise overview
 
@@ -50,7 +62,7 @@ http://localhost:8081  (admin@enterpriseglue.com / adminadmin)
 | [3](../../docs/en/exercise-03.md) | Automate a step | Turn the "Send welcome mail" Manual Task into a Service Task + JavaDelegate (Cockpit-started) |
 | [4](../../docs/en/exercise-04.md) | The application takes over | Message start, REST register + confirm endpoints, correlation, persistence |
 | [5](../../docs/en/exercise-05.md) | Membership & gateway | Exclusive gateway, capacity check |
-| [6](../../docs/en/exercise-06.md) | Process tests | Process unit test: in-memory engine, mocked use cases, without PostgreSQL |
+| [6](../../docs/en/exercise-06.md) | Process tests | Process unit test: in-memory engine, mocked use cases, without a running application |
 | [6 · Add-on](../../docs/en/exercise-06-addon.md) | bpmn-to-code | Generate a type-safe process API from the BPMN – strings out, constants in |
 | [7](../../docs/en/exercise-07.md) | Boundary events & subprocesses | Parallel gateway, timer and message boundary events, subprocesses |
 | [8](../../docs/en/exercise-08.md) | Compensation (SAGA) | Automatic rollback via BPMN compensation |
@@ -102,6 +114,7 @@ this module and continue working with it (valid values: 1–10):
 ```
 
 The task replaces `src/main` completely (Java, `application.yaml`, BPMN/DMN); `src/test` stays
-untouched. All modules run on the same port (`8080`) and DB schema (`exercise`), so only ever
-one module runs at a time. The prerequisite is that you enabled the Operaton dependencies in
-**Exercise 1** (the `pom.xml` is not copied along).
+untouched. All modules run on the same port (`8080`) and use the same embedded H2 database file, so
+only ever one module runs at a time (the running application locks the file, so a second instance
+fails at startup). The prerequisite is that you enabled the Operaton dependencies in **Exercise 1** (the
+`pom.xml` is not copied along).

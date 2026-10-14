@@ -91,10 +91,19 @@ stehen.
 
 ## Erwartetes Ergebnis
 
-Nach dem Start über das Start-Formular wartet die Instanz am User Task – in `act_ru_task` steht eine
-Zeile, im Cockpit unter **Tasklist** erscheint `Confirm membership`. Öffne den Task: `email` ist
-vorbefüllt. Setze den Haken bei `confirmed` und schließe ab – die Instanz läuft über den (noch
-manuellen) „Send welcome mail" bis `Member joined` durch.
+Nach dem Start über das Start-Formular wartet die Instanz am User Task – im Cockpit unter
+**Tasklist** erscheint `Confirm membership`. Den Wait State siehst du auch im Datenbestand: Öffne die
+H2-Konsole wie in [Aufgabe 1](exercise-01.md) (sie merkt sich die JDBC-URL) und führe diese Abfrage
+aus:
+
+```sql
+SELECT id_, name_, proc_inst_id_ FROM act_ru_task;
+```
+
+Für jede wartende Instanz steht dort eine Zeile mit `Confirm membership`. Öffne den Task in der
+Tasklist: `email` ist vorbefüllt. Setze den Haken bei `confirmed` und schließe ab – die Instanz
+läuft über den (noch manuellen) „Send welcome mail" bis `Member joined` durch, und ihre Zeile
+verschwindet aus `act_ru_task`.
 
 > **Begriff: Wait State.** Eine Stelle, an der die Prozessinstanz **stehen bleibt und auf ein
 > Ereignis von außen wartet** – hier der User Task, der auf seinen Abschluss wartet. Die Engine
