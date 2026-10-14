@@ -234,18 +234,24 @@ Remote-Adapter-Test gegen einen HTTP-Stub (`MockRestServiceServer`):
 
 ### End-to-End mit beiden Services
 
-Für den vollständigen Durchlauf brauchst du drei Terminals: eines für den Stack, je eines
-für die beiden Anwendungen. Arbeite die Schritte der Reihe nach ab:
+Starte für einen sauberen Beweis mit einer frischen Engine: Beende alle Anwendungen und lösche den
+Ordner `~/.operaton-training` (unter Windows `%USERPROFILE%\.operaton-training`, siehe
+[Aufgabe 1](exercise-01.md)). Sonst liegt das Deployment aus früheren Läufen des Logistik-Services
+schon in der Datenbank. Nach Schritt 1 listet `curl http://localhost:8080/engine-rest/deployment`
+dann noch kein Deployment `logistics-service`, nach Schritt 2 schon.
+
+Für den vollständigen Durchlauf brauchst du drei Terminals: je eines für die beiden
+Anwendungen, die gleichzeitig laufen, und eines für die `curl`-Aufrufe. Arbeite die Schritte
+der Reihe nach ab:
 
 ```bash
-# 1. Stack und Engine-Host (:8080) starten
-cd stack && docker-compose up -d
-cd ../solutions/exercise-10/process-application && ../../../mvnw spring-boot:run
+# 1. Engine-Host (:8080) starten
+cd solutions/exercise-10/process-application && ../../../mvnw spring-boot:run
 
 # 2. Logistik-Service (:8090) in einem zweiten Terminal – er deployt sein Modell beim Start
 cd solutions/exercise-10/logistics-service && ../../../mvnw spring-boot:run
 
-# 3. Beweis, dass der Remote-Service das Modell deployt hat:
+# 3. Beweis im dritten Terminal, dass der Remote-Service das Modell deployt hat:
 curl http://localhost:8080/engine-rest/deployment
 
 # 4. Mitglied anlegen, im Cockpit (http://localhost:8080/operaton/app/cockpit/, admin/admin) die

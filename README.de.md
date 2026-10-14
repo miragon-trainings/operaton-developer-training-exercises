@@ -37,12 +37,12 @@ Detaillierte Aufgabenbeschreibungen befinden sich in [`docs/`](docs/).
 | Aufgabe | Thema | Beschreibung |
 |---|---|---|
 | [0](docs/de/exercise-00.md) | Fachliche BPMN-Modellierung | Den kompletten Inner-Circle-Membership-Prozess rein fachlich modellieren — die gemeinsame Vorlage für das ganze Training |
-| [1](docs/de/exercise-01.md) | Engine zum Laufen bringen | Das vorgegebene Start-Formular-/Manual-Task-Modell durchlaufen lassen, Cockpit, `act_*`-Tabellen der Engine und EnterpriseGlue The Bridge kennenlernen |
+| [1](docs/de/exercise-01.md) | Engine zum Laufen bringen | Das vorgegebene Start-Formular-/Manual-Task-Modell durchlaufen lassen, Cockpit, `act_*`-Tabellen der Engine in der H2-Konsole und optional EnterpriseGlue The Bridge kennenlernen |
 | [2](docs/de/exercise-02.md) | Der erste Wartepunkt | Aus dem Manual Task „Confirm" einen User Task machen und ihm eine selbst erstellte Generated Form geben |
 | [3](docs/de/exercise-03.md) | Einen Schritt automatisieren | Aus dem Manual Task „Send welcome mail" einen Service Task mit JavaDelegate machen (Start über Cockpit) |
 | [4](docs/de/exercise-04.md) | Die Anwendung übernimmt | Message Start Event, REST-Endpunkte für Register + Confirm, Nachrichten-Korrelation, Persistenz |
 | [5](docs/de/exercise-05.md) | Kapazitätsprüfung mit Gateway | Exclusive Gateway, Transaktionsgrenzen, Business Key, Task-Formular |
-| [6](docs/de/exercise-06.md) | Prozess-Tests | Prozess-Unit-Test mit In-Memory-Engine, gemockten Use Cases, ohne PostgreSQL |
+| [6](docs/de/exercise-06.md) | Prozess-Tests | Prozess-Unit-Test mit In-Memory-Engine, gemockten Use Cases, ohne laufende Anwendung |
 | [6 · Add-on](docs/de/exercise-06-addon.md) | bpmn-to-code | Element-IDs als generierte Konstanten statt handgetippter Strings, Pfade compile-sicher mit `PathWalk` navigieren |
 | [7](docs/de/exercise-07.md) | Subprozess, Boundary Events & Parallelität | Subprozess, Timer- und Message-Boundary-Events, Parallel Gateway, Teams-Anbindung |
 | [8](docs/de/exercise-08.md) | Kompensation (SAGA) | Compensation Boundary Event, Compensating End Event, Kompensations-Handler |
@@ -57,10 +57,21 @@ Detaillierte Aufgabenbeschreibungen befinden sich in [`docs/`](docs/).
 
 ## Quick Start
 
-```bash
-# PostgreSQL, MailHog und EnterpriseGlue The Bridge starten
-cd stack && docker-compose up -d
+Für die Aufgaben brauchst du kein Docker: Die Engine nutzt eine eingebettete H2-Datenbank, die als
+Datei unter `~/.operaton-training` liegt – du musst keine Datenbank installieren oder starten.
+Docker brauchst du nur für die optionale EnterpriseGlue The Bridge (letzter Abschnitt im Codeblock
+unten).
 
+Der Datenbestand der Engine (Deployments, wartende Instanzen, History) übersteht einen Neustart; die
+eigenen JPA-Tabellen der Anwendung (z. B. `membership` ab Aufgabe 4) legt `ddl-auto: create` bei
+jedem Start leer neu an – eine vor dem Neustart registrierte Membership lässt sich danach nicht mehr
+bestätigen, registriere also neu. Für einen sauberen Neuanfang beende die Anwendung und lösche den
+Ordner `~/.operaton-training` (unter Windows `%USERPROFILE%\.operaton-training`).
+
+Im Auslieferungszustand ist die Engine im `process-application`-Modul noch auskommentiert – Cockpit
+und H2-Konsole sind erst nach Aufgabe 1 erreichbar.
+
+```bash
 # Alles bauen
 ./mvnw clean install
 
@@ -70,7 +81,11 @@ cd services/process-application && ../../mvnw spring-boot:run
 # Operaton Cockpit
 open http://localhost:8080/operaton/app/cockpit/    # admin / admin
 
-# EnterpriseGlue The Bridge (zusätzliche UI)
+# H2-Konsole (Engine-Tabellen) – im Login die vorbelegte JDBC-URL jdbc:h2:~/test ersetzen
+open http://localhost:8080/h2-console               # JDBC-URL jdbc:h2:file:~/.operaton-training/exercise, Benutzer sa, kein Passwort
+
+# Optional: EnterpriseGlue The Bridge (zusätzliche UI, braucht Docker) – aus dem Wurzelverzeichnis des Repositories
+cd stack && docker-compose up -d
 open http://localhost:8081                          # admin@enterpriseglue.com / adminadmin
 ```
 
@@ -87,7 +102,8 @@ kopieren und mit ihr weiterarbeiten:
 
 Der Task ersetzt `src/main` komplett (Java, `application.yaml`, BPMN/DMN); `src/test` bleibt
 unberührt. Alle Module – das `process-application`-Modul **und** alle Solutions – laufen auf demselben Port
-(`8080`) und demselben DB-Schema (`exercise`); es läuft also immer nur **ein** Modul zur Zeit.
+(`8080`) und nutzen dieselbe eingebettete H2-Datenbankdatei; es läuft also immer nur **ein** Modul zur Zeit
+(die laufende Anwendung sperrt die Datei, eine zweite Instanz bricht beim Start ab).
 Die in **Aufgabe 1** aktivierten Operaton-Abhängigkeiten (`pom.xml`) bleiben bestehen – lade
 eine Lösung ab `exercise-2` daher erst, nachdem Aufgabe 1 abgeschlossen ist.
 
@@ -119,9 +135,9 @@ operaton-developer-training-exercises/
 │   ├── exercise-{01-10}/             # exercise-10/ ist verschachtelt: process-application/ + logistics-service/
 │   └── extra-task-1/
 ├── models/                           # Referenz-BPMN-/DMN-Modelle
-├── stack/
-│   ├── docker-compose.yml            # PostgreSQL + MailHog + EnterpriseGlue The Bridge
-│   └── init-schemas.sql
+├── stack/                            # Optional, braucht Docker – für die Aufgaben nicht nötig
+│   ├── docker-compose.yml            # Optional: EnterpriseGlue The Bridge (zusätzliche UI)
+│   └── enterpriseglue-ledger-baseline-v0.19.2.sql  # Einmalige Migrationskorrektur für ältere Bridge-Datenbanken
 └── pom.xml
 ```
 
@@ -132,10 +148,10 @@ operaton-developer-training-exercises/
 | Sprache | Java 21 |
 | Framework | Spring Boot 4 |
 | Process Engine | Operaton 2.1.3 |
-| Datenbank | PostgreSQL (JPA / Hibernate) |
+| Datenbank | H2 (eingebettet, dateibasiert; JPA / Hibernate) |
 | Build | Maven |
 | Architektur-Tests | ArchUnit |
-| Prozess-UIs | Operaton Cockpit + EnterpriseGlue The Bridge |
+| Prozess-UIs | Operaton Cockpit + EnterpriseGlue The Bridge (optional, Docker) |
 
 ## Operaton
 
@@ -143,7 +159,7 @@ operaton-developer-training-exercises/
 
 In diesem Projekt läuft Operaton eingebettet in Spring Boot, stellt die klassischen Weboberflächen (Cockpit, Tasklist, Admin) unter `http://localhost:8080/operaton/app/cockpit/` bereit und übernimmt die BPMN-Prozessausführung für den Inner-Circle-Membership-Prozess.
 
-Als **zusätzliche UI** läuft [EnterpriseGlue The Bridge](https://github.com/EnterpriseGlue/enterpriseglue-the-bridge-oss) — ein Open-Source-Portal zum Modellieren, Deployen und Verwalten von BPMN/DMN-Prozessen — parallel im Stack unter `http://localhost:8081`. Es spricht dieselbe Engine-REST-API (`/engine-rest`) wie das Cockpit; eingerichtet wird es in Aufgabe 1.
+Als **optionale, zusätzliche UI** lässt sich [EnterpriseGlue The Bridge](https://github.com/EnterpriseGlue/enterpriseglue-the-bridge-oss) — ein Open-Source-Portal zum Modellieren, Deployen und Verwalten von BPMN/DMN-Prozessen — per Docker aus `stack/` starten (`docker-compose up -d`); sie läuft dann unter `http://localhost:8081`. Sie spricht dieselbe Engine-REST-API (`/engine-rest`) wie das Cockpit; einrichten kannst du sie im optionalen letzten Schritt von Aufgabe 1. Keine Aufgabe setzt sie voraus.
 
 Service Tasks werden über das `JavaDelegate`-Pattern mit `DelegateExpression` angebunden:
 

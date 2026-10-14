@@ -3,17 +3,19 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/operaton-training?currentSchema=exercise
-    username: admin
-    password: admin
-    driver-class-name: org.postgresql.Driver
+    # Embedded H2 database, stored as a file in your home directory – nothing to install or start.
+    # The engine state survives a restart. To reset: stop the application, delete ~/.operaton-training.
+    url: jdbc:h2:file:~/.operaton-training/exercise
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
   jpa:
     hibernate:
       ddl-auto: create
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        default_schema: exercise
+  h2:
+    console:
+      # SQL console in the browser: http://localhost:8080/h2-console (same JDBC URL, user sa, no password)
+      enabled: true
 
 # Process-Engine-API (bpm-crafters): engine-neutral orchestration on top of the embedded Operaton engine
 dev:
@@ -41,5 +43,5 @@ operaton:
       id: admin
       password: admin
     database:
-      type: postgres
+      type: h2
       schema-update: true

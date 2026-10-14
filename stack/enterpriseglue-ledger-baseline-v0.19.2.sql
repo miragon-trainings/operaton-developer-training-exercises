@@ -21,8 +21,9 @@
 --   cd stack && docker-compose rm -sf enterpriseglue-frontend enterpriseglue-backend enterpriseglue-db \
 --     && docker volume rm stack_enterpriseglue_postgres_data stack_enterpriseglue_git_repos && docker-compose up -d
 -- (The `stack_` prefix is the compose project name, i.e. the directory name; check `docker volume ls` if you
--- run compose differently. Do NOT use `docker-compose down -v` – that would also wipe the training engine's
--- PostgreSQL data.)
+-- run compose differently. Since this stack only runs the Bridge, `cd stack && docker-compose down -v &&
+-- docker-compose up -d` is an equivalent reset – the training engine's data lives in ~/.operaton-training,
+-- not in Docker.)
 
 BEGIN;
 

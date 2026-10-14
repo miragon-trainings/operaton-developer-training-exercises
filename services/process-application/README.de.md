@@ -23,22 +23,35 @@ Der ausgelagerte Sub-Prozess für die Ablehnung (Call Activity + DMN):
 
 ## Voraussetzungen
 
-```bash
-# PostgreSQL, MailHog und EnterpriseGlue The Bridge starten (im Stack-Verzeichnis)
-cd ../../stack && docker-compose up -d
+Für die Aufgaben brauchst du kein Docker: Die Engine nutzt eine eingebettete H2-Datenbank, die als
+Datei unter `~/.operaton-training` liegt – du musst keine Datenbank installieren oder starten.
+Docker brauchst du nur für die optionale EnterpriseGlue The Bridge (letzter Abschnitt im Codeblock
+unten).
 
+Der Datenbestand der Engine (Deployments, wartende Instanzen, History) übersteht einen Neustart; die
+eigenen JPA-Tabellen der Anwendung (z. B. `membership` ab Aufgabe 4) legt `ddl-auto: create` bei
+jedem Start leer neu an – eine vor dem Neustart registrierte Membership lässt sich danach nicht mehr
+bestätigen, registriere also neu. Für einen sauberen Neuanfang beende die Anwendung und lösche den
+Ordner `~/.operaton-training` (unter Windows `%USERPROFILE%\.operaton-training`).
+
+```bash
 # Anwendung starten (aus diesem process-application-Verzeichnis)
 ../../mvnw spring-boot:run
 
 # Operaton Cockpit
 http://localhost:8080/operaton/app/cockpit/  (admin / admin)
 
-# EnterpriseGlue The Bridge (zusätzliche UI)
+# H2-Konsole (Engine-Tabellen) – im Login die vorbelegte JDBC-URL jdbc:h2:~/test ersetzen
+http://localhost:8080/h2-console  (JDBC-URL jdbc:h2:file:~/.operaton-training/exercise, Benutzer sa, kein Passwort)
+
+# Optional: EnterpriseGlue The Bridge (zusätzliche UI, braucht Docker; Start im Stack-Verzeichnis)
+cd ../../stack && docker-compose up -d
 http://localhost:8081  (admin@enterpriseglue.com / adminadmin)
 ```
 
 > Im Auslieferungszustand startet dieses Modul im Zustand von **Aufgabe 1** – die
-> Operaton-Engine ist noch auskommentiert. In Aufgabe 1 schaltest du sie scharf.
+> Operaton-Engine ist noch auskommentiert, Cockpit und H2-Konsole sind also noch nicht erreichbar.
+> In Aufgabe 1 schaltest du sie scharf.
 
 ## Aufgaben-Übersicht
 
@@ -50,7 +63,7 @@ http://localhost:8081  (admin@enterpriseglue.com / adminadmin)
 | [3](../../docs/de/exercise-03.md) | Einen Schritt automatisieren | Aus dem Manual Task „Send welcome mail" einen Service Task + JavaDelegate machen (Start über Cockpit) |
 | [4](../../docs/de/exercise-04.md) | Die Anwendung übernimmt | Message Start, REST-Endpunkte für Register + Confirm, Korrelation, Persistenz |
 | [5](../../docs/de/exercise-05.md) | Membership & Gateway | Exclusive Gateway, Kapazitätsprüfung |
-| [6](../../docs/de/exercise-06.md) | Prozess-Tests | Prozess-Unit-Test: In-Memory-Engine, gemockte Use Cases, ohne PostgreSQL |
+| [6](../../docs/de/exercise-06.md) | Prozess-Tests | Prozess-Unit-Test: In-Memory-Engine, gemockte Use Cases, ohne laufende Anwendung |
 | [6 · Add-on](../../docs/de/exercise-06-addon.md) | bpmn-to-code | Typsichere Process-API aus dem BPMN generieren – Strings raus, Konstanten rein |
 | [7](../../docs/de/exercise-07.md) | Boundary Events & Subprozesse | Parallel Gateway, Timer- und Message-Boundary-Events, Subprozesse |
 | [8](../../docs/de/exercise-08.md) | Kompensation (SAGA) | Automatisches Rollback via BPMN-Kompensation |
@@ -102,6 +115,7 @@ dieses Modul kopieren und mit ihr weiterarbeiten (gültige Werte: 1–10):
 ```
 
 Der Task ersetzt `src/main` komplett (Java, `application.yaml`, BPMN/DMN); `src/test` bleibt
-unberührt. Alle Module laufen auf demselben Port (`8080`) und DB-Schema (`exercise`), es läuft
-also immer nur ein Modul zur Zeit. Voraussetzung ist, dass du in **Aufgabe 1** die
+unberührt. Alle Module laufen auf demselben Port (`8080`) und nutzen dieselbe eingebettete
+H2-Datenbankdatei, es läuft also immer nur ein Modul zur Zeit (die laufende Anwendung sperrt die
+Datei, eine zweite Instanz bricht beim Start ab). Voraussetzung ist, dass du in **Aufgabe 1** die
 Operaton-Abhängigkeiten aktiviert hast (die `pom.xml` wird nicht mitkopiert).
