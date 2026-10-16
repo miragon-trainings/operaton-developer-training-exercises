@@ -1,52 +1,34 @@
 # Extra-Aufgabe 1 – Raus aus dem Engine-Lock-in
 
-> **Voraussetzung:** Aufgabe 10 ist abgeschlossen – der Membership-Prozess läuft vollständig, inklusive Signal-End-Event „Membership activated".
-> **Arbeitsverzeichnis:** `services/process-application`
-> **Neu in dieser Aufgabe:** Process-Engine-API von bpm-crafters, Worker-Pattern statt JavaDelegate, engine-neutraler Outbound-Adapter, ArchUnit-Guardrail.
+> **Voraussetzung:** Aufgabe 7 ist abgeschlossen – der Membership-Prozess läuft vollständig, inklusive Signal-End-Event „Membership activated".
+> **Arbeitsverzeichnis:** `services/process-application` (Teil A) und `services/logistics-service` (Teil B)
+> **Neu in dieser Aufgabe:** Process-Engine-API von bpm-crafters, Worker-Pattern statt JavaDelegate, engine-neutraler Outbound-Adapter, embedded- und Remote-Adapter, ArchUnit-Guardrail.
 
 ## Darum geht es
 
-**Strategie-Meeting. Der Prozess läuft. Jemand stellt die unbequeme Frage.**
+Jeder Service Task hängt an einem `JavaDelegate` mit `DelegateExecution`, der Prozess-Adapter ruft
+`RuntimeService` und `TaskService` direkt auf. Ein Wechsel auf Camunda 8 oder Operaton hieße, jede
+dieser Stellen anzufassen. Die [**Process-Engine-API**](https://github.com/bpm-crafters/process-engine-api)
+von bpm-crafters abstrahiert die Engine, so wie JPA die Datenbank abstrahiert. Ein Engine-Wechsel
+wird damit im Wesentlichen zum Tausch eines Adapters. Domain, Application-Services und Ports bleiben
+unangetastet, du änderst nur die Adapter-Schicht.
 
-> *„Schön, dass alles läuft. Aber wir haben unsere komplette Fachlogik an eine Engine
-> getackert. Was passiert, wenn wir in zwei Jahren wechseln müssen?"*
+> *„Schön, dass alles läuft. Aber was passiert, wenn wir in zwei Jahren die Engine wechseln müssen?"*
 > — Die Person, die schon mal eine Migration mitgemacht hat.
-
-Camunda 7 ist End-of-Life, wir sind auf **Operaton** umgestiegen – ein gepflegter Fork,
-gute Wahl. Aber unser Code weiß das ein bisschen *zu* genau: Jeder Service Task hängt an
-einem `JavaDelegate` mit `org.operaton.bpm.engine.delegate.DelegateExecution`, der
-Prozess-Adapter ruft den `RuntimeService` direkt auf. Ein Wechsel auf Camunda 8 oder
-eine andere Engine hieße: jeden Delegate und jeden Engine-Aufruf anfassen.
-
-Die [**Process-Engine-API**](https://github.com/bpm-crafters/process-engine-api) von
-bpm-crafters ist eine engine-neutrale Abstraktionsschicht – so, wie JPA die Datenbank
-abstrahiert. Sie bringt Adapter für verschiedene BPMN-Engines mit (Operaton, Camunda 7,
-Camunda 8, CIB Seven). Ein Engine-Wechsel wird damit – stark vereinfacht – zum **Tausch eines
-Adapters**. In der Realität nie ganz so einfach, aber deutlich einfacher als sonst.
-
-Das Beste daran: **Domain, Application-Services und Ports bleiben unangetastet.** Sie waren
-schon immer engine-neutral – genau dafür gibt es die hexagonale Architektur. Du fasst nur
-die Adapter-Schicht an.
 
 ## Lernziele
 
 Nach dieser Aufgabe kannst du
 
-- benennen, wo native Engine-Kopplung im Code entsteht (`JavaDelegate`, `DelegateExecution`,
-  `RuntimeService`),
-- Service Tasks über das Worker-Pattern (`@ProcessEngineWorker`) statt über
-  `DelegateExpression` anbinden,
-- Prozesse engine-neutral starten und Nachrichten korrelieren (`StartProcessApi`,
-  `CorrelationApi`),
+- Service Tasks über das Worker-Pattern (`@ProcessEngineWorker`) statt über `DelegateExpression` anbinden,
+- Prozesse engine-neutral starten, Nachrichten korrelieren und User Tasks abschließen,
 - begründen, warum External Tasks die `asyncBefore`-Marker überflüssig machen,
-- per Architektur-Test garantieren, dass kein `org.operaton.bpm`-Import mehr in den Code leakt.
+- dieselbe API einmal embedded und einmal remote gegen `/engine-rest` betreiben,
+- per Architektur-Test garantieren, dass kein `org.operaton.bpm`-Import mehr im Code steht.
 
 ## Ziel-Modell
 
-Das Prozessmodell ändert sich **fachlich nicht**. Es ist exakt der Prozess aus Aufgabe 10 –
-nur die technische Anbindung der Service Tasks wechselt. Das Signal-End-Event „Membership
-activated" bleibt ein natives BPMN-Throw ohne Delegate und passt damit ohnehin in die
-engine-neutrale Welt.
+Das Modell ändert sich fachlich nicht, nur die technische Anbindung der Service Tasks.
 
 Hauptprozess:
 
@@ -56,50 +38,29 @@ Aufgerufener Prozess `handleRejection`:
 
 ![BPMN-Subprozess](../assets/extra-task-1-sub.svg)
 
-Was sich ändert – und was nicht:
-
-| Schicht | Aufgabe 10 (nativ Operaton) | Extra-Aufgabe 1 |
-|---|---|---|
-| `domain/`, `application/` | unverändert | **unverändert** |
-| Inbound Service Tasks | `JavaDelegate` + `DelegateExecution` | `@ProcessEngineWorker`-Worker |
-| Outbound Prozess-Adapter | `RuntimeService.createMessageCorrelation(...)` | `StartProcessApi` / `CorrelationApi` |
-| BPMN Service Tasks | `camunda:delegateExpression="#{xDelegate}"` | `camunda:type="external"` + `camunda:topic` |
-| Bootstrap | `@EnableProcessApplication` | entfällt – der Adapter übernimmt Deployment und Worker |
-
-Message Start, Boundary Events, Subprozess, Call Activity, DMN und Kompensation bleiben
-strukturell gleich. DMN und User Tasks laufen weiterhin in der Engine; dafür braucht es
-keine Worker.
-
 ## Aufgabe
 
-> Am einfachsten kopierst du deine Aufgabe-9-Lösung und baust sie Schritt für Schritt um.
-> Der Logistik-Service aus Aufgabe 10 bleibt dabei **unverändert** und ist nicht Teil dieser
-> Aufgabe.
+Du baust beide Services aus Aufgabe 7 um. Teil A stellt den Engine-Host auf den Embedded-Adapter um,
+Teil B den Logistik-Service auf den Remote-Adapter.
+
+### Teil A – Engine-Host: embedded
 
 ### 1. Dependencies einbinden
 
-In die `pom.xml` des Moduls:
+Ergänze in der `pom.xml` des Moduls:
 
 - `dev.bpm-crafters.process-engine-api:process-engine-api`
 - `dev.bpm-crafters.process-engine-worker:process-engine-worker-spring-boot-starter`
 - `dev.bpm-crafters.process-engine-adapters:process-engine-adapter-operaton-embedded-spring-boot-starter`
 
-Der Operaton-Embedded-Adapter ist genau die Abhängigkeit, die du beim Engine-Wechsel gegen
-einen anderen Adapter tauschen würdest – Worker und Ports bleiben, wie sie sind.
+Der Operaton-Embedded-Adapter ist die Abhängigkeit, die du beim Engine-Wechsel tauschen würdest.
 
 ### 2. Service Tasks auf External Tasks umstellen
 
-Auch das ist Modellierungsarbeit im **Miragon BPMN Modeler**, nicht im XML: Service Task
-auswählen → Properties Panel → **Implementation** auf **External** → Topic setzen → im
-Abschnitt **Input/Output** ein Input-Mapping anlegen, damit der Worker die `membershipId`
-bekommt. Aus
-
-```xml
-<bpmn:serviceTask id="serviceTask_sendConfirmationMail" name="Send confirmation mail"
-                  camunda:delegateExpression="#{sendConfirmationMailDelegate}">
-```
-
-wird so ein External Task mit Topic und Input-Mapping – im XML:
+Stelle im Modeler bei allen sieben Service Tasks **Implementation** auf **External**, setze das
+Topic und lege unter **Input/Output** ein Input-Mapping für `membershipId` an: `claimMembership`,
+`sendConfirmationMail`, `sendWelcomeMail`, `sendRejectionMail`, `reSendConfirmationMail`,
+`revokeClaim` (auch als Kompensations-Handler) und `notifyCommunity`. Im XML entsteht zum Beispiel:
 
 ```xml
 <bpmn:serviceTask id="serviceTask_sendConfirmationMail" name="Send confirmation mail"
@@ -111,26 +72,9 @@ wird so ein External Task mit Topic und Input-Mapping – im XML:
   </bpmn:extensionElements>
 ```
 
-Stelle alle sieben Service Tasks um: `claimMembership`, `sendConfirmationMail`,
-`sendWelcomeMail`, `sendRejectionMail`, `reSendConfirmationMail`, `revokeClaim` (auch als
-Kompensations-Handler) und `notifyCommunity`.
-
 ### 3. Delegates durch Worker ersetzen
 
-Aus dem `JavaDelegate`
-
-```java
-@Component
-public class SendConfirmationMailDelegate extends BaseDelegate {
-    @Override
-    protected void executeTask(DelegateExecution execution) {
-        var membershipId = (String) execution.getVariable("membershipId");
-        useCase.sendConfirmationMail(new MembershipId(UUID.fromString(membershipId)));
-    }
-}
-```
-
-wird ein engine-neutraler Worker – **ohne** `org.operaton.bpm`-Import:
+Ersetze jeden Delegate durch einen Worker ohne `org.operaton.bpm`-Import:
 
 ```java
 @Component
@@ -149,8 +93,7 @@ public class SendConfirmationMailWorker {
 }
 ```
 
-Der `claimMembership`-Worker gibt – anders als die übrigen – ein Ergebnis zurück, das das
-Gateway auswertet:
+Der `claimMembership`-Worker gibt das Ergebnis für das Gateway zurück:
 
 ```java
 @ProcessEngineWorker(topic = ServiceTasks.CLAIM_MEMBERSHIP)
@@ -160,9 +103,9 @@ public Map<String, Object> claimMembership(@Variable(name = "membershipId") Stri
 }
 ```
 
-### 4. Outbound-Adapter umstellen
+### 4. Den Outbound-Adapter umstellen
 
-Statt des `RuntimeService` injizierst du `StartProcessApi` und `CorrelationApi`:
+Ersetze `RuntimeService` durch `StartProcessApi` und `CorrelationApi`:
 
 ```java
 @Override
@@ -192,13 +135,26 @@ public void rejectMembership(MembershipId membershipId) {
 }
 ```
 
-### 5. Bootstrap und Konfiguration anpassen
+### 5. Die Bestätigung engine-neutral abschließen
 
-Entferne `@EnableProcessApplication` aus der `TrainingApplication` – der Adapter übernimmt
-Deployment und Worker-Registrierung.
+Statt den Task per `TaskService` zu suchen, lässt du dir offene User Tasks von der Engine zustellen.
+`UserTaskSupport` aus der Process-Engine-API merkt sich die zugestellten Tasks samt Payload.
+Abonniere im Konstruktor des Adapters `userTask_confirmMembership` mit der Variable `membershipId`
+und schließe in `confirm(...)` den passenden Task über die `UserTaskCompletionApi` ab:
 
-Stelle einen `EngineCommandExecutor` als Bean bereit, damit Engine- und Business-Daten in
-**einer** Transaktion committen:
+```java
+confirmationTasks.subscribe(taskSubscriptionApi, CommonRestrictions.builder().build(),
+        FlowNodes.UserTaskConfirmMembership.ELEMENT_ID, Set.of("membershipId"));
+
+// in confirm(...): Task-ID über getAllTasks() und getPayload(taskId) zur membershipId finden
+userTaskCompletionApi.completeTask(new CompleteTaskCmd(/* Task-ID */)).join();
+```
+
+### 6. Bootstrap und Konfiguration anpassen
+
+Entferne `@EnableProcessApplication` aus der `TrainingApplication`, der Adapter übernimmt Deployment
+und Worker-Registrierung. Stelle einen `EngineCommandExecutor` bereit, der Engine-Commands synchron
+im aufrufenden Thread ausführt. So committen Engine-Fortschritt und Fachdaten gemeinsam:
 
 ```java
 @Bean
@@ -206,10 +162,6 @@ public EngineCommandExecutor engineCommandExecutor() {
     return new EngineCommandExecutor(Runnable::run);
 }
 ```
-
-`Runnable::run` führt den Engine-Command synchron im aufrufenden Thread aus – Engine-Fortschritt
-und Fachdaten committen oder rollen gemeinsam. Ein eigener Thread-Pool würde diese Grenze
-zerschneiden. Das ist die direkte Fortsetzung des Themas aus [Aufgabe 5](exercise-05.md).
 
 Ergänze in der `application.yaml` den Worker- und Adapter-Block:
 
@@ -229,12 +181,14 @@ dev:
             delivery-strategy: embedded_scheduled
             worker-id: extra-task-1-worker
             schedule-delivery-fixed-rate-in-seconds: 5
+          user-tasks:
+            delivery-strategy: embedded_scheduled
+            schedule-delivery-fixed-rate-in-seconds: 5
 ```
 
-### 6. Guardrail setzen
+### 7. Guardrail setzen
 
-Ein ArchUnit-Test macht die Kernaussage prüfbar: **Nirgends** im Java-Code darf noch ein
-`org.operaton.bpm`-Import stehen.
+Ergänze im `ArchitectureTest` eine Regel, die jeden `org.operaton.bpm`-Import verbietet:
 
 ```java
 @ArchTest
@@ -242,27 +196,86 @@ static final ArchRule no_class_should_depend_on_the_native_engine = noClasses()
         .should().dependOnClassesThat().resideInAPackage("org.operaton.bpm..");
 ```
 
-Ist der Test grün, lebt die Engine nur noch in `pom.xml` und `application.yaml` – genau
-das, was bei einem Wechsel angefasst werden müsste.
+Ist der Test grün, steckt die Engine nur noch in `pom.xml` und `application.yaml`.
+
+### Teil B – Logistik-Service: dieselbe API, remote
+
+Der Logistik-Service aus Aufgabe 7 hat keine eigene Engine. Er wechselt ebenfalls auf die
+Process-Engine-API, nutzt aber den **Remote**-Adapter: Der Code spricht dieselbe API, der Adapter
+übersetzt sie in Aufrufe gegen `/engine-rest`.
+
+### 8. Den Remote-Adapter einbinden
+
+Ersetze in der `pom.xml` des Logistik-Services den External-Task-Client und den generierten
+Engine-Client (Generator-Block samt Jackson-Abhängigkeiten) durch:
+
+- `dev.bpm-crafters.process-engine-api:process-engine-api`
+- `dev.bpm-crafters.process-engine-worker:process-engine-worker-spring-boot-starter`
+- `dev.bpm-crafters.process-engine-adapters:process-engine-adapter-operaton-remote-spring-boot-starter`
+- `io.holunda.c7:c7-rest-client-spring-boot-starter-feign-4`: der REST-Client, über den der Adapter
+  mit `/engine-rest` spricht (der Adapter deklariert ihn als `provided`)
+
+Konfiguriere den Adapter in `application.yaml`:
+
+```yaml
+dev:
+  bpm-crafters:
+    process-api:
+      adapter:
+        operaton-remote:
+          enabled: true
+          service-tasks:
+            delivery-strategy: remote_scheduled
+            worker-id: logistics-service-worker
+            schedule-delivery-fixed-rate-in-seconds: 5
+          user-tasks:
+            delivery-strategy: remote_scheduled
+            schedule-delivery-fixed-rate-in-seconds: 5
+```
+
+Die Adresse der Engine bekommt der REST-Client des Adapters:
+
+```yaml
+feign:
+  client:
+    config:
+      default:
+        url: http://localhost:8080/engine-rest/
+```
+
+Der REST-Client mappt Prozessvariablen mit einem Jackson-2-`ObjectMapper`, den Spring Boot 4 nicht
+mehr automatisch bereitstellt (nur noch Jackson 3). Stelle ihn in einer kleinen `@Configuration` als
+`@Bean` bereit (`new ObjectMapper().findAndRegisterModules()`).
+
+### 9. Worker, Start und Deployment umstellen
+
+- `ShipWelcomeKitWorker` wird ein `@ProcessEngineWorker(topic = ServiceTasks.SHIP_WELCOME_KIT)` mit
+  `@Variable(name = "name")`. `BaseExternalTaskWorker` entfällt, Abschluss und Fehlerfall übernimmt die
+  Worker-Library.
+- `RemoteWelcomeKitProcessAdapter` startet den Prozess über
+  `startProcessApi.startProcess(new StartProcessByDefinitionCmd(PROCESS_ID, Map.of("name", ...)))`.
+- Das Modell deployt ein kleiner Adapter über die engine-neutrale `DeploymentApi`
+  (`DeployBundleCommand` mit den `NamedResource`s aus `classpath*:bpmn/*.bpmn`).
+
+Ergänze auch hier einen `ArchitectureTest`, der jede Abhängigkeit auf `org.operaton..` verbietet.
+Danach unterscheiden sich beide Services nur noch im Adapter: embedded im Engine-Host, remote im
+Logistik-Service.
 
 ## Randbedingungen
 
-- **Die `asyncBefore`-Marker entfallen.** Ein External Task ist von Natur aus ein Wait
-  State: Die Engine committet, sobald sie den Task anlegt, und wartet, bis ein Worker ihn
-  fetcht und completet. Die Transaktionsgrenze, die du in Aufgabe 5 und 7 von Hand gesetzt
-  hast, bringt der External Task eingebaut mit. Darin liegt ein Teil des Gewinns.
-- Die Topic-Konstanten (`ServiceTasks.SEND_CONFIRMATION_MAIL`) stammen aus der generierten
-  Process-API, die du seit [Aufgabe 6](exercise-06.md) kennst. Das Plugin ist bereits
-  eingerichtet; zur Not gehen auch schlichte Strings.
-- Die REST-Schnittstelle bleibt identisch zu Aufgabe 10 (Port `8080`). Service Tasks werden
-  jetzt per Polling abgearbeitet (etwa alle 5 Sekunden) – es kann also einen Moment dauern.
+- Die `asyncBefore`-Marker an den Service Tasks entfallen. Ein External Task ist ein Wait State: Die
+  Engine committet beim Anlegen und wartet, bis ein Worker ihn abschließt.
+- Die Topic-Konstanten (`ServiceTasks.*`) stammen aus der generierten Process-API aus
+  [Aufgabe 4 · Add-on](exercise-04-addon.md).
+- Service Tasks und User Tasks werden per Polling etwa alle 5 Sekunden zugestellt. Ein `confirm`
+  direkt nach der Registrierung kann deshalb noch keinen Task finden.
+- Die Auto-Deployment-Option der Worker-Library (`dev.bpm-crafters.process-api.worker.deployment`)
+  greift mit dem Remote-Adapter nicht. Deshalb deployt der Logistik-Service sein Modell selbst über
+  die `DeploymentApi`. Im Engine-Host deployt weiterhin das Operaton-Starter-Auto-Deployment.
 
 ## Erwartetes Ergebnis
 
-Fahre dieselben beiden Szenarien wie in Aufgabe 9 – das Ergebnis muss identisch sein, nur
-die Ausführung läuft jetzt über Worker statt über Delegates.
-
-**Ablehnung außerhalb der Zielgruppe:**
+Fahre die Szenarien aus Aufgabe 6. Das Verhalten ist identisch, nur laufen Worker statt Delegates:
 
 ```bash
 MEMBERSHIP_ID=$(curl -s -X POST http://localhost:8080/api/memberships \
@@ -272,39 +285,29 @@ MEMBERSHIP_ID=$(curl -s -X POST http://localhost:8080/api/memberships \
 curl -X POST http://localhost:8080/api/memberships/$MEMBERSHIP_ID/reject
 ```
 
-Im Cockpit (`http://localhost:8080/operaton/app/cockpit/`, admin/admin): Der Worker
-`sendConfirmationMail` feuert, der User Task *Confirm membership* erscheint. Nach dem
-Rückzug läuft die Call Activity `handleRejection`, danach feuert über die Kompensation der
-Worker `revokeClaim`.
+Nach dem Rückzug läuft `handleRejection`, danach kompensiert der Worker `revokeClaim`. Wiederhole das
+mit Hanna (Alter `25`): Der aufgerufene Prozess wartet zusätzlich am User Task *Write an email
+expressing regret*. Eine dritte Anmeldung, die du nach ein paar Sekunden mit
+`POST /api/memberships/$MEMBERSHIP_ID/confirm` bestätigst, endet an `Membership activated`.
 
-**Ablehnung innerhalb der Zielgruppe:**
-
-```bash
-MEMBERSHIP_ID=$(curl -s -X POST http://localhost:8080/api/memberships \
-  -H "Content-Type: application/json" \
-  -d '{"email": "hanna@miravelo.com", "name": "Hanna", "age": 25}')
-
-curl -X POST http://localhost:8080/api/memberships/$MEMBERSHIP_ID/reject
-```
-
-Hier wartet der aufgerufene Prozess zusätzlich am User Task *Write an email expressing
-regret*.
+Läuft der Logistik-Service mit, startet das Signal eine `sendWelcomeKit`-Instanz, und dessen Worker
+verschickt das Kit über den Remote-Adapter. `POST http://localhost:8090/api/welcome-kits` startet den
+Prozess über die `StartProcessApi`.
 
 ## Selbstcheck
 
 - [ ] Alle sieben Service Tasks sind `camunda:type="external"` mit Topic
 - [ ] Es gibt keine `JavaDelegate`-Klassen mehr, nur noch `@ProcessEngineWorker`-Worker
-- [ ] Der Outbound-Adapter nutzt `StartProcessApi` / `CorrelationApi` statt `RuntimeService`
-- [ ] `@EnableProcessApplication` ist entfernt, der `EngineCommandExecutor`-Bean ist gesetzt
-- [ ] Der ArchUnit-Test meldet **null** Abhängigkeiten auf `org.operaton.bpm`
-- [ ] Das fachliche Verhalten ist identisch zu Aufgabe 10
+- [ ] Der Outbound-Adapter nutzt `StartProcessApi`, `CorrelationApi` und `UserTaskCompletionApi`
+- [ ] `@EnableProcessApplication` ist entfernt, die `EngineCommandExecutor`-Bean ist gesetzt
+- [ ] Der ArchUnit-Test meldet keine Abhängigkeit auf `org.operaton.bpm`
+- [ ] Der Logistik-Service nutzt den Remote-Adapter und hat keine Abhängigkeit auf `org.operaton..` im Code
 
 ## Referenzlösung
 
-`../../solutions/extra-task-1/`
+- Engine-Host (embedded): `../../solutions/extra-task-1/process-application/`
+- Logistik-Service (remote): `../../solutions/extra-task-1/logistics-service/`
 
 ## Nächster Schritt
 
-🦁 **Geschafft!** Dein Prozess ist engine-neutral. Operaton läuft weiter unter der Haube –
-aber dein Code weiß nichts mehr davon. Ein Engine-Wechsel ist damit kein Code-Umbau mehr,
-sondern ein Adapter-Tausch.
+🦁 **Geschafft!** Operaton läuft weiter unter der Haube, aber dein Code weiß nichts mehr davon.

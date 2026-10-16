@@ -20,8 +20,8 @@ exclusive offers. Someone signs up, gets a welcome mail — done.
 > — Every developer who has ever underestimated a newsletter.
 
 The training takes place in the context of the exclusive **Miravelo Inner Circle** — a membership
-limited to a thousand seats for the most loyal customers. You first model the whole target process
-at the business level, then automate it step by step.
+limited to a thousand seats for the most loyal customers. You first model the core membership flow
+at the business level, then automate it step by step and add the exceptions along the way.
 
 What follows is a journey through increasingly complex BPMN patterns: gateways, boundary events,
 subprocesses, parallel gateways, call activities, DMN decision tables, and compensation —
@@ -35,19 +35,16 @@ Detailed exercise descriptions can be found in [`docs/`](docs/).
 
 | Exercise | Topic | Description |
 |---|---|---|
-| [0](docs/en/exercise-00.md) | Business-level BPMN modeling | Model the complete Inner Circle membership process at the business level — the shared target for the whole training |
-| [1](docs/en/exercise-01.md) | Getting the engine running | Run the given start-form / Manual-Task model end-to-end, get to know the Cockpit, the engine's `act_*` tables in the H2 console and, optionally, EnterpriseGlue The Bridge |
-| [2](docs/en/exercise-02.md) | The first wait state | Turn the "Confirm" Manual Task into a User Task and give it a self-made Generated Form |
-| [3](docs/en/exercise-03.md) | Automate a step | Turn the "Send welcome mail" Manual Task into a Service Task backed by a JavaDelegate (Cockpit-started) |
-| [4](docs/en/exercise-04.md) | The application takes over | Message start event, REST register + confirm endpoints, message correlation, persistence |
-| [5](docs/en/exercise-05.md) | Capacity check with a gateway | Exclusive gateway, transaction boundaries, business key, task form |
-| [6](docs/en/exercise-06.md) | Process tests | Process unit test with an in-memory engine, mocked use cases, without a running application |
-| [6 · Add-on](docs/en/exercise-06-addon.md) | bpmn-to-code | Element IDs as generated constants instead of hand-typed strings, compile-safe path navigation with `PathWalk` |
-| [7](docs/en/exercise-07.md) | Subprocess, boundary events & parallelism | Subprocess, timer and message boundary events, parallel gateway, Teams integration |
-| [8](docs/en/exercise-08.md) | Compensation (SAGA) | Compensation boundary event, compensating end event, compensation handler |
-| [9](docs/en/exercise-09.md) | Call activity & DMN | Call activity, DMN decision table, business rule task |
-| [10](docs/en/exercise-10.md) | Remote engine as shared infrastructure | One department owns its **own** small process (`sendWelcomeKit`) in its remote service: model, worker, deployment, and tests live there; triggered via signal broadcast; the engine driven through a generated OpenAPI client |
-| [Extra 1](docs/en/extra-task-1.md) | Process engine API | Rebuild Exercise 10 to be engine-neutral: worker instead of JavaDelegate, swapping adapters instead of engine lock-in |
+| [0](docs/en/exercise-00.md) | Business-level BPMN modeling | Model the core Inner Circle membership flow purely at the business level, using only the shapes from Chapter 1 — the starting point for the whole training |
+| [1](docs/en/exercise-01.md) | Getting the engine running | Run the given start-form / Manual-Task model end-to-end, get to know the Cockpit, the engine's `act_*` tables and, optionally, EnterpriseGlue The Bridge |
+| [2](docs/en/exercise-02.md) | User Task and Service Task | Turn "Confirm" into a User Task with a self-made Generated Form and "Send welcome mail" into a Service Task with a JavaDelegate (started from the Cockpit) |
+| [3](docs/en/exercise-03.md) | The application takes over | Message start event, business key, REST endpoints for register + confirm, correlation, persistence, capacity check with an exclusive gateway |
+| [4](docs/en/exercise-04.md) | Process tests | Transaction boundaries, process unit test with an in-memory engine and mocked use cases, without a running application |
+| [4 · Add-on](docs/en/exercise-04-addon.md) | bpmn-to-code | Element IDs as generated constants instead of hand-typed strings, compile-safe path navigation with `PathWalk` |
+| [5](docs/en/exercise-05.md) | Subprocess, boundary events & parallelism | Subprocess, timer and message boundary events, parallel gateway, Teams integration |
+| [6](docs/en/exercise-06.md) | Compensation, call activity & DMN | Compensation boundary event, compensating end event, call activity, DMN decision table, business rule task |
+| [7](docs/en/exercise-07.md) | Remote engine as shared infrastructure | A department owns its **own** small process (`sendWelcomeKit`) in its remote service: model, worker, deployment and tests live there; triggered by a signal broadcast; the engine is driven through a generated OpenAPI client |
+| [Extra 1](docs/en/extra-task-1.md) | Process Engine API | Rebuild Exercise 7 engine-neutrally: workers instead of JavaDelegates, swapping adapters instead of engine lock-in |
 
 > The structure, language, and quality criteria of the exercises are captured in
 > [`docs/aufgaben-template.md`](docs/aufgaben-template.md) (German). New or changed
@@ -56,18 +53,9 @@ Detailed exercise descriptions can be found in [`docs/`](docs/).
 
 ## Quick Start
 
-You don't need Docker for the exercises: the engine uses an embedded H2 database that is stored as
-a file under `~/.operaton-training` – there is no database to install or start. You only need
-Docker for the optional EnterpriseGlue The Bridge (last section of the code block below).
-
-The engine's data (deployments, waiting instances, history) survives a restart; the application's
-own JPA tables (e.g. `membership` from Exercise 4 on) are recreated empty on every start
-(`ddl-auto: create`) – a membership registered before a restart can't be confirmed afterwards, so
-register a new one. For a clean slate, stop the application and delete the folder
-`~/.operaton-training` (on Windows `%USERPROFILE%\.operaton-training`).
-
-On delivery the engine in the `process-application` module is still commented out – the Cockpit
-and the H2 console are only reachable after Exercise 1.
+The engine uses an embedded H2 database that is stored as a file under `~/.operaton-training` –
+there is no database to install or start. The data survives a restart; for a clean slate, stop the
+application and delete the folder `~/.operaton-training` (on Windows `%USERPROFILE%\.operaton-training`).
 
 ```bash
 # Build everything
@@ -80,30 +68,38 @@ cd services/process-application && ../../mvnw spring-boot:run
 open http://localhost:8080/operaton/app/cockpit/    # admin / admin
 
 # H2 console (engine tables) – replace the pre-filled JDBC URL jdbc:h2:~/test in the login form
-open http://localhost:8080/h2-console               # JDBC URL jdbc:h2:file:~/.operaton-training/exercise, user sa, no password
+open http://localhost:8080/h2-console    # JDBC URL jdbc:h2:file:~/.operaton-training/exercise, user sa, no password
 
 # Optional: EnterpriseGlue The Bridge (additional UI, needs Docker) – from the repository root
 cd stack && docker-compose up -d
-open http://localhost:8081                          # admin@enterpriseglue.com / adminadmin
+open http://localhost:8081               # admin@enterpriseglue.com / adminadmin
 ```
+
+You only need Docker for the optional EnterpriseGlue The Bridge; none of the exercises depends on it.
 
 ### Loading an exercise solution
 
 The `process-application` module starts in the state of **Exercise 1** (engine still commented out). If you
-can't fully finish an exercise, you can copy the reference solution into your `process-application` module
+can't fully finish an exercise, you can load the reference solution into your `process-application` module
 and continue working with it:
 
 ```bash
-# Copy solutions/exercise-02 into the process-application module (valid values: 01–10, two-digit)
+# Load solutions/exercise-02 into the process-application module (valid values: 00–07, two digits; 00 = back to the starter state)
 ./mvnw -pl services/process-application antrun:run@load-solution -Dsolution=02
 ```
 
-The task replaces `src/main` completely (Java, `application.yaml`, BPMN/DMN); `src/test` stays
-untouched. All modules – the `process-application` module **and** all solutions – run on the same port
+The task resets `src/` and `pom.xml` to the starter state and copies the solution on top: `src/main`
+(Java, `application.yaml`, BPMN/DMN), the process tests and the matching `pom.xml` (e.g. with the
+Operaton starters from Exercise 1). The stubs of the later exercises stay in place, `ArchitectureTest`
+stays as it is. Your own changes in `src/` and `pom.xml` are replaced – the task first backs them up to
+`services/process-application/.load-solution-backup/<timestamp>/`. Because the `pom.xml` changes, run
+Maven again afterwards (IntelliJ: reload the Maven project). If you went back to an earlier exercise,
+stop the application and delete the folder `~/.operaton-training` – otherwise the deployments and process
+instances of the later exercise stay in the database.
+
+All modules – the `process-application` module **and** all solutions – run on the same port
 (`8080`) and use the same embedded H2 database file; so only **one** module runs at a time (the running
-application locks the file, so a second instance fails at startup).
-The Operaton dependencies activated in **Exercise 1** (`pom.xml`) remain in place – so only load
-a solution from `exercise-2` onward after Exercise 1 is complete.
+application locks the file, a second instance fails at startup).
 
 ## Repository structure
 
@@ -126,11 +122,12 @@ operaton-developer-training-exercises/
 │   │       │   │   └── outbound/     # Repository and process port interfaces
 │   │       │   └── service/          # Use-case implementations
 │   │       └── domain/               # Domain model (pure Java, no framework dependencies)
-│   └── (logistics-service/)          # created from templates/ only in Exercise 10 (remote owner)
+│   └── (logistics-service/)          # created from templates/ only in Exercise 7 (remote owner)
 ├── templates/
-│   └── exercise-10/logistics-service/ # Template for the Exercise 10 worker (copied into services/)
-├── solutions/                        # Cumulative solutions per exercise (exercise-01 … exercise-10, extra-task-1)
-│   ├── exercise-{01-10}/             # exercise-10/ is nested: process-application/ + logistics-service/
+│   ├── exercise-07/logistics-service/ # Template for the Exercise 7 worker (copied into services/)
+│   └── process-application-starter/  # Starter state of process-application (baseline for load-solution)
+├── solutions/                        # Cumulative solutions per exercise (exercise-01 … exercise-07, extra-task-1)
+│   ├── exercise-{01-07}/             # exercise-07/ is nested: process-application/ + logistics-service/
 │   └── extra-task-1/
 ├── models/                           # Reference BPMN/DMN models
 ├── stack/                            # Optional, needs Docker – not required for the exercises
