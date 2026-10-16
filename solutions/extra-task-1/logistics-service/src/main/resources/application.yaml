@@ -1,0 +1,31 @@
+# Logistics service — the remote OWNER of the sendWelcomeKit process. It runs no engine of its own;
+# it knows the shared engine only through its REST API. A lightweight HTTP server (the "re-send" action)
+# runs on :8090 so it does not clash with the engine host on :8080.
+server:
+  port: 8090
+
+# Process-Engine-API (bpm-crafters): engine-neutral orchestration on top of the REMOTE Operaton engine
+dev:
+  bpm-crafters:
+    process-api:
+      adapter:
+        operaton-remote:
+          enabled: true
+          service-tasks:
+            delivery-strategy: remote_scheduled
+            worker-id: logistics-service-worker
+            schedule-delivery-fixed-rate-in-seconds: 5
+          user-tasks:
+            delivery-strategy: remote_scheduled
+            schedule-delivery-fixed-rate-in-seconds: 5
+
+# REST client of the remote adapter: where the shared engine's REST API lives
+feign:
+  client:
+    config:
+      default:
+        url: http://localhost:8080/engine-rest/
+
+logging:
+  level:
+    io.miragon.training: INFO

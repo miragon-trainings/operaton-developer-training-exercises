@@ -19,6 +19,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <!-- Provides the auto-configured RestClient.Builder bean (RestClientAutoConfiguration). In Spring
+             Boot 4 this sits in the standalone spring-boot-restclient module, which the Operaton webapp
+             starter does not pull in transitively (used by adapter/config/RestClientConfig). -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-restclient</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>

@@ -8,30 +8,24 @@ Welcome to the Operaton Developer Training!
 running gear, gravel bikes, road bikes. The company is growing, the customer base is growing,
 and the processes have to keep up.
 
-In this module you work your way step by step through 10 exercises that build a complete
+In this module you work your way step by step through 7 exercises that build a complete
 Inner Circle membership process on top of Operaton (Camunda Platform 7).
 
 ## The complete target process
 
-Here is what the process looks like at the end of Exercise 10 – with all the concepts you build up step by step:
+Here is what the process looks like at the end of Exercise 7 – with all the concepts you build up step by step:
 
-![Complete membership process](../../docs/assets/exercise-10-main.svg)
+![Complete membership process](../../docs/assets/exercise-07-main.svg)
 
 The extracted sub-process for the rejection (Call Activity + DMN):
 
-![Membership rejection sub-process](../../docs/assets/exercise-10-sub.svg)
+![Membership rejection sub-process](../../docs/assets/exercise-07-sub.svg)
 
-## Prerequisites
+## Quick Start
 
-You don't need Docker for the exercises: the engine uses an embedded H2 database that is stored as
-a file under `~/.operaton-training` – there is no database to install or start. You only need
-Docker for the optional EnterpriseGlue The Bridge (last section of the code block below).
-
-The engine's data (deployments, waiting instances, history) survives a restart; the application's
-own JPA tables (e.g. `membership` from Exercise 4 on) are recreated empty on every start
-(`ddl-auto: create`) – a membership registered before a restart can't be confirmed afterwards, so
-register a new one. For a clean slate, stop the application and delete the folder
-`~/.operaton-training` (on Windows `%USERPROFILE%\.operaton-training`).
+The engine uses an embedded H2 database that is stored as a file under `~/.operaton-training` –
+there is no database to install or start. The data survives a restart; for a clean slate, stop the
+application and delete the folder `~/.operaton-training` (on Windows `%USERPROFILE%\.operaton-training`).
 
 ```bash
 # Start the application (from this process-application directory)
@@ -49,26 +43,22 @@ http://localhost:8081  (admin@enterpriseglue.com / adminadmin)
 ```
 
 > On delivery this module starts in the state of **Exercise 1** – the
-> Operaton engine is still commented out, so the Cockpit and the H2 console aren't reachable yet.
-> In Exercise 1 you switch it on.
+> Operaton engine is still commented out. In Exercise 1 you switch it on.
 
 ## Exercise overview
 
 | Exercise | Topic | Description |
 |---|---|---|
-| [0](../../docs/en/exercise-00.md) | Business BPMN modeling | Create the whole target process purely on the business level with the Miragon BPMN Modeler |
-| [1](../../docs/en/exercise-01.md) | Engine & tooling | Run the given start-form / Manual-Task model, get to know the Cockpit & DB tables |
-| [2](../../docs/en/exercise-02.md) | The first wait state | Turn the "Confirm" Manual Task into a User Task with a self-made Generated Form |
-| [3](../../docs/en/exercise-03.md) | Automate a step | Turn the "Send welcome mail" Manual Task into a Service Task + JavaDelegate (Cockpit-started) |
-| [4](../../docs/en/exercise-04.md) | The application takes over | Message start, REST register + confirm endpoints, correlation, persistence |
-| [5](../../docs/en/exercise-05.md) | Membership & gateway | Exclusive gateway, capacity check |
-| [6](../../docs/en/exercise-06.md) | Process tests | Process unit test: in-memory engine, mocked use cases, without a running application |
-| [6 · Add-on](../../docs/en/exercise-06-addon.md) | bpmn-to-code | Generate a type-safe process API from the BPMN – strings out, constants in |
-| [7](../../docs/en/exercise-07.md) | Boundary events & subprocesses | Parallel gateway, timer and message boundary events, subprocesses |
-| [8](../../docs/en/exercise-08.md) | Compensation (SAGA) | Automatic rollback via BPMN compensation |
-| [9](../../docs/en/exercise-09.md) | Call Activity & DMN | Process modularization with decision tables |
-| [10](../../docs/en/exercise-10.md) | Remote engine & external task | Extract the notify-community delegate as an external task into a dedicated remote worker, notification into a Teams channel |
-| [Extra 1](../../docs/en/extra-task-1.md) | Process engine API | Break the engine lock-in: workers instead of delegates, engine-neutral adapter layer |
+| [0](../../docs/en/exercise-00.md) | Business-level BPMN modeling | Model the core Inner Circle membership flow purely at the business level, using only the shapes from Chapter 1 — the starting point for the whole training |
+| [1](../../docs/en/exercise-01.md) | Getting the engine running | Run the given start-form / Manual-Task model end-to-end, get to know the Cockpit, the engine's `act_*` tables and, optionally, EnterpriseGlue The Bridge |
+| [2](../../docs/en/exercise-02.md) | User Task and Service Task | Turn "Confirm" into a User Task with a self-made Generated Form and "Send welcome mail" into a Service Task with a JavaDelegate (started from the Cockpit) |
+| [3](../../docs/en/exercise-03.md) | The application takes over | Message start event, business key, REST endpoints for register + confirm, correlation, persistence, capacity check with an exclusive gateway |
+| [4](../../docs/en/exercise-04.md) | Process tests | Transaction boundaries, process unit test with an in-memory engine and mocked use cases, without a running application |
+| [4 · Add-on](../../docs/en/exercise-04-addon.md) | bpmn-to-code | Element IDs as generated constants instead of hand-typed strings, compile-safe path navigation with `PathWalk` |
+| [5](../../docs/en/exercise-05.md) | Subprocess, boundary events & parallelism | Subprocess, timer and message boundary events, parallel gateway, Teams integration |
+| [6](../../docs/en/exercise-06.md) | Compensation, call activity & DMN | Compensation boundary event, compensating end event, call activity, DMN decision table, business rule task |
+| [7](../../docs/en/exercise-07.md) | Remote engine as shared infrastructure | A department owns its **own** small process (`sendWelcomeKit`) in its remote service: model, worker, deployment and tests live there; triggered by a signal broadcast; the engine is driven through a generated OpenAPI client |
+| [Extra 1](../../docs/en/extra-task-1.md) | Process Engine API | Rebuild Exercise 7 engine-neutrally: workers instead of JavaDelegates, swapping adapters instead of engine lock-in |
 
 ## Architecture
 
@@ -106,15 +96,21 @@ The ArchUnit tests verify at test time that the architecture rules are being obs
 For every exercise there is a reference solution under `../../solutions/exercise-X/`.
 Each solution is a self-contained, runnable Spring Boot application.
 
-If you don't quite manage to finish an exercise, you can copy the reference solution directly into
-this module and continue working with it (valid values: 1–10):
+If you don't quite manage to finish an exercise, you can load the reference solution directly into
+this module and continue working with it (valid values: 00–07, two digits; 00 = back to the starter state):
 
 ```bash
 ../../mvnw antrun:run@load-solution -Dsolution=02
 ```
 
-The task replaces `src/main` completely (Java, `application.yaml`, BPMN/DMN); `src/test` stays
-untouched. All modules run on the same port (`8080`) and use the same embedded H2 database file, so
-only ever one module runs at a time (the running application locks the file, so a second instance
-fails at startup). The prerequisite is that you enabled the Operaton dependencies in **Exercise 1** (the
-`pom.xml` is not copied along).
+The task resets `src/` and `pom.xml` to the starter state and copies the solution on top: `src/main`
+(Java, `application.yaml`, BPMN/DMN), the process tests and the matching `pom.xml` (e.g. with the
+Operaton starters from Exercise 1). The stubs of the later exercises stay in place, `ArchitectureTest`
+stays as it is. Your own changes in `src/` and `pom.xml` are replaced – the task first backs them up to
+`.load-solution-backup/<timestamp>/` in this module. Then run Maven again (IntelliJ: reload the Maven
+project), because the `pom.xml` has changed. If you went back to an earlier exercise, stop the
+application and delete the folder `~/.operaton-training`.
+
+All modules run on the same port (`8080`) and the same embedded H2 database file, so only
+ever one module runs at a time (the running application locks the file, a second instance fails at
+startup).

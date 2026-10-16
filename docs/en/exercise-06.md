@@ -1,256 +1,206 @@
-# Exercise 6 – Securing the process with tests
+# Exercise 6 – Compensation, Call Activity and DMN
 
-> **Prerequisite:** Exercise 5 is complete – the gateway, the capacity check, and both process outcomes are working.
+> **Prerequisite:** Exercise 5 is complete – subprocess, boundary events and parallel branches are running.
 > **Working directory:** `services/process-application`
-> **New in this exercise:** in-memory engine with H2, the job executor turned off, `@MockitoBean`, assertions with `BpmnAwareTests`.
+> **New in this exercise:** compensation (Compensation Boundary Event, compensation handler, Compensating End Event), Call Activity with in-mapping, DMN decision table, Business Rule Task.
 
 ## What this is about
 
-**Monday morning. The process is running. Supposedly.**
+In Exercise 5, `revokeClaim` sits in the sequence flow of every abort path. With every new abort
+path you would have to wire it in again. **BPMN compensation** instead declares once which
+activity undoes which other one, and the engine invokes the handler on abort by itself.
 
-You've built a solid process: gateway, confirmation mail, rejection. In the
-Cockpit demo everything worked – once. But how do you know it will **still** work
-next week, when someone attaches a boundary event, reroutes a sequence flow, or
-flips a condition?
-
-Are you going to click through the Cockpit every single time? Start the application, fire off curl calls,
-read logs? Nobody does that reliably. That's exactly where processes die quietly: a sequence flow
-points into the void after a refactoring, the gateway takes the wrong path – and nobody notices
-until someone gets a rejection despite a free spot.
-
-> *"Works on my machine" is not a test strategy. It's an excuse with better PR.*
-
-A **process test** starts the real process in an in-memory engine, lets the real
-delegates run, and only replaces the business logic behind them with mocks. Which path the
-process instance has to take is then written down as an **assertion** in the test – verifiable on every
-build instead of just once in a demo.
+On top of that, Miravelo doesn't want to let rejected applicants between 21 and 29 go without a
+fight. The rejection handling therefore moves into its **own process**, invoked via a **Call
+Activity**. Who belongs to the target group is decided by a **DMN decision table** that the
+business side can maintain itself later.
 
 ## Learning goals
 
 After this exercise you can
 
-- secure a process as a unit test, without a running application and independent of its data,
-- run the engine in the test on its own in-memory database (H2) and with the job executor
-  turned off,
-- mock the use cases behind the delegates in a targeted way using `@MockitoBean`,
-- execute the async continuations yourself in the test and thereby drive the instance in a controlled way up to
-  the next wait state,
-- check process paths with `BpmnAwareTests` (`isWaitingAt`, `hasPassedInOrder`, `isEnded`).
+- declare a compensation handler and trigger it via a Compensating End Event,
+- tell compensation apart from a transaction rollback,
+- extract part of a process into its own process definition and invoke it via a Call Activity with in-mapping,
+- evaluate a DMN decision table via a Business Rule Task.
 
 ## Target model
 
-![BPMN model of the exercise](../assets/exercise-06.svg)
+Main process:
 
-There is **no new model**. You test the process from Exercise 5: Message Start →
-Claim → Gateway → confirmation → welcome mail, respectively rejection.
+![BPMN main process](../assets/exercise-06-main.svg)
 
-Reference model (unchanged from Exercise 5): `../../models/exercise-06/membership.bpmn`
+Called process `handleRejection`:
+
+![BPMN subprocess](../assets/exercise-06-sub.svg)
+
+Reference models: `../../models/exercise-06/membership.bpmn`,
+`../../models/exercise-06/membership-rejection.bpmn`,
+`../../models/exercise-06/categorize-applicant.dmn`
 
 ## The task
 
-### 1. Add the test dependency
+### 1. Declare the compensation handler
 
-The assertions come from the Operaton port of `camunda-bpm-assert`. The version is
-managed centrally in the root `pom.xml`:
+Attach a Compensation Boundary Event to the reserving task and connect it via an Association to
+the task that undoes the reservation:
+
+| Element | Type | ID | Configuration |
+|---|---|---|---|
+| Compensation boundary | Compensation Boundary Event | `event_compensateClaim` | attached to `serviceTask_claimMembership` |
+| Link | Association | `association_compensateClaim` | from the boundary to `serviceTask_revokeClaim` |
+| Handler | Service Task | `serviceTask_revokeClaim` | `isForCompensation="true"`, delegate stays `#{revokeClaimDelegate}` |
+
+The handler thus no longer has any incoming or outgoing sequence flow.
+
+### 2. Turn the End Event into the trigger
+
+Turn `endEvent_membershipDeclined` into a **Compensating End Event**. When an instance reaches
+this End Event, the engine compensates all completed activities that have a handler, here
+`claimMembership`.
+
+### 3. Model the DMN decision table
+
+In a DMN modeler, create `src/main/resources/dmn/categorize-applicant.dmn`. IDs and types have to
+match exactly so that the Business Rule Task finds the decision:
+
+| Property | Value |
+|---|---|
+| Decision ID | `categorizeApplicant` |
+| Hit Policy | `FIRST` |
+| Input | `age` (integer) |
+| Output | `isHighValue` (boolean) |
+| Rules | `[21..29]` → `true`; default `-` → `false` |
+
+The FEEL range `[21..29]` includes both bounds. All `*.dmn` files under `src/main/resources` are
+deployed at start-up. If you want to skip the DMN editor, copy
+`models/exercise-06/categorize-applicant.dmn` into the module.
+
+### 4. Model the process `handleRejection`
+
+Create `src/main/resources/bpmn/membership-rejection.bpmn` with the process key `handleRejection`:
+
+| Element | Type | ID | Name | Configuration |
+|---|---|---|---|---|
+| Start | None Start Event | `startEvent_confirmationRejected` | Confirmation rejected | – |
+| Categorization | Business Rule Task | `businessRuleTask_categorizeApplicant` | Categorize applicant | Decision Ref `categorizeApplicant`, Result Variable `isHighValue`, Map Decision Result `singleEntry` |
+| Branch | Exclusive Gateway | `gateway_highValue` | High value? | Default flow: no-path |
+| Personal contact | User Task | `userTask_writeRegretMail` | Write an email expressing regret | `asyncAfter="true"` |
+| End of yes-path | End Event | `endEvent_triedToReacquire` | Tried to reaquire applicant | – |
+| End of no-path | End Event | `endEvent_acceptRejection` | Accept rejection | – |
+
+The yes-path gets the condition `${isHighValue}`.
+
+### 5. Use the Call Activity
+
+In the main process, place a Call Activity between the two abort boundary events and the
+Compensating End Event:
+
+| Element | Type | ID | Name | Configuration |
+|---|---|---|---|---|
+| Rejection handling | Call Activity | `callActivity_handleRejection` | Handle rejection | Called Element: `handleRejection` |
+
+Incoming flows come from `event_abortAfter3HalfDays` and `event_confirmationRejected`, the
+outgoing flow goes to `endEvent_membershipDeclined`. Under **In Mapping**, add one pair each for
+`membershipId` and `age`. Without `age` the decision table has no input. In the XML this produces:
 
 ```xml
-<dependency>
-    <groupId>org.operaton.bpm</groupId>
-    <artifactId>operaton-bpm-assert</artifactId>
-    <scope>test</scope>
-</dependency>
+<bpmn:extensionElements>
+  <camunda:in source="membershipId" target="membershipId" />
+  <camunda:in source="age" target="age" />
+</bpmn:extensionElements>
 ```
 
-`spring-boot-starter-test` (JUnit 5, Mockito, AssertJ) and `h2` are already present.
+### 6. Adapt the process test
 
-### 2. Create the test profile
-
-**New file:** `src/test/resources/application-test.yaml`
-
-The `test` profile runs the engine on its own in-memory H2 (`jdbc:h2:mem:…`) and turns the job
-executor off:
-
-```yaml
-spring:
-  main:
-    allow-bean-definition-overriding: true
-  datasource:
-    url: jdbc:h2:mem:operaton-test;DB_CLOSE_DELAY=-1
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-
-operaton:
-  bpm:
-    admin-user:
-      id: admin
-      password: admin
-    database:
-      type: h2
-      schema-update: true
-    job-execution:
-      enabled: false   # <-- the key point: we run the async continuations ourselves
-    webapp:
-      enabled: false
-```
-
-> **Term: job executor.** The engine's background thread. It picks up the jobs that
-> arise from an asynchronous continuation (`asyncBefore` / `asyncAfter` from
-> [Exercise 5](exercise-05.md)) and works through them – exactly right in production,
-> but a source of randomness in a test: the test never knows how far the instance currently is.
-> That's why we turn it off and run the jobs ourselves.
-
-### 3. The test helper – already provided
-
-You neither write nor copy this plumbing: it already ships in the test module at
-`src/test/java/io/miragon/training/process/util/ProcessEngineTestUtils.java`. It is the same for
-every process test; you just call its methods. What it gives you:
-
-- **`continueToNextWaitState(processEngine)`** – because the job executor is off (Step 2),
-  nobody picks up the async-continuation jobs (`asyncBefore`/`asyncAfter`). This method executes
-  them from the test thread until the instance reaches its next wait state (user task or end).
-  You call it right after starting the process and again after completing a task.
-- **`fireTimer(processEngine, activityId)`** – executes a timer job directly, ignoring its due
-  date. You don't need it here; it first comes into play with the boundary events in
-  [Exercise 7](exercise-07.md).
-- **`findProcessInstance(runtimeService, membershipId)`** – looks up the running instance by the
-  process key `subscribeNewsletter` and the `membershipId` variable, so your test can assert
-  against it.
-
-> The helper needs the engine classes to compile. That is already wired into the module's
-> `pom.xml` (the `operaton-engine` core dependency), so it compiles from the start – you don't
-> add anything for it. Open the file once to see how the two or three lines per method work; then
-> just use it.
-
-### 4. Write the happy-path test yourself
-
-**New file:** `src/test/java/io/miragon/training/process/MembershipProcessTest.java`
-
-This part is yours to write. Start from the scaffold – the class annotations, the injected engine
-services, the mocked use cases and the `init(...)` call are the same for every process test:
+After `generate-sources`, the timeout and withdrawal paths no longer compile, because
+`serviceTaskRevokeClaim()` is no longer part of the sequence flow. The new path runs through the
+Call Activity and ends at the Compensating End Event, which triggers the handler:
 
 ```java
-@SpringBootTest
-@ActiveProfiles("test")
-class MembershipProcessTest {
-
-    @Autowired private MembershipProcess membershipProcess;
-    @Autowired private RuntimeService runtimeService;
-    @Autowired private TaskService taskService;
-    @Autowired private ProcessEngine processEngine;
-
-    @MockitoBean private ClaimMembershipUseCase claimMembershipUseCase;
-    @MockitoBean private SendConfirmationMailUseCase sendConfirmationMailUseCase;
-    @MockitoBean private SendRejectionMailUseCase sendRejectionMailUseCase;
-    @MockitoBean private SendWelcomeMailUseCase sendWelcomeMailUseCase;
-
-    @BeforeEach
-    void setUp() {
-        init(processEngine); // BpmnAwareTests.init(...)
-    }
-}
+var abortPath = PathWalk.from(FlowNodes.userTaskConfirmMembership())
+        .interruptedBy(FlowNodes.subProcessConfirmMembership(), boundary -> boundary.eventAbortAfter3HalfDays())
+        .then(next -> next.callActivityHandleRejection())
+        .end(next -> next.endEventMembershipDeclined())
+        .throwingCompensation(FlowNodes.eventCompensateClaim(), boundary -> boundary.serviceTaskRevokeClaim());
 ```
 
-Every process test follows the same **Given – When – Then** shape. Here is a **generic worked
-example** of the happy path: it shows the exact API calls, but the element IDs are placeholders –
-you replace each `"<…>"` with the real ID from your model.
+Check it with `hasPassed(abortPath.getIds())` instead of `hasPassedInOrder`: the engine sorts
+passed activities by their end time, and the handler ends before the End Event that triggers it.
+Then cover both DMN branches:
 
-```java
-@Test
-void happyPath_membershipIsConfirmedAndWelcomeMailIsSent() {
-    // Given: the capacity check grants a spot
-    when(claimMembershipUseCase.claimMembership(any())).thenReturn(true);
+- **Timeout with age 40:** the Call Activity runs through without a wait state, then compensation
+  kicks in.
+- **Withdrawal with age 25:** the called process waits at `userTask_writeRegretMail`. The
+  constant comes from the second generated API
+  (`HandleRejectionProcessApi.FlowNodes.UserTaskWriteRegretMail.ELEMENT_ID`). Complete the task
+  and check the same path with `eventConfirmationRejected()`.
 
-    // When: the process is started and driven to its first wait state
-    Membership membership = new Membership(new Email("jane@example.com"), new Name("Jane"), new Age(30));
-    membershipProcess.startProcess(membership);
-    ProcessInstance instance = findProcessInstance(runtimeService, membership.id().value().toString());
-    continueToNextWaitState(processEngine);
-
-    // Then: the instance waits at the user task
-    assertThat(instance).isWaitingAt("<user-task-id>");
-
-    // When: that user task is completed and the process runs on
-    String taskId = taskService.createTaskQuery()
-            .processInstanceId(instance.getProcessInstanceId()).singleResult().getId();
-    taskService.complete(taskId);
-    continueToNextWaitState(processEngine);
-
-    // Then: it ended along the confirm path and never touched the reject path
-    assertThat(instance)
-            .isEnded()
-            .hasPassedInOrder("<start>", "<…confirm-path activities, in order…>", "<confirmed-end>")
-            .hasNotPassed("<reject-activity>", "<rejected-end>");
-
-    // And: the welcome-mail use case was invoked
-    verify(sendWelcomeMailUseCase).sendWelcomeMail(membership.id());
-}
-```
-
-Everything else you need:
-
-- **Assertion vocabulary** (from `BpmnAwareTests`, via the statically imported `assertThat`):
-  `isWaitingAt(id)`, `isEnded()`, `hasPassedInOrder(ids…)`, `hasNotPassed(ids…)` – plus Mockito's
-  `when(...)`/`verify(...)` for the use cases.
-- **Driving and lookup** come from the provided helper: `continueToNextWaitState(processEngine)`
-  and `findProcessInstance(runtimeService, membership.id().value().toString())`.
-- **The element IDs** are deliberately not listed here – read them off `membership.bpmn` in the
-  modeler. The confirm path is start → claim → gateway → confirmation mail → user task → welcome
-  mail → confirmed end; at the gateway the reject path branches to the rejection mail → rejected end.
-
-### 5. Test the rejection path yourself
-
-Now the second test, `noCapacity_membershipIsRejected` – same approach, you write it:
-
-- `claimMembership` returns `false`.
-- The process instance runs without a wait state straight through to the rejected end event.
-- What's checked: the rejection-mail activity was passed, confirmation and
-  welcome mail were **not**, and `sendWelcomeMailUseCase` was never called
-  (`verify(..., never())`).
+The called process is a separate instance with its own jobs. Therefore call
+`continueToNextWaitState` **without** an instance ID, otherwise the job behind
+`userTask_writeRegretMail` stays put. In the happy path and when capacity is missing, you now
+check `hasNotPassed` with `CallActivityHandleRejection` instead of `ServiceTaskRevokeClaim`.
 
 ## Constraints
 
-- The test needs **no** running application. Two knobs make it fast and reproducible:
-  1. **Its own in-memory H2** – the application keeps its state in an H2 file under
-     `~/.operaton-training`. The test uses a separate in-memory database that is freshly
-     created for each test run and gone afterwards: no leftovers from earlier test runs,
-     no dependency on the application's data.
-  2. **Job executor off** – you run the continuations yourself from the test thread. This way
-     you determine how far the instance is when you write your assertion.
-- Only **the use cases** get mocked. Delegates, model, and engine run for real – otherwise
-  you're testing your mocks instead of your process.
-- In this exercise the element IDs are still string literals in the test. Note how many there
-  are – the [add-on](exercise-06-addon.md) clears them away next.
+- Nothing changes in the production Java code. `RevokeClaimDelegate` is bound to the element,
+  not to its position in the flow.
+- Assertions on the main instance see the Call Activity, not its internals.
+- `mapDecisionResult=singleEntry` only works as long as exactly one rule with exactly one
+  output matches.
+- In the high-value branch, the spot is only released after the User Task in the called process
+  has been completed.
 
 ## Expected result
 
-Run just this one test class – from the repository root directory:
+Reject two sign-ups with different ages. `POST /api/memberships` returns the ID as plain
+text:
 
 ```bash
-./mvnw -pl services/process-application test -Dtest=MembershipProcessTest
+MEMBERSHIP_ID=$(curl -s -X POST http://localhost:8080/api/memberships \
+  -H "Content-Type: application/json" \
+  -d '{"email": "grace@miravelo.com", "name": "Grace", "age": 35}')
+
+curl -X POST http://localhost:8080/api/memberships/$MEMBERSHIP_ID/reject
 ```
 
-Both tests pass in a few seconds – the application doesn't need to be running for this. If one
-fails, the assertion shows you at which activity the instance actually stood.
+In the Cockpit, a separate instance of `handleRejection` runs through and ends at *Accept
+rejection*. Then the Compensating End Event fires in the main instance, and the log shows
+`Revoking membership claim for …`.
+
+Repeat this with Hanna (`hanna@miravelo.com`, age `25`). This time *Write an email expressing
+regret* appears in the tasklist. After completing it, `handleRejection` ends at *Tried to
+reaquire applicant*, and the main instance compensates.
 
 ## Self-check
 
-- [ ] `application-test.yaml` exists, the job executor is turned off in the test profile
-- [ ] `ProcessEngineTestUtils` brings the instance up to the next wait state
-- [ ] The happy-path test checks the order **and** the paths not taken
-- [ ] The rejection test checks that the welcome mail was never called
-- [ ] Both tests pass green without the application running
+- [ ] `serviceTask_revokeClaim` carries `isForCompensation="true"` and is no longer part of the sequence flow
+- [ ] `endEvent_membershipDeclined` is a Compensating End Event
+- [ ] `handleRejection` shows up in the Cockpit as its own process definition, the DMN is deployed
+- [ ] The Call Activity passes `membershipId` and `age`
+- [ ] Age 21–29 leads to the User Task, any other age goes straight to the End Event
+- [ ] The process test is green, both DMN branches are covered
+
+## Hints
+
+**Compensation is not a rollback.** A rollback undoes an engine transaction that hasn't been
+committed yet. Compensation undoes already committed work at the business level, in new
+transactions and long after the wait state.
+
+**SAGA pattern:** every step gets a compensation step. If the flow fails, the engine compensates
+the successful steps in reverse order.
 
 ## Reference solution
 
-`../../solutions/exercise-06/`
+`../../solutions/exercise-06/` – or load it directly:
+
+```bash
+./mvnw -pl services/process-application antrun:run@load-solution -Dsolution=06
+```
 
 ## Next step
 
-The element IDs are still hand-typed strings in the test – fragile the moment someone renames
-in the modeler. The add-on turns them into verified constants.
+In Exercise 7 you leave the single module behind: another department gets its own service and
+its own process on the same engine.
 
-➡️ [Next — Add-on: bpmn-to-code](exercise-06-addon.md)
+➡️ [Next: Exercise 7](exercise-07.md)

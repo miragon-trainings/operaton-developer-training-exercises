@@ -13,15 +13,22 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
+      # load-solution resets services/process-application to templates/process-application-starter/,
+      # so the template must stay a byte copy of the module's starter state (src/ + pom.xml).
+      # The task itself is not run in CI; check it locally before changing it, the starter or a solution:
+      #   bash .github/scripts/check-load-solution.sh load NN | sequence A B ...
+      - name: Check starter baseline
+        run: bash .github/scripts/check-load-solution.sh baseline
+
       - name: Set up JDK 21
-        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
 
       - name: Set up Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: '22'
 
@@ -33,11 +40,11 @@ jobs:
       - name: Build
         run: ./mvnw clean verify
 
-      # The Aufgabe-10 worker template lives under templates/ and is not part of the default reactor
-      # (so services/ stays clean for exercises 0–9). Compile it here so the starter never rots. Its pom
+      # The Aufgabe-7 worker template lives under templates/ and is not part of the default reactor
+      # (so services/ stays clean for exercises 0–6). Compile it here so the starter never rots. Its pom
       # targets its final home (services/logistics-service), so we install the root pom first to resolve
       # the parent from the repo while it still sits under templates/.
-      - name: Verify exercise-10 starter template
+      - name: Verify exercise-07 starter template
         run: |
           ./mvnw -N -q install
-          ./mvnw -Pexercise-10 -pl templates/exercise-10/logistics-service clean compile
+          ./mvnw -Pexercise-07 -pl templates/exercise-07/logistics-service clean compile

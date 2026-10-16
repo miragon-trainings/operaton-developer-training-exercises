@@ -1,6 +1,6 @@
 package io.miragon.training.adapter.inbound.operaton;
 
-// TODO Exercise 3: Uncomment this class (remove the /* and */ lines).
+// TODO Exercise 2: Uncomment this class (remove the /* and */ lines).
 //  It needs the Operaton engine that you switch on in Exercise 1.
 /*
 import org.operaton.bpm.engine.delegate.DelegateExecution;
