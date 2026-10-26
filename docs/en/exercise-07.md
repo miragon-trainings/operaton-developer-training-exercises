@@ -162,8 +162,8 @@ Provide the `ProcessDefinitionApi` bean in `EngineClientConfig` and start the pr
 - The host carries no `send-welcome-kit.bpmn`.
 - "Remote" is the client's view. A standalone engine (Operaton Run) would give the same picture.
 - The setup follows the blueprint
-  [`miragon-blueprints/operaton-remote-example`](https://github.com/miragon-blueprints/operaton-remote-example)
-  (Kotlin/Gradle there, Java/Maven here).
+  [`Miragon/process-engine-blueprints` → `examples/operaton-remote`](https://github.com/Miragon/process-engine-blueprints/tree/main/examples/operaton-remote)
+  (available there in Java/Maven and Kotlin/Gradle).
 
 ## Expected result
 
