@@ -3,6 +3,7 @@
 > **Prerequisite:** Exercise 1 is complete – the engine starts and deploys `membership.bpmn`.
 > **Working directory:** `services/process-application`
 > **New in this exercise:** process key, element ID, User Task, wait state, Generated Form on the User Task, Service Task, JavaDelegate, Delegate Expression.
+> **Duration:** 45–60 min
 
 ## What this is about
 
@@ -26,7 +27,11 @@ After this exercise you can
 
 ![BPMN model of the exercise](../assets/exercise-02.svg)
 
-Reference model: `../../models/exercise-02/membership.bpmn`
+You don't build this target model from scratch; you change the existing model from Exercise 1:
+`services/process-application/src/main/resources/bpmn/membership.bpmn`. That is the only file the
+engine deploys at start-up.
+
+Reference model for comparison: `../../models/exercise-02/membership.bpmn`
 
 ## The task
 
@@ -44,10 +49,11 @@ you write the engine binding yourself in step 4.
 
 ### 2. Convert "Confirm" into a User Task
 
-Open `src/main/resources/bpmn/membership.bpmn` in the Miragon BPMN Modeler. You make all changes
-there in the Properties Panel, not in the XML. First take a look at the process properties: the
-**process key** `subscribeNewsletter` is the name under which the engine knows the process (a
-historical name, it stays as it is). `Executable` is enabled, `History Time To Live` is set to `180`.
+Open `services/process-application/src/main/resources/bpmn/membership.bpmn` in the Miragon BPMN
+Modeler. You make all changes in this and the next steps in this file, in the Properties Panel,
+not in the XML. Save the file after each change. First take a look at the process properties: the
+**process key** `membership` is the name under which the engine knows the process.
+`Executable` is enabled, `History Time To Live` is set to `180`.
 
 Change the type of "Confirm" to **User Task** and create a Generated Form under **Forms**:
 
@@ -65,7 +71,7 @@ is stored as a new process variable on completion.
 
 ### 3. Convert "Send welcome mail" into a Service Task
 
-Change the type of "Send welcome mail" to **Service Task** and bind it to the delegate:
+In the same model, change the type of "Send welcome mail" to **Service Task** and bind it to the delegate:
 
 | Element | Type | Element ID | Name | Delegate Expression |
 |---|---|---|---|---|

@@ -1,12 +1,13 @@
-# Exercise 5 – Subprocess, Boundary Events and Parallelism
+# Exercise 5 – Subprocess, boundary events and parallelism
 
 > **Prerequisite:** Exercise 4 including the add-on is complete – the process tests run against the generated Process API.
 > **Working directory:** `services/process-application`
 > **New in this exercise:** embedded subprocess, Timer Boundary Events (interrupting and non-interrupting), Message Boundary Event, Parallel Gateway, an outbound adapter to Microsoft Teams.
+> **Duration:** 45–60 min
 
 ## What this is about
 
-Many applicants never confirm and thereby block spots. Miravelo therefore wants to send a daily
+Many applicants never confirm and thereby block spots. MiraVelo therefore wants to send a daily
 reminder, cancel automatically after three and a half days without confirmation, and allow a
 withdrawal via REST. Whoever makes it to activation gets welcomed in a community **Microsoft Teams
 channel**, in parallel with the welcome mail.
@@ -62,13 +63,15 @@ Add the paths behind the boundary events:
 | Element | Type | Element ID | Name | Configuration |
 |---|---|---|---|---|
 | Reminder mail | Service Task | `serviceTask_reSendConfirmationMail` | Re-Send confirmation mail | `#{reSendConfirmationMailDelegate}` |
+| Cancellation join | Exclusive Gateway | `gateway_declineJoin` | | joins both interrupting paths |
 | Release spot | Service Task | `serviceTask_revokeClaim` | Revoke claim | `#{revokeClaimDelegate}` |
 | End reminder | End Event | `endEvent_mailSentAgain` | Mail sent again | end of the reminder branch |
 | End cancellation | End Event | `endEvent_membershipDeclined` | Membership declined | after `Revoke claim` |
-| End activation | End Event | `endEvent_membershipActivated` | Membership activated | after the join |
+| End activation | End Event | `endEvent_membershipActivated` | Membership activated | after `gateway_notifyJoin` |
 
-Both interrupting boundary events lead to `serviceTask_revokeClaim` and from there to
-`endEvent_membershipDeclined`.
+Both interrupting boundary events lead to `gateway_declineJoin`, from there to
+`serviceTask_revokeClaim` and on to `endEvent_membershipDeclined`. The gateway joins the two paths
+visibly, instead of letting both flows run straight into the task.
 
 ### 4. Add the Parallel Gateway
 
@@ -155,18 +158,23 @@ Add three tests and mock `RevokeClaimUseCase`, `ReSendConfirmationMailUseCase`, 
 `NotifyCommunityUseCase` for them:
 
 - **Timeout:** Fire the timer with `fireTimer(processEngine, FlowNodes.EventAbortAfter3HalfDays.ELEMENT_ID)`
-  from `ProcessEngineTestUtils`, execute the open jobs, and check the path with `hasPassedInOrder`:
+  from `ProcessEngineTestUtils`. The event carries `asyncAfter`, so run that job next with
+  `execute(job(jobQuery().messages().activityId(FlowNodes.EventAbortAfter3HalfDays.ELEMENT_ID), instance))`
+  and check the path with `hasPassedInOrder`:
 
   ```java
   var abortPath = PathWalk.from(FlowNodes.userTaskConfirmMembership())
           .interruptedBy(FlowNodes.subProcessConfirmMembership(), boundary -> boundary.eventAbortAfter3HalfDays())
+          .then(next -> next.gatewayDeclineJoin())
           .then(next -> next.serviceTaskRevokeClaim())
           .end(next -> next.endEventMembershipDeclined());
   ```
 
 - **Withdrawal:** Instead of the timer, call `membershipProcess.rejectMembership(id)`. The path runs
   via `eventConfirmationRejected()`.
-- **Reminder:** Fire `FlowNodes.EventResendEveryDay.ELEMENT_ID` and check that
+- **Reminder:** Fire `FlowNodes.EventResendEveryDay.ELEMENT_ID`, run the event's `asyncAfter` job
+  and then the job of the re-send task, one `execute(job(...))` each. The cycle timer schedules its
+  next run on the same element, so pick the async job with `jobQuery().messages()`. Check that
   `reSendConfirmationMailUseCase` was called and the instance is still waiting at the user task.
 
 ## Constraints
@@ -195,8 +203,8 @@ at `Membership activated`.
 ## Self-check
 
 - [ ] All three boundary events attach to the subprocess, and the interruption semantics are correct
-- [ ] Both interrupting paths lead through `Revoke claim` to `Membership declined`
-- [ ] Fork and join are Parallel Gateways, both branches carry `asyncBefore`
+- [ ] Both interrupting paths meet at the Exclusive Gateway `gateway_declineJoin` and lead through `Revoke claim` to `Membership declined`
+- [ ] `gateway_notifyFork` and `gateway_notifyJoin` are Parallel Gateways, both branches carry `asyncBefore`
 - [ ] `POST /api/memberships/{id}/reject` cancels a waiting instance
 - [ ] The three new process tests are green
 

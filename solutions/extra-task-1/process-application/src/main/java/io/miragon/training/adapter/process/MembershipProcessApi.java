@@ -31,12 +31,12 @@ import io.miragon.bpmn.runtime.VariableDefinitions;
 import io.miragon.bpmn.runtime.VariableName;
 import java.util.List;
 
-public final class SubscribeNewsletterProcessApi {
-  public static final ProcessId PROCESS_ID = new ProcessId("subscribeNewsletter");
+public final class MembershipProcessApi {
+  public static final ProcessId PROCESS_ID = new ProcessId("membership");
 
   public static final BpmnEngine PROCESS_ENGINE = BpmnEngine.CAMUNDA_7;
 
-  private SubscribeNewsletterProcessApi() {
+  private MembershipProcessApi() {
   }
 
   /**
@@ -84,6 +84,10 @@ public final class SubscribeNewsletterProcessApi {
 
     public static EventResendEveryDay eventResendEveryDay() {
       return EventResendEveryDay.INSTANCE;
+    }
+
+    public static GatewayDeclineJoin gatewayDeclineJoin() {
+      return GatewayDeclineJoin.INSTANCE;
     }
 
     public static GatewayHasEmptySpots gatewayHasEmptySpots() {
@@ -154,6 +158,7 @@ public final class SubscribeNewsletterProcessApi {
           EventCompensateClaim.INSTANCE,
           EventConfirmationRejected.INSTANCE,
           EventResendEveryDay.INSTANCE,
+          GatewayDeclineJoin.INSTANCE,
           GatewayHasEmptySpots.INSTANCE,
           GatewayNotifyFork.INSTANCE,
           GatewayNotifyJoin.INSTANCE,
@@ -341,8 +346,8 @@ public final class SubscribeNewsletterProcessApi {
       }
 
       public static final class Next {
-        public SequenceFlows<CallActivityHandleRejection> callActivityHandleRejection() {
-          return SequenceFlows.single(new ElementId("flow_abortAfter3HalfDaysToHandleRejection"), CallActivityHandleRejection.INSTANCE);
+        public SequenceFlows<GatewayDeclineJoin> gatewayDeclineJoin() {
+          return SequenceFlows.single(new ElementId("flow_abortAfter3HalfDaysToDeclineJoin"), GatewayDeclineJoin.INSTANCE);
         }
       }
     }
@@ -418,8 +423,8 @@ public final class SubscribeNewsletterProcessApi {
       }
 
       public static final class Next {
-        public SequenceFlows<CallActivityHandleRejection> callActivityHandleRejection() {
-          return SequenceFlows.single(new ElementId("flow_confirmationRejectedToHandleRejection"), CallActivityHandleRejection.INSTANCE);
+        public SequenceFlows<GatewayDeclineJoin> gatewayDeclineJoin() {
+          return SequenceFlows.single(new ElementId("flow_confirmationRejectedToDeclineJoin"), GatewayDeclineJoin.INSTANCE);
         }
       }
     }
@@ -459,9 +464,29 @@ public final class SubscribeNewsletterProcessApi {
       }
 
       public static final class Next {
-        public SequenceFlows<ServiceTaskReSendConfirmationMail> serviceTaskReSendConfirmationMail(
-            ) {
+        public SequenceFlows<ServiceTaskReSendConfirmationMail> serviceTaskReSendConfirmationMail() {
           return SequenceFlows.single(new ElementId("flow_resendEveryDayToReSendConfirmationMail"), ServiceTaskReSendConfirmationMail.INSTANCE);
+        }
+      }
+    }
+
+    public static final class GatewayDeclineJoin extends AbstractFlowNode implements HasSuccessors<GatewayDeclineJoin.Next> {
+      public static final String ELEMENT_ID = "gateway_declineJoin";
+
+      public static final GatewayDeclineJoin INSTANCE = new GatewayDeclineJoin();
+
+      private GatewayDeclineJoin() {
+        super(new ElementId(ELEMENT_ID), BpmnElementType.EXCLUSIVE_GATEWAY);
+      }
+
+      @Override
+      public Next getNext() {
+        return new Next();
+      }
+
+      public static final class Next {
+        public SequenceFlows<CallActivityHandleRejection> callActivityHandleRejection() {
+          return SequenceFlows.single(new ElementId("flow_declineJoinToHandleRejection"), CallActivityHandleRejection.INSTANCE);
         }
       }
     }
@@ -868,7 +893,7 @@ public final class SubscribeNewsletterProcessApi {
 
       @Override
       public MessageName getMessage() {
-        return Messages.SUBSCRIPTION_REQUESTED;
+        return Messages.MEMBERSHIP_REQUESTED;
       }
 
       @Override

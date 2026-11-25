@@ -2,12 +2,15 @@
 package io.miragon.training.adapter.process;
 
 import io.miragon.bpmn.runtime.AbstractFlowNode;
+import io.miragon.bpmn.runtime.AssociatedCompensationHandler;
 import io.miragon.bpmn.runtime.AttachedBoundaryEvent;
 import io.miragon.bpmn.runtime.BoundaryEvent;
 import io.miragon.bpmn.runtime.BpmnElementType;
 import io.miragon.bpmn.runtime.BpmnEngine;
 import io.miragon.bpmn.runtime.BpmnEventType;
 import io.miragon.bpmn.runtime.BpmnTimer;
+import io.miragon.bpmn.runtime.CallActivity;
+import io.miragon.bpmn.runtime.CompensationThrowEvent;
 import io.miragon.bpmn.runtime.ElementId;
 import io.miragon.bpmn.runtime.Event;
 import io.miragon.bpmn.runtime.FlowNode;
@@ -15,19 +18,23 @@ import io.miragon.bpmn.runtime.FlowScope;
 import io.miragon.bpmn.runtime.HasJobType;
 import io.miragon.bpmn.runtime.HasMessage;
 import io.miragon.bpmn.runtime.HasSuccessors;
+import io.miragon.bpmn.runtime.HasVariables;
+import io.miragon.bpmn.runtime.InputOutputMapping;
 import io.miragon.bpmn.runtime.MessageName;
 import io.miragon.bpmn.runtime.ProcessId;
 import io.miragon.bpmn.runtime.SequenceFlows;
 import io.miragon.bpmn.runtime.TimerEvent;
 import io.miragon.bpmn.runtime.TimerType;
+import io.miragon.bpmn.runtime.VariableDefinitions;
+import io.miragon.bpmn.runtime.VariableName;
 import java.util.List;
 
-public final class SubscribeNewsletterProcessApi {
-  public static final ProcessId PROCESS_ID = new ProcessId("subscribeNewsletter");
+public final class MembershipProcessApi {
+  public static final ProcessId PROCESS_ID = new ProcessId("membership");
 
   public static final BpmnEngine PROCESS_ENGINE = BpmnEngine.CAMUNDA_7;
 
-  private SubscribeNewsletterProcessApi() {
+  private MembershipProcessApi() {
   }
 
   /**
@@ -35,6 +42,10 @@ public final class SubscribeNewsletterProcessApi {
    */
   public static final class FlowNodes {
     private FlowNodes() {
+    }
+
+    public static CallActivityHandleRejection callActivityHandleRejection() {
+      return CallActivityHandleRejection.INSTANCE;
     }
 
     public static EndEventMailSentAgain endEventMailSentAgain() {
@@ -61,12 +72,20 @@ public final class SubscribeNewsletterProcessApi {
       return EventAbortAfter3HalfDays.INSTANCE;
     }
 
+    public static EventCompensateClaim eventCompensateClaim() {
+      return EventCompensateClaim.INSTANCE;
+    }
+
     public static EventConfirmationRejected eventConfirmationRejected() {
       return EventConfirmationRejected.INSTANCE;
     }
 
     public static EventResendEveryDay eventResendEveryDay() {
       return EventResendEveryDay.INSTANCE;
+    }
+
+    public static GatewayDeclineJoin gatewayDeclineJoin() {
+      return GatewayDeclineJoin.INSTANCE;
     }
 
     public static GatewayHasEmptySpots gatewayHasEmptySpots() {
@@ -127,14 +146,17 @@ public final class SubscribeNewsletterProcessApi {
 
     public static List<FlowNode> all() {
       return List.of(
+          CallActivityHandleRejection.INSTANCE,
           EndEventMailSentAgain.INSTANCE,
           EndEventMembershipActivated.INSTANCE,
           EndEventMembershipConfirmed.INSTANCE,
           EndEventMembershipDeclined.INSTANCE,
           EndEventMembershipRejected.INSTANCE,
           EventAbortAfter3HalfDays.INSTANCE,
+          EventCompensateClaim.INSTANCE,
           EventConfirmationRejected.INSTANCE,
           EventResendEveryDay.INSTANCE,
+          GatewayDeclineJoin.INSTANCE,
           GatewayHasEmptySpots.INSTANCE,
           GatewayNotifyFork.INSTANCE,
           GatewayNotifyJoin.INSTANCE,
@@ -149,6 +171,62 @@ public final class SubscribeNewsletterProcessApi {
           StartEventSubmitRegistration.INSTANCE,
           SubProcessConfirmMembership.INSTANCE,
           UserTaskConfirmMembership.INSTANCE);
+    }
+
+    public static final class CallActivityHandleRejection extends AbstractFlowNode implements HasSuccessors<CallActivityHandleRejection.Next>, CallActivity, HasVariables {
+      public static final String ELEMENT_ID = "callActivity_handleRejection";
+
+      public static final CallActivityHandleRejection INSTANCE = new CallActivityHandleRejection();
+
+      private static final Variables VARIABLES = new Variables();
+
+      private CallActivityHandleRejection() {
+        super(new ElementId(ELEMENT_ID), BpmnElementType.CALL_ACTIVITY, "Handle rejection");
+      }
+
+      @Override
+      public ProcessId getCalledProcess() {
+        return new ProcessId("handleRejection");
+      }
+
+      @Override
+      public Variables getVariables() {
+        return VARIABLES;
+      }
+
+      @Override
+      public Next getNext() {
+        return new Next();
+      }
+
+      public static final class Variables extends VariableDefinitions {
+        public static final VariableName.Input AGE = new VariableName.Input(ProcessVariables.AGE);
+
+        public static final VariableName.Input MEMBERSHIP_ID = new VariableName.Input(ProcessVariables.MEMBERSHIP_ID);
+
+        private Variables() {
+        }
+
+        @Override
+        public List<VariableName> getAll() {
+          return List.of(AGE, MEMBERSHIP_ID);
+        }
+      }
+
+      public static final class Inputs {
+        public static final InputOutputMapping AGE = new InputOutputMapping("age", "age", null);
+
+        public static final InputOutputMapping MEMBERSHIP_ID = new InputOutputMapping("membershipId", "membershipId", null);
+
+        private Inputs() {
+        }
+      }
+
+      public static final class Next {
+        public SequenceFlows<EndEventMembershipDeclined> endEventMembershipDeclined() {
+          return SequenceFlows.single(new ElementId("flow_handleRejectionToMembershipDeclined"), EndEventMembershipDeclined.INSTANCE);
+        }
+      }
     }
 
     public static final class EndEventMailSentAgain extends AbstractFlowNode implements Event {
@@ -196,7 +274,7 @@ public final class SubscribeNewsletterProcessApi {
       }
     }
 
-    public static final class EndEventMembershipDeclined extends AbstractFlowNode implements Event {
+    public static final class EndEventMembershipDeclined extends AbstractFlowNode implements Event, CompensationThrowEvent {
       public static final String ELEMENT_ID = "endEvent_membershipDeclined";
 
       public static final EndEventMembershipDeclined INSTANCE = new EndEventMembershipDeclined();
@@ -207,7 +285,7 @@ public final class SubscribeNewsletterProcessApi {
 
       @Override
       public BpmnEventType getEventType() {
-        return BpmnEventType.NONE;
+        return BpmnEventType.COMPENSATION;
       }
     }
 
@@ -261,8 +339,44 @@ public final class SubscribeNewsletterProcessApi {
       }
 
       public static final class Next {
-        public SequenceFlows<ServiceTaskRevokeClaim> serviceTaskRevokeClaim() {
-          return SequenceFlows.single(new ElementId("flow_abortAfter3HalfDaysToRevokeClaim"), ServiceTaskRevokeClaim.INSTANCE);
+        public SequenceFlows<GatewayDeclineJoin> gatewayDeclineJoin() {
+          return SequenceFlows.single(new ElementId("flow_abortAfter3HalfDaysToDeclineJoin"), GatewayDeclineJoin.INSTANCE);
+        }
+      }
+    }
+
+    public static final class EventCompensateClaim extends AbstractFlowNode implements HasSuccessors<EventCompensateClaim.Next>, BoundaryEvent<ServiceTaskClaimMembership> {
+      public static final String ELEMENT_ID = "event_compensateClaim";
+
+      public static final EventCompensateClaim INSTANCE = new EventCompensateClaim();
+
+      private EventCompensateClaim() {
+        super(new ElementId(ELEMENT_ID), BpmnElementType.BOUNDARY_EVENT, "Membership declined");
+      }
+
+      @Override
+      public BpmnEventType getEventType() {
+        return BpmnEventType.COMPENSATION;
+      }
+
+      @Override
+      public ServiceTaskClaimMembership getAttachedTo() {
+        return ServiceTaskClaimMembership.INSTANCE;
+      }
+
+      @Override
+      public boolean isInterrupting() {
+        return true;
+      }
+
+      @Override
+      public Next getNext() {
+        return new Next();
+      }
+
+      public static final class Next {
+        public AssociatedCompensationHandler<ServiceTaskRevokeClaim> serviceTaskRevokeClaim() {
+          return new AssociatedCompensationHandler<>(ServiceTaskRevokeClaim.INSTANCE);
         }
       }
     }
@@ -302,8 +416,8 @@ public final class SubscribeNewsletterProcessApi {
       }
 
       public static final class Next {
-        public SequenceFlows<ServiceTaskRevokeClaim> serviceTaskRevokeClaim() {
-          return SequenceFlows.single(new ElementId("flow_confirmationRejectedToRevokeClaim"), ServiceTaskRevokeClaim.INSTANCE);
+        public SequenceFlows<GatewayDeclineJoin> gatewayDeclineJoin() {
+          return SequenceFlows.single(new ElementId("flow_confirmationRejectedToDeclineJoin"), GatewayDeclineJoin.INSTANCE);
         }
       }
     }
@@ -343,9 +457,29 @@ public final class SubscribeNewsletterProcessApi {
       }
 
       public static final class Next {
-        public SequenceFlows<ServiceTaskReSendConfirmationMail> serviceTaskReSendConfirmationMail(
-            ) {
+        public SequenceFlows<ServiceTaskReSendConfirmationMail> serviceTaskReSendConfirmationMail() {
           return SequenceFlows.single(new ElementId("flow_resendEveryDayToReSendConfirmationMail"), ServiceTaskReSendConfirmationMail.INSTANCE);
+        }
+      }
+    }
+
+    public static final class GatewayDeclineJoin extends AbstractFlowNode implements HasSuccessors<GatewayDeclineJoin.Next> {
+      public static final String ELEMENT_ID = "gateway_declineJoin";
+
+      public static final GatewayDeclineJoin INSTANCE = new GatewayDeclineJoin();
+
+      private GatewayDeclineJoin() {
+        super(new ElementId(ELEMENT_ID), BpmnElementType.EXCLUSIVE_GATEWAY);
+      }
+
+      @Override
+      public Next getNext() {
+        return new Next();
+      }
+
+      public static final class Next {
+        public SequenceFlows<CallActivityHandleRejection> callActivityHandleRejection() {
+          return SequenceFlows.single(new ElementId("flow_declineJoinToHandleRejection"), CallActivityHandleRejection.INSTANCE);
         }
       }
     }
@@ -441,6 +575,10 @@ public final class SubscribeNewsletterProcessApi {
       }
 
       public static final class Next {
+        public AttachedBoundaryEvent<EventCompensateClaim> eventCompensateClaim() {
+          return new AttachedBoundaryEvent<>(EventCompensateClaim.INSTANCE);
+        }
+
         public SequenceFlows<GatewayHasEmptySpots> gatewayHasEmptySpots() {
           return SequenceFlows.single(new ElementId("flow_claimMembershipToHasEmptySpots"), GatewayHasEmptySpots.INSTANCE);
         }
@@ -499,7 +637,7 @@ public final class SubscribeNewsletterProcessApi {
       }
     }
 
-    public static final class ServiceTaskRevokeClaim extends AbstractFlowNode implements HasSuccessors<ServiceTaskRevokeClaim.Next>, HasJobType {
+    public static final class ServiceTaskRevokeClaim extends AbstractFlowNode implements HasJobType {
       public static final String ELEMENT_ID = "serviceTask_revokeClaim";
 
       public static final ServiceTaskRevokeClaim INSTANCE = new ServiceTaskRevokeClaim();
@@ -511,17 +649,6 @@ public final class SubscribeNewsletterProcessApi {
       @Override
       public String getJobType() {
         return ServiceTasks.REVOKE_CLAIM_DELEGATE;
-      }
-
-      @Override
-      public Next getNext() {
-        return new Next();
-      }
-
-      public static final class Next {
-        public SequenceFlows<EndEventMembershipDeclined> endEventMembershipDeclined() {
-          return SequenceFlows.single(new ElementId("flow_revokeClaimToMembershipDeclined"), EndEventMembershipDeclined.INSTANCE);
-        }
       }
     }
 
@@ -645,7 +772,7 @@ public final class SubscribeNewsletterProcessApi {
 
       @Override
       public MessageName getMessage() {
-        return Messages.SUBSCRIPTION_REQUESTED;
+        return Messages.MEMBERSHIP_REQUESTED;
       }
 
       @Override

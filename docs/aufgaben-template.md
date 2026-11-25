@@ -14,7 +14,7 @@ die übrigen entfallen, wenn sie nichts beitragen.
 | # | Abschnitt | Inhalt |
 |---|---|---|
 | 1 | **`# Aufgabe N – Titel`** | Kurz, aktiv, ohne Doppelpunkt-Kaskaden |
-| 2 | **Info-Kasten** (Blockquote direkt unter dem Titel) | `Voraussetzung` · `Arbeitsverzeichnis` · `Neu in dieser Aufgabe` |
+| 2 | **Info-Kasten** (Blockquote direkt unter dem Titel) | `Voraussetzung` · `Arbeitsverzeichnis` · `Neu in dieser Aufgabe` · `Dauer` |
 | 3 | **`## Darum geht es`** | Ausgangssituation: fachlicher Anlass in 2–4 Sätzen, höchstens ein Zitat |
 | 4 | **`## Lernziele`** | „Nach dieser Aufgabe kannst du …" – 3–4 Bullets, jeder mit einem Verb |
 | 5 | **`## Ziel-Modell`** | Grafik (`../assets/exercise-NN.svg`) und Referenzpfad, ohne die Story zu wiederholen; bei reinen Code-Aufgaben ein Satz, dass kein Modell dazukommt |
@@ -39,6 +39,7 @@ beobachtbare Verhalten, Letzteres ist die abhakbare Abnahme.
 > **Voraussetzung:** Aufgabe 2 ist abgeschlossen.
 > **Arbeitsverzeichnis:** `services/process-application`
 > **Neu in dieser Aufgabe:** Message Start Event, Business Key, Exclusive Gateway
+> **Dauer:** 60–90 Min.
 ```
 
 ### Referenzlösung – Format
@@ -160,7 +161,7 @@ das Bild – nie das Bild allein.
 
 Weitere Festlegungen:
 
-- **Prozess-Key** (nicht „Prozess-ID"), wenn die Engine gemeint ist (`subscribeNewsletter`).
+- **Prozess-Key** (nicht „Prozess-ID"), wenn die Engine gemeint ist (`membership`).
 - **Element-ID**, wenn eine BPMN-ID gemeint ist (`serviceTask_sendWelcomeMail`).
 - **Delegate** (männlich, „der Delegate"), **das Modell**, **die Instanz**.
 - Erste Nennung eines Begriffs, der nicht vorausgesetzt werden kann, bekommt einen
@@ -206,11 +207,9 @@ Weitere Festlegungen:
 
 ## 3. Konsistenz über das Training hinweg
 
-- **Domäne:** durchgehend *Membership* / Miravelo Inner Circle – ab Aufgabe 0. Der
-  Prozess-Key bleibt aus historischen Gründen `subscribeNewsletter`, die BPMN-Datei heißt
-  `membership.bpmn`, der Start-Message-Name `Message_SubscriptionRequested`. Diese
-  technischen Altnamen werden bei ihrer Einführung einmal erwähnt (Prozess-Key in Aufgabe 2,
-  Message-Name in Aufgabe 3) und danach nicht mehr kommentiert.
+- **Domäne:** durchgehend *Membership* (die MiraVelo Inner Circle Membership) – ab Aufgabe 0.
+  Der Prozess-Key ist `membership`, die BPMN-Datei heißt `membership.bpmn`, der
+  Start-Message-Name `Message_MembershipRequested`.
 - **Personen in Beispielen:** alphabetisch fortlaufend (Alice, Bob, Carol, Dave, Eve,
   Grace, Hanna, Jane) – jede Aufgabe nimmt die nächsten Namen.
 - **Element-ID-Konvention:** `startEvent_`, `endEvent_`, `userTask_`, `serviceTask_`,
@@ -252,7 +251,7 @@ Weitere Festlegungen:
 
   Gehört ein Block zu einem Add-on, bekommt die Kennung ein Suffix (`@exercise-4-addon`). Dieselbe
   Kennung darf mehrfach vorkommen, etwa für Dependency und Plugin. Bisher gibt es `@exercise-1`
-  (Operaton-Starter), `@exercise-4` (`operaton-bpm-assert`) und `@exercise-4-addon`
+  (Operaton-Starter), `@exercise-4` (`operaton-bpm-assert`, Process Test Coverage, `kotlin-reflect`) und `@exercise-4-addon`
   (`bpmn-to-code-runtime`, Plugin `bpmn-to-code-maven`).
 - **Starter-Kopie.** `templates/process-application-starter/` ist eine Byte-Kopie von `src/` und
   `pom.xml` des Arbeitsmoduls im Auslieferungszustand; auf sie setzt `load-solution` zurück. Wer das
@@ -289,7 +288,7 @@ in Aufgabe 0 bewusst **nicht** vor – sie werden erst in Aufgabe 5 bzw. 6 einge
 | 1 | Engine, Deployment, Cockpit, Tasklist, Prozessdefinition, **Prozessinstanz**, Prozessvariable, **Start-Formular** (Generated Form am Start Event, vorhanden), **Manual Task** (Durchlauf ohne Code), **Embedded-Datenbank** (H2 als Datei), H2-Konsole, `act_*`-Tabellen (`re` / `ru` / `hi`), **EnterpriseGlue The Bridge** (optionale zusätzliche UI per Docker, spricht `engine-rest`) |
 | 2 | Prozess-Key, Element-ID, `isExecutable`, `historyTimeToLive`, **User Task**, **Wait State**, **Generated Form selbst erstellen** (am User Task), Manual Task → **Service Task**, **JavaDelegate**, **Delegate Expression**, hexagonale Architektur (Delegate → Use Case → Service), Prozessvariable im Delegate lesen |
 | 3 | Message Start Event, Nachricht, **Korrelation** (`createMessageCorrelation` / `correlateStartMessage`), **`RuntimeService`** (Prozessstart aus Java), **Business Key**, **REST-Endpunkt**, **Persistenz** (Repository), Task-Completion per REST (`TaskService`, Confirm-Endpunkt), `membershipId` als Prozessreferenz, Exclusive Gateway (Default-Flow, Flow-Bedingung) |
-| 4 | **Transaktionsgrenze**, **asynchrone Continuation** (`asyncBefore` / `asyncAfter`), Commit und Rollback, **Token**, Idempotenz, Prozess-Test, In-Memory-Engine (H2), **Job Executor**, Mock (`@MockitoBean`), Assertion (`BpmnAwareTests`) |
+| 4 | **Transaktionsgrenze**, **asynchrone Continuation** (`asyncBefore` / `asyncAfter`), Commit und Rollback, **Token**, Idempotenz, Prozess-Test, In-Memory-Engine (H2), **Job Executor**, Mock (`@MockitoBean`), Assertion (`BpmnAwareTests`), Process Test Coverage |
 | 4 · Add-on | generierte Process-API, `bpmn-to-code` |
 | 5 | eingebetteter Subprozess, Boundary Event (unterbrechend / nicht unterbrechend), Timer als Duration und als Cycle, Message Boundary Event, Parallel Gateway (Fork / Join) |
 | 6 | Kompensation, Compensation Boundary Event, Kompensations-Handler (`isForCompensation`), Association, Compensating End Event, SAGA-Muster, Call Activity, Called Element, In-/Out-Mapping, DMN, Entscheidungstabelle, Business Rule Task, `mapDecisionResult` |
@@ -309,7 +308,7 @@ Zwei Regeln dazu:
 ## 5. Checkliste vor dem Commit einer Aufgabe
 
 - [ ] Alle Pflichtabschnitte vorhanden und in der Reihenfolge aus Abschnitt 1
-- [ ] Info-Kasten mit Voraussetzung, Arbeitsverzeichnis, Neuerungen
+- [ ] Info-Kasten mit Voraussetzung, Arbeitsverzeichnis, Neuerungen, Dauer
 - [ ] Jeder Arbeitsschritt beginnt mit einem Imperativ
 - [ ] Kein Abschnitt und kein Schritt startet direkt mit einem Codeblock, einer Tabelle oder
       einem Diagramm – überall steht mindestens ein erklärender Satz davor

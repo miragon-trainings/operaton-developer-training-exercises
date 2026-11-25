@@ -3,6 +3,7 @@
 > **Prerequisite:** Exercise 5 is complete – subprocess, boundary events and parallel branches are running.
 > **Working directory:** `services/process-application`
 > **New in this exercise:** compensation (Compensation Boundary Event, compensation handler, Compensating End Event), Call Activity with in-mapping, DMN decision table, Business Rule Task.
+> **Duration:** 60–90 min
 
 ## What this is about
 
@@ -10,7 +11,7 @@ In Exercise 5, `revokeClaim` sits in the sequence flow of every abort path. With
 path you would have to wire it in again. **BPMN compensation** instead declares once which
 activity undoes which other one, and the engine invokes the handler on abort by itself.
 
-On top of that, Miravelo doesn't want to let rejected applicants between 21 and 29 go without a
+On top of that, MiraVelo doesn't want to let rejected applicants between 21 and 29 go without a
 fight. The rejection handling therefore moves into its **own process**, invoked via a **Call
 Activity**. Who belongs to the target group is decided by a **DMN decision table** that the
 business side can maintain itself later.
@@ -93,15 +94,15 @@ The yes-path gets the condition `${isHighValue}`.
 
 ### 5. Use the Call Activity
 
-In the main process, place a Call Activity between the two abort boundary events and the
-Compensating End Event:
+In the main process, place a Call Activity between `gateway_declineJoin` and the Compensating End
+Event:
 
 | Element | Type | ID | Name | Configuration |
 |---|---|---|---|---|
 | Rejection handling | Call Activity | `callActivity_handleRejection` | Handle rejection | Called Element: `handleRejection` |
 
-Incoming flows come from `event_abortAfter3HalfDays` and `event_confirmationRejected`, the
-outgoing flow goes to `endEvent_membershipDeclined`. Under **In Mapping**, add one pair each for
+The incoming flow comes from `gateway_declineJoin`, which still joins `event_abortAfter3HalfDays`
+and `event_confirmationRejected`. The outgoing flow goes to `endEvent_membershipDeclined`. Under **In Mapping**, add one pair each for
 `membershipId` and `age`. Without `age` the decision table has no input. In the XML this produces:
 
 ```xml
@@ -120,6 +121,7 @@ Call Activity and ends at the Compensating End Event, which triggers the handler
 ```java
 var abortPath = PathWalk.from(FlowNodes.userTaskConfirmMembership())
         .interruptedBy(FlowNodes.subProcessConfirmMembership(), boundary -> boundary.eventAbortAfter3HalfDays())
+        .then(next -> next.gatewayDeclineJoin())
         .then(next -> next.callActivityHandleRejection())
         .end(next -> next.endEventMembershipDeclined())
         .throwingCompensation(FlowNodes.eventCompensateClaim(), boundary -> boundary.serviceTaskRevokeClaim());
@@ -136,9 +138,10 @@ Then cover both DMN branches:
   (`HandleRejectionProcessApi.FlowNodes.UserTaskWriteRegretMail.ELEMENT_ID`). Complete the task
   and check the same path with `eventConfirmationRejected()`.
 
-The called process is a separate instance with its own jobs. Therefore call
-`continueToNextWaitState` **without** an instance ID, otherwise the job behind
-`userTask_writeRegretMail` stays put. In the happy path and when capacity is missing, you now
+The called process is a separate instance with its own jobs. Run the job behind
+`userTask_writeRegretMail` on that instance:
+`execute(job(HandleRejectionProcessApi.FlowNodes.UserTaskWriteRegretMail.ELEMENT_ID, calledProcessInstance(instance)))`.
+In the happy path and when capacity is missing, you now
 check `hasNotPassed` with `CallActivityHandleRejection` instead of `ServiceTaskRevokeClaim`.
 
 ## Constraints

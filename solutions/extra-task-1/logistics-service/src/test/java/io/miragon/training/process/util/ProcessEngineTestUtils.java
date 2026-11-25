@@ -1,9 +1,7 @@
 package io.miragon.training.process.util;
 
-import org.operaton.bpm.engine.ManagementService;
 import org.operaton.bpm.engine.ProcessEngine;
 import org.operaton.bpm.engine.externaltask.LockedExternalTask;
-import org.operaton.bpm.engine.runtime.Job;
 import org.operaton.bpm.engine.runtime.ProcessInstance;
 
 import java.util.List;
@@ -48,24 +46,6 @@ public final class ProcessEngineTestUtils {
             throw new IllegalStateException("No external task found for topic '" + topic + "'");
         }
         engine.getExternalTaskService().complete(tasks.get(0).getId(), TEST_WORKER);
-    }
-
-    /**
-     * Executes the pending async-continuation ("message") jobs one after another until the process reaches
-     * its next wait state. Needed because the signal start event is {@code operaton:asyncBefore}: the instance
-     * is created and committed at once, and the token only moves to the external task when this async job
-     * runs. The job executor stays off in the test, so we drive that continuation from the test thread.
-     */
-    public static void continueToNextWaitState(ProcessEngine engine) {
-        ManagementService managementService = engine.getManagementService();
-        for (int i = 0; i < 50; i++) {
-            Job job = managementService.createJobQuery().active().messages()
-                    .listPage(0, 1).stream().findFirst().orElse(null);
-            if (job == null) {
-                return;
-            }
-            managementService.executeJob(job.getId());
-        }
     }
 
     /** Finds the single running instance of the given process definition. */
