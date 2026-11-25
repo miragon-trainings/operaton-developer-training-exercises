@@ -37,6 +37,7 @@
         <archunit.version>1.5.1</archunit.version>
         <bpmn-to-code.version>6.2.0</bpmn-to-code.version>
         <openapi-generator.version>7.24.0</openapi-generator.version>
+        <process-test-coverage.version>1.0.0</process-test-coverage.version>
     </properties>
 
     <!--
@@ -73,6 +74,14 @@
                 <groupId>org.operaton.bpm</groupId>
                 <artifactId>operaton-bpm-assert</artifactId>
                 <version>${operaton.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- Process tests: coverage report per test class (Operaton community extension
+                 Process Test Coverage). kotlin-reflect, which it needs, comes from the Spring Boot BOM -->
+            <dependency>
+                <groupId>io.github.ronalders</groupId>
+                <artifactId>operaton-process-test-coverage-spring-test</artifactId>
+                <version>${process-test-coverage.version}</version>
                 <scope>test</scope>
             </dependency>
             <!-- Engine core — a worker without an engine starter (Aufgabe 7) brings it explicitly

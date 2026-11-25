@@ -67,6 +67,18 @@
             <artifactId>operaton-bpm-assert</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Coverage report per test class: target/process-test-coverage/ -->
+        <dependency>
+            <groupId>io.github.ronalders</groupId>
+            <artifactId>operaton-process-test-coverage-spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Needed by Process Test Coverage, but not declared by it -->
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+            <scope>test</scope>
+        </dependency>
         <!-- Runtime types referenced by the bpmn-to-code generated process API -->
         <dependency>
             <groupId>io.miragon</groupId>
