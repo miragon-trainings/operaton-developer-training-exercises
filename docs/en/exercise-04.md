@@ -202,6 +202,10 @@ Run the test (command under *Expected result*) and open
 Green elements were reached by a test, white ones never. The rejection path is still white: 13 of
 17 elements (sequence flows count too), about 76 %.
 
+The given class `process/util/CompensationCoverageWorkaround` works around a bug in the extension that
+fails every test with compensation (from Exercise 6) with a `NullPointerException`. Leave it as it is;
+the report then shows everything except compensation boundary events.
+
 ### 6. Test the rejection path
 
 Write the second test, `noCapacity_membershipIsRejected`: `claimMembership` returns `false`, the

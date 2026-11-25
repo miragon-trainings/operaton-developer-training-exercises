@@ -202,6 +202,10 @@ Führe den Test aus (Befehl unter *Erwartetes Ergebnis*) und öffne
 Grüne Elemente hat ein Test erreicht, weiße nie. Der Ablehnungspfad ist noch weiß: 13 von
 17 Elementen (Sequenzflüsse zählen mit), etwa 76 %.
 
+Die vorgegebene Klasse `process/util/CompensationCoverageWorkaround` umgeht einen Fehler der Extension,
+der jeden Test mit Kompensation (ab Aufgabe 6) mit einer `NullPointerException` scheitern lässt. Lass sie,
+wie sie ist; der Report zeigt dann alles außer Compensation Boundary Events.
+
 ### 6. Ablehnungspfad testen
 
 Schreibe den zweiten Test `noCapacity_membershipIsRejected`: `claimMembership` liefert `false`, die

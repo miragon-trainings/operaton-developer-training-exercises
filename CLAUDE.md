@@ -144,7 +144,14 @@ Multi-module Maven project:
     `load-solution` won't bring it. Format: a `TODO Exercise N` comment for participants, then
     `<!-- @exercise-N[-suffix]:begin – … -->`, `<!--` on its own line, the XML, `-->` on its own line,
     `<!-- @exercise-N[-suffix]:end -->`. Existing: `@exercise-1` (Operaton starters), `@exercise-4`
-    (`operaton-bpm-assert`), `@exercise-4-addon` ×2 (`bpmn-to-code-runtime`, `bpmn-to-code-maven` plugin).
+    (`operaton-bpm-assert`, Process Test Coverage `io.github.ronalders:operaton-process-test-coverage-spring-test`,
+    `kotlin-reflect`), `@exercise-4-addon` ×2 (`bpmn-to-code-runtime`, `bpmn-to-code-maven` plugin).
+
+- Process Test Coverage (Exercise 4+, activated by `src/test/resources/META-INF/spring/…AutoConfiguration.imports`):
+  the Operaton port 1.0.0 registers a compensation event handler with a non-null payload parameter, so every
+  process test that throws compensation fails with a `NullPointerException`. The provided test class
+  `process/util/CompensationCoverageWorkaround` (starter, solutions 06/07) removes that handler again; the report
+  misses only compensation boundary events. Drop it once a fixed extension version is out.
 
 ## Domain
 
