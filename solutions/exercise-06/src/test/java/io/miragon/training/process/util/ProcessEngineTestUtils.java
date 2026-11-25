@@ -1,6 +1,6 @@
 package io.miragon.training.process.util;
 
-import io.miragon.training.adapter.process.SubscribeNewsletterProcessApi;
+import io.miragon.training.adapter.process.MembershipProcessApi;
 import org.operaton.bpm.engine.ManagementService;
 import org.operaton.bpm.engine.ProcessEngine;
 import org.operaton.bpm.engine.RuntimeService;
@@ -17,7 +17,7 @@ import org.operaton.bpm.engine.runtime.ProcessInstance;
  */
 public final class ProcessEngineTestUtils {
 
-    private static final String PROCESS_DEFINITION_KEY = SubscribeNewsletterProcessApi.PROCESS_ID.getValue();
+    private static final String PROCESS_DEFINITION_KEY = MembershipProcessApi.PROCESS_ID.getValue();
 
     private ProcessEngineTestUtils() {
     }
